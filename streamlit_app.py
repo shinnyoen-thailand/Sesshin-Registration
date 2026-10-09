@@ -7,32 +7,41 @@ import streamlit as st
 GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
 
 # =========================================================
-# 全画面共通のベース設定
+# 全画面共通：絶対に長細くさせない「超巨大化」ベース設定
 # =========================================================
 st.markdown(
     """
     <style>
     /* 画面の左右の余白を極限まで減らして、iPadの画面をフルに使う */
     .block-container {
-        max-width: 95% !important;
-        padding-top: 2rem !important;
-        padding-bottom: 2rem !important;
+        max-width: 98% !important;
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
     }
 
-    /* ボタン全体のデザイン（枠線、角丸、背景色） */
-    div[data-testid="stButton"] > button {
+    /* ▼▼ 全てのボタンに「最低でもこの高さにする」という絶対命令を下す ▼▼ */
+    .stButton > button {
         width: 100% !important;
-        border-radius: 15px !important;
+        min-height: 160px !important; /* 絶対に長細くならないようにするロック */
+        border-radius: 20px !important;
         border: 4px solid #1e293b !important;
         background-color: #ffffff !important;
-        color: #0f172a !important;
-        box-shadow: 0px 5px 10px rgba(0,0,0,0.1) !important;
+        box-shadow: 0px 8px 16px rgba(0,0,0,0.15) !important;
         transition: all 0.2s !important;
     }
     
-    /* 押したとき・触れたときの色 */
-    div[data-testid="stButton"] > button:hover {
-        background-color: #f1f5f9 !important;
+    /* ボタンの中の文字を極太・特大にする */
+    .stButton > button p {
+        font-size: 50px !important;
+        font-weight: 900 !important;
+        color: #0f172a !important;
+        margin: 0 !important;
+    }
+
+    .stButton > button:hover {
+        background-color: #f8fafc !important;
         border-color: #000000 !important;
     }
     </style>
@@ -48,39 +57,35 @@ if "selected_category" not in st.session_state:
 
 
 # =========================================================
-# 画面1：受付種類の選択
+# 画面1：受付種類の選択（左を特大ブロックに、右を4つの大ブロックに）
 # =========================================================
 if st.session_state.step == "select_category":
   st.markdown(
       """
       <style>
-      /* 【超重要】左側の列（向上・向上相談）のサイズ設定 */
-      /* stColumn ではなく column が正解でした！ */
-      div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] button {
-          height: 280px !important;
+      /* 左側の列（向上・向上相談）の高さをさらに巨大化！ */
+      div[data-testid="column"]:first-child .stButton > button,
+      div[data-testid="stColumn"]:first-child .stButton > button {
+          min-height: 350px !important;
           margin-bottom: 20px !important;
       }
-      div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] p {
-          font-size: 55px !important;
-          font-weight: bold !important;
+      div[data-testid="column"]:first-child .stButton > button p,
+      div[data-testid="stColumn"]:first-child .stButton > button p {
+          font-size: 70px !important; /* 文字もさらに大きく */
       }
 
-      /* 【超重要】右側の列（初信、相談、特別相談、鑑定）のサイズ設定 */
-      div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] button {
-          height: 125px !important;
+      /* 右側の列（初信・相談・特別相談・鑑定）の高さ */
+      div[data-testid="column"]:last-child .stButton > button,
+      div[data-testid="stColumn"]:last-child .stButton > button {
+          min-height: 160px !important;
           margin-bottom: 10px !important;
-      }
-      div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] p {
-          font-size: 40px !important;
-          font-weight: bold !important;
       }
       </style>
       """,
       unsafe_allow_html=True,
   )
 
-  st.markdown("<h1 style='text-align: center; font-size: 45px;'>受付システム - 種類を選択</h1>", unsafe_allow_html=True)
-  st.write("")
+  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 30px;'>受付システム - 種類を選択</h1>", unsafe_allow_html=True)
 
   # 左右の幅を 1:1 にして綺麗に並べる
   col_left, col_right = st.columns(2, gap="large")
@@ -125,37 +130,37 @@ elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      /* 戻るボタンや完了ボタンのサイズ */
-      div[data-testid="stButton"] button { height: 110px !important; }
-      div[data-testid="stButton"] p { font-size: 38px !important; font-weight: bold !important; }
+      /* 戻るボタンや完了ボタンのサイズを調整（それでも巨大） */
+      .stButton > button { min-height: 130px !important; }
+      .stButton > button p { font-size: 45px !important; }
       
-      h3 { font-size: 36px !important; color: #1e293b !important; margin-bottom: 10px !important; }
+      h3 { font-size: 40px !important; color: #1e293b !important; margin-bottom: 15px !important; }
 
       /* ▼▼ 言語などのプルダウン（選択ボックス）を巨大化 ▼▼ */
       div[data-baseweb="select"] > div {
-          min-height: 70px !important;
-          font-size: 28px !important;
-          border-radius: 10px !important;
+          min-height: 80px !important;
+          font-size: 32px !important;
+          border-radius: 12px !important;
       }
-      /* プルダウンを開いたときの選択肢の文字も巨大化 */
       ul[role="listbox"] li {
-          font-size: 28px !important;
-          padding-top: 15px !important;
-          padding-bottom: 15px !important;
+          font-size: 32px !important;
+          padding-top: 20px !important;
+          padding-bottom: 20px !important;
       }
 
-      /* ▼▼ チェックボックスとラジオボタンの枠を巨大化 ▼▼ */
+      /* ▼▼ チェックボックスとラジオボタンを約2倍に巨大化 ▼▼ */
       [data-testid="stCheckbox"] {
-          transform: scale(1.8);  /* 1.8倍に拡大！ */
+          transform: scale(2.0);
           transform-origin: left center;
-          margin-top: 10px;
-          margin-bottom: 25px;
-          margin-left: 10px;
+          margin-top: 15px;
+          margin-bottom: 35px;
+          margin-left: 15px;
       }
       [data-testid="stRadio"] {
-          transform: scale(1.8);  /* 1.8倍に拡大！ */
+          transform: scale(2.0);
           transform-origin: left center;
-          margin-left: 10px;
+          margin-left: 15px;
+          margin-top: 10px;
       }
       </style>
       """,
@@ -163,7 +168,7 @@ elif st.session_state.step == "input_details":
   )
 
   category = st.session_state.selected_category
-  st.markdown(f"<h1>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
+  st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
   if st.button("← 最初の画面に戻る"):
     st.session_state.step = "select_category"
@@ -176,7 +181,7 @@ elif st.session_state.step == "input_details":
       "お名前",
       label_visibility="collapsed",
       placeholder="ここに名前を記入してください",
-      height=150,
+      height=180,
   )
   
   st.write("---")
@@ -190,13 +195,13 @@ elif st.session_state.step == "input_details":
     kai_suu = "-"
     if category == "初信":
       st.write("")
+      st.write("")
       st.markdown("### 回数")
       kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
 
   with col2:
-    # 「オプション」の文字を消しつつ、隣の「言語」と高さを揃えるための透明なスペース
-    st.markdown("<div style='height: 52px;'></div>", unsafe_allow_html=True)
-    
+    # 隣と高さを揃えるための透明スペース
+    st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     is_kanki = st.checkbox("歓喜以上")
     st.write("")
     is_priority = st.checkbox("優先")
@@ -248,11 +253,11 @@ elif st.session_state.step == "completed":
   st.markdown(
       """
       <style>
-      div[data-testid="stButton"] button { height: 120px !important; }
-      div[data-testid="stButton"] p { font-size: 40px !important; font-weight: bold !important; }
-      h1 { font-size: 50px !important; text-align: center; }
-      h2 { font-size: 100px !important; text-align: center; color: #1e293b; margin-top: 20px;}
-      h3 { font-size: 45px !important; text-align: center; }
+      .stButton > button { min-height: 150px !important; }
+      .stButton > button p { font-size: 50px !important; font-weight: bold !important; }
+      h1 { font-size: 60px !important; text-align: center; }
+      h2 { font-size: 120px !important; text-align: center; color: #1e293b; margin-top: 30px; margin-bottom: 30px;}
+      h3 { font-size: 50px !important; text-align: center; }
       </style>
       """,
       unsafe_allow_html=True,
