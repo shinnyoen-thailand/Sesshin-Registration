@@ -7,7 +7,7 @@ import streamlit as st
 GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
 
 # =========================================================
-# 全画面共通：絶対に長細くさせない「超巨大化」ベース設定
+# 全画面共通：ベース設定
 # =========================================================
 st.markdown(
     """
@@ -21,10 +21,10 @@ st.markdown(
         padding-right: 1.5rem !important;
     }
 
-    /* ▼▼ 全てのボタンに「最低でもこの高さにする」という絶対命令を下す ▼▼ */
+    /* 全てのボタンに「最低でもこの高さにする」という絶対命令 */
     .stButton > button {
         width: 100% !important;
-        min-height: 160px !important; /* 絶対に長細くならないようにするロック */
+        min-height: 160px !important;
         border-radius: 20px !important;
         border: 4px solid #1e293b !important;
         background-color: #ffffff !important;
@@ -32,7 +32,6 @@ st.markdown(
         transition: all 0.2s !important;
     }
     
-    /* ボタンの中の文字を極太・特大にする */
     .stButton > button p {
         font-size: 50px !important;
         font-weight: 900 !important;
@@ -54,16 +53,21 @@ if "step" not in st.session_state:
   st.session_state.step = "select_category"
 if "selected_category" not in st.session_state:
   st.session_state.selected_category = ""
+# 二重押し防止用のフラグ
+if "is_submitting" not in st.session_state:
+  st.session_state.is_submitting = False
 
 
 # =========================================================
-# 画面1：受付種類の選択（左を特大ブロックに、右を4つの大ブロックに）
+# 画面1：受付種類の選択
 # =========================================================
 if st.session_state.step == "select_category":
+  # 画面が切り替わったら送信フラグをリセット
+  st.session_state.is_submitting = False
+
   st.markdown(
       """
       <style>
-      /* 左側の列（向上・向上相談）の高さをさらに巨大化！ */
       div[data-testid="column"]:first-child .stButton > button,
       div[data-testid="stColumn"]:first-child .stButton > button {
           min-height: 350px !important;
@@ -71,10 +75,9 @@ if st.session_state.step == "select_category":
       }
       div[data-testid="column"]:first-child .stButton > button p,
       div[data-testid="stColumn"]:first-child .stButton > button p {
-          font-size: 70px !important; /* 文字もさらに大きく */
+          font-size: 70px !important;
       }
 
-      /* 右側の列（初信・相談・特別相談・鑑定）の高さ */
       div[data-testid="column"]:last-child .stButton > button,
       div[data-testid="stColumn"]:last-child .stButton > button {
           min-height: 160px !important;
@@ -87,7 +90,6 @@ if st.session_state.step == "select_category":
 
   st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 30px;'>受付システム - 種類を選択</h1>", unsafe_allow_html=True)
 
-  # 左右の幅を 1:1 にして綺麗に並べる
   col_left, col_right = st.columns(2, gap="large")
 
   with col_left:
@@ -130,7 +132,6 @@ elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      /* ▼▼ 「最初の画面に戻る」ボタンだけを20%小さくする ▼▼ */
       button[kind="secondary"] { 
           min-height: 100px !important; 
       }
@@ -138,7 +139,6 @@ elif st.session_state.step == "input_details":
           font-size: 35px !important; 
       }
 
-      /* ▼▼ 「受付を完了する」ボタンは巨大なまま ▼▼ */
       button[kind="primary"] { 
           min-height: 140px !important; 
       }
@@ -148,25 +148,20 @@ elif st.session_state.step == "input_details":
       
       h3 { font-size: 40px !important; color: #1e293b !important; margin-bottom: 15px !important; }
 
-      /* ▼▼ 言語や回数のプルダウンをさらに超巨大化 ▼▼ */
       div[data-baseweb="select"] > div {
-          min-height: 100px !important;  /* 枠の高さをさらにアップ */
-          font-size: 40px !important;    /* 選択されている文字サイズをアップ */
+          min-height: 100px !important;
+          font-size: 40px !important;
           border-radius: 12px !important;
       }
-      /* プルダウン内に表示される文字サイズもアップ */
       div[data-baseweb="select"] span {
           font-size: 40px !important;
       }
-      
-      /* タップして開いたときのメニュー項目のサイズ */
       ul[role="listbox"] li {
           font-size: 40px !important;
           padding-top: 25px !important;
           padding-bottom: 25px !important;
       }
 
-      /* ▼▼ チェックボックスとラジオボタンを約2倍に巨大化 ▼▼ */
       [data-testid="stCheckbox"] {
           transform: scale(2.0);
           transform-origin: left center;
@@ -188,7 +183,6 @@ elif st.session_state.step == "input_details":
   category = st.session_state.selected_category
   st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
-  # ここが kind="secondary" になるので20%小さくなります
   if st.button("← 最初の画面に戻る"):
     st.session_state.step = "select_category"
     st.rerun()
@@ -219,7 +213,6 @@ elif st.session_state.step == "input_details":
       kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
 
   with col2:
-    # 隣と高さを揃えるための透明スペース
     st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     is_kanki = st.checkbox("歓喜以上")
     st.write("")
@@ -232,11 +225,14 @@ elif st.session_state.step == "input_details":
   st.write("---")
   st.write("")
 
-  # type="primary" なのでこちらは大きなままになります
-  if st.button("受付を完了する", type="primary"):
+  # ▼▼ disabled=st.session_state.is_submitting を追加して二重押しを完全にガード ▼▼
+  if st.button("受付を完了する", type="primary", disabled=st.session_state.is_submitting):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
     else:
+      # ボタンが押された瞬間にフラグを True にして連打をロック
+      st.session_state.is_submitting = True
+
       now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
       post_data = {
@@ -262,8 +258,12 @@ elif st.session_state.step == "input_details":
           st.rerun()
         else:
           st.error("データの送信に失敗しました。")
+          st.session_state.is_submitting = (
+              False  # 失敗時は再度押せるように戻す
+          )
       except Exception as e:
         st.error(f"エラーが発生しました: {e}")
+        st.session_state.is_submitting = False
 
 
 # =========================================================
