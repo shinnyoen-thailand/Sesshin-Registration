@@ -6,9 +6,9 @@ import streamlit as st
 # ご自身のGASのウェブアプリのURLに書き換えてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
 
-# ---------------------------------------------------------
+# =========================================================
 # 全画面共通のベース設定
-# ---------------------------------------------------------
+# =========================================================
 st.markdown(
     """
     <style>
@@ -19,12 +19,9 @@ st.markdown(
         padding-bottom: 2rem !important;
     }
 
-    /* ボタン全体の基本デザイン。絶対に幅を100%にする */
-    div[data-testid="stButton"], div[data-testid="stButton"] > button {
-        width: 100% !important;
-    }
-    
+    /* ボタン全体のデザイン（枠線、角丸、背景色） */
     div[data-testid="stButton"] > button {
+        width: 100% !important;
         border-radius: 15px !important;
         border: 4px solid #1e293b !important;
         background-color: #ffffff !important;
@@ -33,6 +30,7 @@ st.markdown(
         transition: all 0.2s !important;
     }
     
+    /* 押したとき・触れたときの色 */
     div[data-testid="stButton"] > button:hover {
         background-color: #f1f5f9 !important;
         border-color: #000000 !important;
@@ -56,13 +54,26 @@ if st.session_state.step == "select_category":
   st.markdown(
       """
       <style>
-      /* 左側の列（向上・向上相談） */
-      div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] button { height: 260px !important; margin-bottom: 20px !important; }
-      div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] p { font-size: 55px !important; font-weight: bold !important; }
-      
-      /* 右側の列（初信・相談・特別相談・鑑定） */
-      div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] button { height: 120px !important; margin-bottom: 15px !important; }
-      div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] p { font-size: 40px !important; font-weight: bold !important; }
+      /* 【超重要】左側の列（向上・向上相談）のサイズ設定 */
+      /* stColumn ではなく column が正解でした！ */
+      div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] button {
+          height: 280px !important;
+          margin-bottom: 20px !important;
+      }
+      div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] p {
+          font-size: 55px !important;
+          font-weight: bold !important;
+      }
+
+      /* 【超重要】右側の列（初信、相談、特別相談、鑑定）のサイズ設定 */
+      div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] button {
+          height: 125px !important;
+          margin-bottom: 10px !important;
+      }
+      div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] p {
+          font-size: 40px !important;
+          font-weight: bold !important;
+      }
       </style>
       """,
       unsafe_allow_html=True,
@@ -74,7 +85,6 @@ if st.session_state.step == "select_category":
   # 左右の幅を 1:1 にして綺麗に並べる
   col_left, col_right = st.columns(2, gap="large")
 
-  # ※ use_container_width=True を指定して強制的に幅を広げます
   with col_left:
     if st.button("向上", key="btn_kojo", use_container_width=True):
       st.session_state.selected_category = "向上"
