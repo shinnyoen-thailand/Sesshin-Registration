@@ -82,6 +82,7 @@ if st.session_state.step == "select_category":
       st.rerun()
 
   with col_right:
+    # 初信(*) を 初信 に変更
     if st.button("初信", key="btn_shoshin"):
       st.session_state.selected_category = "初信"
       st.session_state.step = "input_details"
@@ -152,9 +153,10 @@ elif st.session_state.step == "input_details":
 
   with col1:
     st.markdown("### 言語")
+    # 言語の選択肢から「その他」を「タイ語」に変更
     language = st.selectbox("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
     
-    # 初信が選ばれた場合だけ「回数」を表示
+    # 初信(*) ではなく 初信 が選ばれた場合だけ「回数」を表示
     kai_suu = "-"
     if category == "初信":
       st.write("")
@@ -227,4 +229,15 @@ elif st.session_state.step == "completed":
   )
 
   st.markdown("<h1>受付が完了いたしました</h1>", unsafe_allow_html=True)
-  st.markdown(f"<h3>お名前:
+  st.markdown(f"<h3>お名前: {st.session_state.completed_name} 様</h3>", unsafe_allow_html=True)
+  
+  # 受付番号を特大サイズで表示
+  st.markdown(f"<h2>受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
+
+  st.info("この番号をレシートにお書きください。")
+
+  st.write("")
+  st.write("")
+  if st.button("次の人の受付をする"):
+    st.session_state.step = "select_category"
+    st.rerun()
