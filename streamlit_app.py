@@ -130,22 +130,40 @@ elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      /* 戻るボタンや完了ボタンのサイズを調整（それでも巨大） */
-      .stButton > button { min-height: 130px !important; }
-      .stButton > button p { font-size: 45px !important; }
+      /* ▼▼ 「最初の画面に戻る」ボタンだけを20%小さくする ▼▼ */
+      button[kind="secondary"] { 
+          min-height: 100px !important; 
+      }
+      button[kind="secondary"] p { 
+          font-size: 35px !important; 
+      }
+
+      /* ▼▼ 「受付を完了する」ボタンは巨大なまま ▼▼ */
+      button[kind="primary"] { 
+          min-height: 140px !important; 
+      }
+      button[kind="primary"] p { 
+          font-size: 45px !important; 
+      }
       
       h3 { font-size: 40px !important; color: #1e293b !important; margin-bottom: 15px !important; }
 
-      /* ▼▼ 言語などのプルダウン（選択ボックス）を巨大化 ▼▼ */
+      /* ▼▼ 言語や回数のプルダウンをさらに超巨大化 ▼▼ */
       div[data-baseweb="select"] > div {
-          min-height: 80px !important;
-          font-size: 32px !important;
+          min-height: 100px !important;  /* 枠の高さをさらにアップ */
+          font-size: 40px !important;    /* 選択されている文字サイズをアップ */
           border-radius: 12px !important;
       }
+      /* プルダウン内に表示される文字サイズもアップ */
+      div[data-baseweb="select"] span {
+          font-size: 40px !important;
+      }
+      
+      /* タップして開いたときのメニュー項目のサイズ */
       ul[role="listbox"] li {
-          font-size: 32px !important;
-          padding-top: 20px !important;
-          padding-bottom: 20px !important;
+          font-size: 40px !important;
+          padding-top: 25px !important;
+          padding-bottom: 25px !important;
       }
 
       /* ▼▼ チェックボックスとラジオボタンを約2倍に巨大化 ▼▼ */
@@ -170,6 +188,7 @@ elif st.session_state.step == "input_details":
   category = st.session_state.selected_category
   st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
+  # ここが kind="secondary" になるので20%小さくなります
   if st.button("← 最初の画面に戻る"):
     st.session_state.step = "select_category"
     st.rerun()
@@ -213,6 +232,7 @@ elif st.session_state.step == "input_details":
   st.write("---")
   st.write("")
 
+  # type="primary" なのでこちらは大きなままになります
   if st.button("受付を完了する", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
