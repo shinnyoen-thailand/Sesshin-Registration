@@ -6,32 +6,30 @@ import streamlit as st
 # ご自身のGASのウェブアプリのURLに書き換えてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
 
-# 画面全体のレイアウトとボタンを「画面いっぱいの巨大サイズ」にする設定
+# 2枚目の図のバランスを完全に再現するスタイル（CSS）
 st.markdown(
     """
     <style>
-    /* 画面の左右の余白をなくして横幅をフル活用する */
+    /* 画面の余白をすっきりさせる */
     .block-container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-        max-width: 100% !important;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        max-width: 1000px !important;
     }
     
-    /* Streamlitのボタンを強制的に親要素の幅・高さ一杯に広げる */
-    div.stButton {
-        width: 100% !important;
-    }
+    /* Streamlitの標準ボタンを大きくカスタマイズ */
     div.stButton > button {
-        font-size: 38px !important;
+        font-size: 32px !important;
         font-weight: bold !important;
         width: 100% !important;
-        border-radius: 16px !important;
-        border: 4px solid #1e293b !important;
+        border-radius: 14px !important;
+        border: 3px solid #1e293b !important;
         background-color: #ffffff !important;
         color: #0f172a !important;
-        box-shadow: 0px 6px 12px rgba(0,0,0,0.15);
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+        transition: 0.2s;
     }
     
     div.stButton > button:hover {
@@ -39,20 +37,20 @@ st.markdown(
         border-color: #0f172a !important;
     }
 
-    /* 左側の大きなボタン（向上・向上相談）の高さ：300px */
-    .left-box div.stButton > button {
-        height: 300px !important;
+    /* 左側のボタン（向上・向上相談）のサイズ：高さ200px */
+    .left-col div.stButton > button {
+        height: 200px !important;
     }
 
-    /* 右側の4つのボタン（初信・相談・特別相談・鑑定）の高さ：135px */
-    .right-box div.stButton > button {
-        height: 135px !important;
+    /* 右側の4つのボタン（初信・相談・特別相談・鑑定）のサイズ：高さ90px */
+    .right-col div.stButton > button {
+        height: 90px !important;
     }
 
     h1 {
-        font-size: 40px !important;
+        font-size: 36px !important;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
     </style>
     """,
@@ -66,65 +64,62 @@ if "selected_category" not in st.session_state:
   st.session_state.selected_category = ""
 
 
-# --- 画面1：受付種類の選択 ---
+# --- 画面1：受付種類の選択（2枚目の図のバランスを再現） ---
 if st.session_state.step == "select_category":
   st.title("受付システム - 種類を選択")
 
-  # 左右に大きく2分割
+  # 左右の幅を 1:1 にして綺麗に並べる
   col_left, col_right = st.columns(2, gap="medium")
 
   # 左側：向上、向上相談
   with col_left:
-    st.markdown('<div class="left-box">', unsafe_allow_html=True)
+    st.markdown('<div class="left-col">', unsafe_allow_html=True)
+
     if st.button("向上", key="btn_kojo"):
       st.session_state.selected_category = "向上"
       st.session_state.step = "input_details"
       st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.write("")  # 上下の隙間
+    st.write("")  # 縦の隙間調整
+    st.write("")
 
-    st.markdown('<div class="left-box">', unsafe_allow_html=True)
     if st.button("向上相談", key="btn_kojosodan"):
       st.session_state.selected_category = "向上相談"
       st.session_state.step = "input_details"
       st.rerun()
+
     st.markdown("</div>", unsafe_allow_html=True)
 
   # 右側：初信、相談、特別相談、鑑定
   with col_right:
-    st.markdown('<div class="right-box">', unsafe_allow_html=True)
+    st.markdown('<div class="right-col">', unsafe_allow_html=True)
+
     if st.button("初信(*)", key="btn_shoshin"):
       st.session_state.selected_category = "初信(*)"
       st.session_state.step = "input_details"
       st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
 
     st.write("")
 
-    st.markdown('<div class="right-box">', unsafe_allow_html=True)
     if st.button("相談", key="btn_sodan"):
       st.session_state.selected_category = "相談"
       st.session_state.step = "input_details"
       st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
 
     st.write("")
 
-    st.markdown('<div class="right-box">', unsafe_allow_html=True)
     if st.button("特別相談", key="btn_tokubetsusodan"):
       st.session_state.selected_category = "特別相談"
       st.session_state.step = "input_details"
       st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
 
     st.write("")
 
-    st.markdown('<div class="right-box">', unsafe_allow_html=True)
     if st.button("鑑定", key="btn_kantei"):
       st.session_state.selected_category = "鑑定"
       st.session_state.step = "input_details"
       st.rerun()
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 
