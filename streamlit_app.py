@@ -6,29 +6,29 @@ import streamlit as st
 # TODO: 下の "ここにGASのURLを貼り付け" を、ご自身のウェブアプリのURLに書き換えてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbyUJU4AzTrhulU6i_ncSTp6sd_wZ1FyVpbRu1MX5ecIJt5vvZADoa6sJ9NN3B7r9b7k/exec"
 
-st.title("📝 受付システム")
+st.title("📝 Sesshin Registration")
 
-# 1. 受付の種類を選ぶ
+# 1. 接心
 categories = [
     "向上",
     "向上相談",
     "相談",
     "特別相談",
     "鑑定",
-    "初信(*)",
+    "初信",
 ]
-selected_category = st.selectbox("受付の種類を選んでください", categories)
+selected_category = st.selectbox("接心の種類を選んでください", categories)
 
-# 初信(*)が選ばれた場合の追加項目
+# 初信が選ばれた場合の追加項目
 kai_suu = "-"
-if selected_category == "初信(*)":
+if selected_category == "初信":
   kai_suu = st.selectbox(
       "何回目ですか？", ["1回目", "2回目", "3回目", "1年以上"]
   )
 
 # 2. 基本情報の入力
 name = st.text_input("お名前（※ペンまたはテキストで記入）")
-language = st.selectbox("言語", ["日本語", "英語", "その他"])
+language = st.selectbox("言語", ["日本語", "英語", "タイ語"])
 
 # チェックボックス類
 is_kanki = st.checkbox("歓喜以上であればチェックを入れてください")
