@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # TODO: 下の "ここにGASのURLを貼り付け" を、ご自身のウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbyUJU4AzTrhulU6i_ncSTp6sd_wZ1FyVpbRu1MX5ecIJt5vvZADoa6sJ9NN3B7r9b7k/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbx7YT2tybI0mR2_VKulEoqdrQu5-DUr6kq1gaP2wOAqLR3F9UpRITVx0BlXU2O2jQRD/exec"
 
 st.title("📝 Sesshin Registration")
 
