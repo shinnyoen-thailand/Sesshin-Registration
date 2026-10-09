@@ -53,18 +53,12 @@ if "step" not in st.session_state:
   st.session_state.step = "select_category"
 if "selected_category" not in st.session_state:
   st.session_state.selected_category = ""
-# 二重押し防止用のフラグ
-if "is_submitting" not in st.session_state:
-  st.session_state.is_submitting = False
 
 
 # =========================================================
 # 画面1：受付種類の選択
 # =========================================================
 if st.session_state.step == "select_category":
-  # 画面が切り替わったら送信フラグをリセット
-  st.session_state.is_submitting = False
-
   st.markdown(
       """
       <style>
@@ -225,45 +219,39 @@ elif st.session_state.step == "input_details":
   st.write("---")
   st.write("")
 
-  # ▼▼ disabled=st.session_state.is_submitting を追加して二重押しを完全にガード ▼▼
-  if st.button("受付を完了する", type="primary", disabled=st.session_state.is_submitting):
+  if st.button("受付を完了する", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
     else:
-      # ボタンが押された瞬間にフラグを True にして連打をロック
-      st.session_state.is_submitting = True
+      # ボタンを押した瞬間、画面に「送信中...」というクルクル（スピナー）を表示して入力を完全ロックする
+      with st.spinner("送信中... しばらくお待ちください"):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-      now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        post_data = {
+            "date": now,
+            "category": category,
+            "name": name.strip(),
+            "kaiSuu": kai_suu,
+            "language": language,
+            "isKanki": "〇" if is_kanki else "",
+            "isPriority": "〇" if is_priority else "",
+            "payment": payment,
+        }
 
-      post_data = {
-          "date": now,
-          "category": category,
-          "name": name.strip(),
-          "kaiSuu": kai_suu,
-          "language": language,
-          "isKanki": "〇" if is_kanki else "",
-          "isPriority": "〇" if is_priority else "",
-          "payment": payment,
-      }
+        try:
+          response = requests.post(GAS_URL, json=post_data)
+          res_json = response.json()
 
-      try:
-        response = requests.post(GAS_URL, json=post_data)
-        res_json = response.json()
-
-        if response.status_code == 200 and res_json.get("status") == "success":
-          ticket_id = res_json.get("ticketId", "J1")
-          st.session_state.ticket_id = ticket_id
-          st.session_state.completed_name = name.strip()
-          st.session_state.step = "completed"
-          st.rerun()
-        else:
-          st.error("データの送信に失敗しました。")
-          st.session_state.is_submitting = (
-              False  # 失敗時は再度押せるように戻す
-          )
-      except Exception as e:
-        st.error(f"エラーが発生しました: {e}")
-        st.session_state.is_submitting = False
+          if response.status_code == 200 and res_json.get("status") == "success":
+            ticket_id = res_json.get("ticketId", "J1")
+            st.session_state.ticket_id = ticket_id
+            st.session_state.completed_name = name.strip()
+            st.session_state.step = "completed"
+            st.rerun()
+          else:
+            st.error("データの送信に失敗しました。もう一度お試しください。")
+        except Exception as e:
+          st.error(f"エラーが発生しました: {e}")
 
 
 # =========================================================
