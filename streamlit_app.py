@@ -6,50 +6,53 @@ import streamlit as st
 # ご自身のGASのウェブアプリのURLに書き換えてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
 
-# 画面全体のデザイン設定（ボタンを大きくし、横幅いっぱいに綺麗に配置）
+# 画面全体のレイアウトとボタンを「画面いっぱいの巨大サイズ」にする設定
 st.markdown(
     """
     <style>
-    /* 画面のパディングを整える */
+    /* 画面の左右の余白をなくして横幅をフル活用する */
     .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-        padding-left: 3rem;
-        padding-right: 3rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        max-width: 100% !important;
     }
     
-    /* ボタン全体のデザイン（文字を大きく、太く） */
-    .stButton > button {
-        font-size: 30px !important;
+    /* Streamlitのボタンを強制的に親要素の幅・高さ一杯に広げる */
+    div.stButton {
+        width: 100% !important;
+    }
+    div.stButton > button {
+        font-size: 38px !important;
         font-weight: bold !important;
         width: 100% !important;
-        border-radius: 12px !important;
-        border: 2px solid #2c3e50 !important;
-        background-color: #f8f9fa !important;
-        color: #2c3e50 !important;
-        box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+        border-radius: 16px !important;
+        border: 4px solid #1e293b !important;
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        box-shadow: 0px 6px 12px rgba(0,0,0,0.15);
     }
     
-    /* マウスを乗せたとき・タップしたときの色 */
-    .stButton > button:hover {
-        background-color: #e2e8f0 !important;
-        border-color: #1a252f !important;
+    div.stButton > button:hover {
+        background-color: #f1f5f9 !important;
+        border-color: #0f172a !important;
     }
 
-    /* 左側の大きなボタン（向上・向上相談）の高さ：260px */
-    .left-btn-box div.stButton > button {
-        height: 260px !important;
+    /* 左側の大きなボタン（向上・向上相談）の高さ：300px */
+    .left-box div.stButton > button {
+        height: 300px !important;
     }
 
-    /* 右側の4つのボタン（初信・相談・特別相談・鑑定）の高さ：120px */
-    .right-btn-box div.stButton > button {
-        height: 120px !important;
+    /* 右側の4つのボタン（初信・相談・特別相談・鑑定）の高さ：135px */
+    .right-box div.stButton > button {
+        height: 135px !important;
     }
 
     h1 {
-        font-size: 36px !important;
+        font-size: 40px !important;
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
     </style>
     """,
@@ -68,11 +71,11 @@ if st.session_state.step == "select_category":
   st.title("受付システム - 種類を選択")
 
   # 左右に大きく2分割
-  col_left, col_right = st.columns(2, gap="large")
+  col_left, col_right = st.columns(2, gap="medium")
 
   # 左側：向上、向上相談
   with col_left:
-    st.markdown('<div class="left-btn-box">', unsafe_allow_html=True)
+    st.markdown('<div class="left-box">', unsafe_allow_html=True)
     if st.button("向上", key="btn_kojo"):
       st.session_state.selected_category = "向上"
       st.session_state.step = "input_details"
@@ -81,7 +84,7 @@ if st.session_state.step == "select_category":
 
     st.write("")  # 上下の隙間
 
-    st.markdown('<div class="left-btn-box">', unsafe_allow_html=True)
+    st.markdown('<div class="left-box">', unsafe_allow_html=True)
     if st.button("向上相談", key="btn_kojosodan"):
       st.session_state.selected_category = "向上相談"
       st.session_state.step = "input_details"
@@ -90,7 +93,7 @@ if st.session_state.step == "select_category":
 
   # 右側：初信、相談、特別相談、鑑定
   with col_right:
-    st.markdown('<div class="right-btn-box">', unsafe_allow_html=True)
+    st.markdown('<div class="right-box">', unsafe_allow_html=True)
     if st.button("初信(*)", key="btn_shoshin"):
       st.session_state.selected_category = "初信(*)"
       st.session_state.step = "input_details"
@@ -99,7 +102,7 @@ if st.session_state.step == "select_category":
 
     st.write("")
 
-    st.markdown('<div class="right-btn-box">', unsafe_allow_html=True)
+    st.markdown('<div class="right-box">', unsafe_allow_html=True)
     if st.button("相談", key="btn_sodan"):
       st.session_state.selected_category = "相談"
       st.session_state.step = "input_details"
@@ -108,7 +111,7 @@ if st.session_state.step == "select_category":
 
     st.write("")
 
-    st.markdown('<div class="right-btn-box">', unsafe_allow_html=True)
+    st.markdown('<div class="right-box">', unsafe_allow_html=True)
     if st.button("特別相談", key="btn_tokubetsusodan"):
       st.session_state.selected_category = "特別相談"
       st.session_state.step = "input_details"
@@ -117,7 +120,7 @@ if st.session_state.step == "select_category":
 
     st.write("")
 
-    st.markdown('<div class="right-btn-box">', unsafe_allow_html=True)
+    st.markdown('<div class="right-box">', unsafe_allow_html=True)
     if st.button("鑑定", key="btn_kantei"):
       st.session_state.selected_category = "鑑定"
       st.session_state.step = "input_details"
@@ -147,7 +150,7 @@ elif st.session_state.step == "input_details":
       "お名前入力欄",
       label_visibility="collapsed",
       placeholder="ここに名前を入力してください",
-      height=120,
+      height=140,
   )
 
   language = st.selectbox("言語", ["日本語", "英語", "タイ語"])
