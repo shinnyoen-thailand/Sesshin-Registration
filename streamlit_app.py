@@ -6,20 +6,34 @@ import streamlit as st
 # ご自身のGASのウェブアプリのURLに書き換えてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
 
-# 画面全体の見た目を大きく調整するためのスタイル（CSS）
+# 画面全体のレイアウト調整（図の配置バランスを再現）
 st.markdown(
     """
     <style>
-    /* ボタンを大きくして押しやすくする */
-    .stButton > button {
-        font-size: 26px !important;
-        font-weight: bold !important;
-        height: 90px !important;
-        border-radius: 12px !important;
+    /* 画面の横幅を広く使い、余白を調整 */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 950px;
     }
-    /* タイトルの文字サイズを大きく */
+    /* ボタンの共通デザイン（文字を大きく、高さを出して押しやすく） */
+    .stButton > button {
+        font-size: 28px !important;
+        font-weight: bold !important;
+        width: 100% !important;
+        border-radius: 10px !important;
+    }
+    /* 左側の大きなボタン（向上・向上相談）の高さ */
+    .left-btn > button {
+        height: 250px !important;
+    }
+    /* 右側のボタン（初信・相談・特別相談・鑑定）の高さ */
+    .right-btn > button {
+        height: 115px !important;
+    }
     h1 {
-        font-size: 36px !important;
+        font-size: 32px !important;
+        text-align: center;
     }
     </style>
     """,
@@ -33,45 +47,71 @@ if "selected_category" not in st.session_state:
   st.session_state.selected_category = ""
 
 
-# --- 画面1：受付種類の選択（大きく見やすいボタン） ---
+# --- 画面1：受付種類の選択（ご提示いただいた図通りの配置） ---
 if st.session_state.step == "select_category":
   st.title("受付システム - 種類を選択")
-  st.write("画面のボタンをタッチして、受付の種類を選んでください。")
   st.write("")
 
-  col1, col2 = st.columns(2)
+  # 左右の列に分割
+  col_left, col_right = st.columns(2)
 
-  with col1:
-    if st.button("向上", use_container_width=True, key="btn_kojo"):
+  # 左側：向上、向上相談
+  with col_left:
+    st.markdown('<div class="left-btn">', unsafe_allow_html=True)
+    if st.button("向上", key="btn_kojo"):
       st.session_state.selected_category = "向上"
       st.session_state.step = "input_details"
       st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    if st.button("向上相談", use_container_width=True, key="btn_kojosodan"):
+    st.write("")  # 上下の隙間調整
+
+    st.markdown('<div class="left-btn">', unsafe_allow_html=True)
+    if st.button("向上相談", key="btn_kojosodan"):
       st.session_state.selected_category = "向上相談"
       st.session_state.step = "input_details"
       st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
-  with col2:
-    if st.button("初信(*)", use_container_width=True, key="btn_shoshin"):
+  # 右側：初信、相談、特別相談、鑑定
+  with col_right:
+    # 初信
+    st.markdown('<div class="right-btn">', unsafe_allow_html=True)
+    if st.button("初信(*)", key="btn_shoshin"):
       st.session_state.selected_category = "初信(*)"
       st.session_state.step = "input_details"
       st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    if st.button("相談", use_container_width=True, key="btn_sodan"):
+    st.write("")
+
+    # 相談
+    st.markdown('<div class="right-btn">', unsafe_allow_html=True)
+    if st.button("相談", key="btn_sodan"):
       st.session_state.selected_category = "相談"
       st.session_state.step = "input_details"
       st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    if st.button("特別相談", use_container_width=True, key="btn_tokubetsusodan"):
+    st.write("")
+
+    # 特別相談
+    st.markdown('<div class="right-btn">', unsafe_allow_html=True)
+    if st.button("特別相談", key="btn_tokubetsusodan"):
       st.session_state.selected_category = "特別相談"
       st.session_state.step = "input_details"
       st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    if st.button("鑑定", use_container_width=True, key="btn_kantei"):
+    st.write("")
+
+    # 鑑定
+    st.markdown('<div class="right-btn">', unsafe_allow_html=True)
+    if st.button("鑑定", key="btn_kantei"):
       st.session_state.selected_category = "鑑定"
       st.session_state.step = "input_details"
       st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # --- 画面2：詳細情報の入力画面 ---
@@ -92,7 +132,7 @@ elif st.session_state.step == "input_details":
         "回数を選んでください", ["1回目", "2回目", "3回目", "1年以上"]
     )
 
-  # お名前入力欄を大きく（テキストエリアに変更して最大表示）
+  # お名前入力欄（大きく記入しやすいように高さを確保）
   st.markdown("### お名前（ペンまたはテキストで記入）")
   name = st.text_area(
       "お名前入力欄",
