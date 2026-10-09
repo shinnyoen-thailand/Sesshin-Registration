@@ -7,7 +7,7 @@ import streamlit as st
 GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
 
 # ---------------------------------------------------------
-# 【超重要】Streamlitのボタンを強制的に巨大化するCSS
+# 全画面共通のベース設定（ボタンの枠線や背景色）
 # ---------------------------------------------------------
 st.markdown(
     """
@@ -19,9 +19,7 @@ st.markdown(
         padding-bottom: 2rem !important;
     }
 
-    /* ---------------------------------------------------
-       ボタン全体のデザイン（枠線、角丸、背景色）
-       --------------------------------------------------- */
+    /* ボタン全体の基本デザイン */
     [data-testid="stButton"] button {
         width: 100% !important;
         border-radius: 15px !important;
@@ -32,34 +30,9 @@ st.markdown(
         transition: all 0.2s !important;
     }
     
-    /* 押したとき・触れたときの色 */
     [data-testid="stButton"] button:hover {
         background-color: #f1f5f9 !important;
         border-color: #000000 !important;
-    }
-
-    /* ---------------------------------------------------
-       左側の列（向上、向上相談）のサイズ設定
-       --------------------------------------------------- */
-    [data-testid="stColumn"]:nth-of-type(1) [data-testid="stButton"] button {
-        height: 280px !important; /* ボタンの高さを超巨大に */
-    }
-    /* 左側の文字サイズ */
-    [data-testid="stColumn"]:nth-of-type(1) [data-testid="stButton"] p {
-        font-size: 55px !important;
-        font-weight: bold !important;
-    }
-
-    /* ---------------------------------------------------
-       右側の列（初信、相談、特別相談、鑑定）のサイズ設定
-       --------------------------------------------------- */
-    [data-testid="stColumn"]:nth-of-type(2) [data-testid="stButton"] button {
-        height: 125px !important; /* 4つ並べるための高さ */
-    }
-    /* 右側の文字サイズ */
-    [data-testid="stColumn"]:nth-of-type(2) [data-testid="stButton"] p {
-        font-size: 40px !important;
-        font-weight: bold !important;
     }
     </style>
     """,
@@ -73,53 +46,89 @@ if "selected_category" not in st.session_state:
   st.session_state.selected_category = ""
 
 
-# --- 画面1：受付種類の選択 ---
+# =========================================================
+# 画面1：受付種類の選択
+# =========================================================
 if st.session_state.step == "select_category":
+  # 画面1専用のCSS（巨大ボタンの設定）
+  st.markdown(
+      """
+      <style>
+      /* 左側の列 */
+      [data-testid="stColumn"]:nth-of-type(1) [data-testid="stButton"] button { height: 280px !important; }
+      [data-testid="stColumn"]:nth-of-type(1) [data-testid="stButton"] p { font-size: 55px !important; font-weight: bold !important; }
+      /* 右側の列 */
+      [data-testid="stColumn"]:nth-of-type(2) [data-testid="stButton"] button { height: 125px !important; }
+      [data-testid="stColumn"]:nth-of-type(2) [data-testid="stButton"] p { font-size: 40px !important; font-weight: bold !important; }
+      </style>
+      """,
+      unsafe_allow_html=True,
+  )
+
   st.markdown("<h1 style='text-align: center; font-size: 45px;'>受付システム - 種類を選択</h1>", unsafe_allow_html=True)
   st.write("")
 
-  # 左右の幅を 1:1 にして綺麗に並べる
   col_left, col_right = st.columns(2, gap="large")
 
-  # 左側：向上、向上相談
   with col_left:
-    if st.button("向上", key="btn_kojo", use_container_width=True):
+    if st.button("向上", key="btn_kojo"):
       st.session_state.selected_category = "向上"
       st.session_state.step = "input_details"
       st.rerun()
 
-    if st.button("向上相談", key="btn_kojosodan", use_container_width=True):
+    if st.button("向上相談", key="btn_kojosodan"):
       st.session_state.selected_category = "向上相談"
       st.session_state.step = "input_details"
       st.rerun()
 
-  # 右側：初信、相談、特別相談、鑑定
   with col_right:
-    if st.button("初信(*)", key="btn_shoshin", use_container_width=True):
-      st.session_state.selected_category = "初信(*)"
+    if st.button("初信", key="btn_shoshin"):
+      st.session_state.selected_category = "初信"
       st.session_state.step = "input_details"
       st.rerun()
 
-    if st.button("相談", key="btn_sodan", use_container_width=True):
+    if st.button("相談", key="btn_sodan"):
       st.session_state.selected_category = "相談"
       st.session_state.step = "input_details"
       st.rerun()
 
-    if st.button("特別相談", key="btn_tokubetsusodan", use_container_width=True):
+    if st.button("特別相談", key="btn_tokubetsusodan"):
       st.session_state.selected_category = "特別相談"
       st.session_state.step = "input_details"
       st.rerun()
 
-    if st.button("鑑定", key="btn_kantei", use_container_width=True):
+    if st.button("鑑定", key="btn_kantei"):
       st.session_state.selected_category = "鑑定"
       st.session_state.step = "input_details"
       st.rerun()
 
 
-# --- 画面2：詳細情報の入力画面 ---
+# =========================================================
+# 画面2：詳細情報の入力画面
+# =========================================================
 elif st.session_state.step == "input_details":
+  # 画面2専用のCSS（入力項目の文字を大きくする設定）
+  st.markdown(
+      """
+      <style>
+      /* 戻るボタンや完了ボタンのサイズ */
+      [data-testid="stButton"] button { height: 110px !important; }
+      [data-testid="stButton"] p { font-size: 38px !important; font-weight: bold !important; }
+      
+      /* 文字を全体的に大きく */
+      .stCheckbox p, .stRadio p, .stSelectbox p {
+          font-size: 32px !important;
+          font-weight: bold !important;
+      }
+      div[data-baseweb="select"] { font-size: 28px !important; }
+      h3 { font-size: 36px !important; color: #1e293b !important; margin-bottom: 5px !important; }
+      </style>
+      """,
+      unsafe_allow_html=True,
+  )
+
   category = st.session_state.selected_category
-  st.title(f"受付: 【 {category} 】")
+  st.markdown(f"<h1>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
   if st.button("← 最初の画面に戻る"):
     st.session_state.step = "select_category"
@@ -127,28 +136,45 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-  kai_suu = "-"
-  if category == "初信(*)":
-    kai_suu = st.selectbox(
-        "回数を選んでください", ["1回目", "2回目", "3回目", "1年以上"]
-    )
-
+  # 1. お名前入力（画面いっぱいに横長）
   st.markdown("### お名前（ペンまたはテキストで記入）")
   name = st.text_area(
-      "お名前入力欄",
+      "お名前",
       label_visibility="collapsed",
-      placeholder="ここに名前を入力してください",
-      height=140,
+      placeholder="ここに名前を記入してください",
+      height=150,
   )
+  
+  st.write("---")
 
-  language = st.selectbox("言語", ["日本語", "英語", "タイ語"])
+  # 2. その他の情報を横に3分割して画面をフル活用
+  col1, col2, col3 = st.columns(3, gap="large")
 
-  is_kanki = st.checkbox("歓喜以上であればチェックを入れてください")
-  is_priority = st.checkbox("優先（チェック欄）")
+  with col1:
+    st.markdown("### 言語")
+    language = st.selectbox("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
+    
+    # 初信が選ばれた場合だけ「回数」を表示
+    kai_suu = "-"
+    if category == "初信":
+      st.write("")
+      st.markdown("### 回数")
+      kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
 
-  payment = st.radio("支払方法", ["QR", "Cash"])
+  with col2:
+    st.markdown("### オプション")
+    is_kanki = st.checkbox("歓喜以上")
+    st.write("")
+    is_priority = st.checkbox("優先")
 
+  with col3:
+    st.markdown("### 支払方法")
+    payment = st.radio("支払方法", ["QR", "Cash"], label_visibility="collapsed")
+
+  st.write("---")
   st.write("")
+
+  # 完了ボタン
   if st.button("受付を完了する", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
@@ -182,16 +208,23 @@ elif st.session_state.step == "input_details":
         st.error(f"エラーが発生しました: {e}")
 
 
-# --- 画面3：完了画面 ---
+# =========================================================
+# 画面3：完了画面
+# =========================================================
 elif st.session_state.step == "completed":
-  st.title("受付が完了いたしました")
+  # 画面3専用のCSS
+  st.markdown(
+      """
+      <style>
+      [data-testid="stButton"] button { height: 120px !important; }
+      [data-testid="stButton"] p { font-size: 40px !important; font-weight: bold !important; }
+      h1 { font-size: 50px !important; text-align: center; }
+      h2 { font-size: 100px !important; text-align: center; color: #1e293b; margin-top: 20px;}
+      h3 { font-size: 45px !important; text-align: center; }
+      </style>
+      """,
+      unsafe_allow_html=True,
+  )
 
-  st.markdown(f"### お名前: {st.session_state.completed_name} 様")
-  st.markdown(f"# 受付番号: {st.session_state.ticket_id}")
-
-  st.info("この番号をレシートにお書きください。")
-
-  st.write("")
-  if st.button("次の人の受付をする"):
-    st.session_state.step = "select_category"
-    st.rerun()
+  st.markdown("<h1>受付が完了いたしました</h1>", unsafe_allow_html=True)
+  st.markdown(f"<h3>お名前:
