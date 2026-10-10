@@ -125,43 +125,40 @@ elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      /* ボタン類のサイズ */
+      /* 戻るボタンや完了ボタンのサイズ */
       button[kind="secondary"] { min-height: 90px !important; }
       button[kind="secondary"] p { font-size: 32px !important; }
       button[kind="primary"] { min-height: 140px !important; }
       button[kind="primary"] p { font-size: 45px !important; }
       
-      h3 { font-size: 40px !important; color: #1e293b !important; margin-bottom: 15px !important; }
+      /* 「お名前」や「支払方法」などの見出し文字（控えめなサイズ調整） */
+      h3 { font-size: 28px !important; color: #1e293b !important; margin-bottom: 10px !important; }
 
-      /* ▼▼ 言語・回数のプルダウンをさらに超巨大化 ▼▼ */
-      /* 1. 選択ボックス（外枠）の高さと文字サイズ */
+      /* ▼▼ プルダウン（言語・回数）の選択文字サイズを「歓喜以上」「優先」に統一 ▼▼ */
       div[data-baseweb="select"] > div {
-          min-height: 110px !important;  /* 枠の高さをさらにアップ */
-          font-size: 45px !important;    /* 選択中の文字サイズ */
-          font-weight: bold !important;
-          border-radius: 15px !important;
+          min-height: 80px !important;
+          border-radius: 12px !important;
           border: 3px solid #1e293b !important;
       }
       
-      /* 2. ボックス内の表示文字サイズ */
+      /* プルダウンの枠内に表示される文字（日本語・英語・タイ語など） */
       div[data-baseweb="select"] span {
-          font-size: 45px !important;
+          font-size: 32px !important;   /* 「歓喜以上」「優先」と同じサイズ */
           font-weight: bold !important;
       }
 
-      /* 3. プルダウンを開いたときの選択肢（日本語、英語、タイ語など）の巨大化 */
+      /* タップして開いたメニュー（日本語・英語・タイ語）の文字サイズ */
       ul[role="listbox"] {
-          border-radius: 15px !important;
+          border-radius: 12px !important;
       }
       ul[role="listbox"] li {
-          font-size: 45px !important;        /* 選択肢の文字を大きく */
+          font-size: 32px !important;   /* 「歓喜以上」「優先」と同じサイズ */
           font-weight: bold !important;
-          padding-top: 30px !important;      /* 上下の押し幅（余白）を大きく */
-          padding-bottom: 30px !important;
-          min-height: 90px !important;
+          padding-top: 20px !important;
+          padding-bottom: 20px !important;
       }
 
-      /* ▼▼ チェックボックスとラジオボタンの拡大 ▼▼ */
+      /* ▼▼ チェックボックスとラジオボタンの拡大設定（font-size: 32px 相当） ▼▼ */
       [data-testid="stCheckbox"] {
           transform: scale(2.0);
           transform-origin: left center;
