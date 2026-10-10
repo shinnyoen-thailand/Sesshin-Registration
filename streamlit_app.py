@@ -177,7 +177,7 @@ elif st.session_state.step == "input_details":
   category = st.session_state.selected_category
   st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
-  if st.button("← 最初の画面に戻る"):
+  if st.button("← 戻る"):
     st.session_state.step = "select_category"
     st.rerun()
 
