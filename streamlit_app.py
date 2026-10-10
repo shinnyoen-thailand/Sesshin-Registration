@@ -7,7 +7,68 @@ import streamlit as st
 GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
 
 # =========================================================
-# 全画面共通：ベース設定
+# 受付種類ごとの金額設定データ
+# =========================================================
+AMOUNT_CONFIG = {
+    "向上": {
+        "base": "100 Bath",
+        "child": "15歳以下 50 Bath",
+        "countries": [
+            "日本 1000円",
+            "日本 250Bath",
+            "シンガポール 150Bath",
+            "アメリカ 200Bath",
+            "フランス 300Bath",
+        ],
+    },
+    "向上相談": {
+        "base": "200 Bath",
+        "child": "15歳以下 100 Bath",
+        "countries": [
+            "日本 2000円",
+            "日本 400Bath",
+            "シンガポール 250Bath",
+            "アメリカ 300Bath",
+            "フランス 400Bath",
+        ],
+    },
+    "相談": {
+        "base": "300 Bath",
+        "child": "15歳以下 150 Bath",
+        "countries": [
+            "日本 3000円",
+            "日本 600Bath",
+            "シンガポール 300Bath",
+            "アメリカ 400Bath",
+            "フランス 500Bath",
+        ],
+    },
+    "特別相談": {
+        "base": "600 Bath",
+        "child": "15歳以下 300 Bath",
+        "countries": [
+            "日本 6000円",
+            "日本 1200Bath",
+            "シンガポール 500Bath",
+            "アメリカ 600Bath",
+            "フランス 700Bath",
+        ],
+    },
+    "鑑定": {
+        "base": "900 Bath",
+        "child": "15歳以下 450 Bath",
+        "countries": [
+            "日本 9000円",
+            "日本 1900Bath",
+            "シンガポール 1100Bath",
+            "アメリカ 12000Bath",
+            "フランス 1400Bath",
+        ],
+    },
+}
+
+# =========================================================
+# 全画面共通：ベース設定（iPadフル活用＆特大UI）
 # =========================================================
 st.markdown(
     """
@@ -21,7 +82,7 @@ st.markdown(
         padding-right: 1.5rem !important;
     }
 
-    /* 全てのボタンに「最低でもこの高さにする」という絶対命令 */
+    /* 全てのボタンに最低高さを設定して薄くなるのを防止 */
     .stButton > button {
         width: 100% !important;
         min-height: 160px !important;
@@ -126,36 +187,47 @@ elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      button[kind="secondary"] { 
-          min-height: 100px !important; 
-      }
-      button[kind="secondary"] p { 
-          font-size: 35px !important; 
-      }
+      /* 「最初の画面に戻る」ボタン */
+      button[kind="secondary"] { min-height: 90px !important; }
+      button[kind="secondary"] p { font-size: 32px !important; }
 
-      button[kind="primary"] { 
-          min-height: 140px !important; 
-      }
-      button[kind="primary"] p { 
-          font-size: 45px !important; 
+      /* 「受付を完了する」ボタン */
+      button[kind="primary"] { min-height: 140px !important; }
+      button[kind="primary"] p { font-size: 45px !important; }
+      
+      /* ラベルの見出しサイズ */
+      h3 { font-size: 28px !important; color: #1e293b !important; margin-bottom: 10px !important; }
+
+      /* ▼▼ プルダウン（選択ボックス）の枠と文字サイズを巨大化 (32px) ▼▼ */
+      [data-testid="stSelectbox"] div[data-baseweb="select"] {
+          min-height: 85px !important;
+          border-radius: 12px !important;
+          border: 3px solid #1e293b !important;
       }
       
-      h3 { font-size: 40px !important; color: #1e293b !important; margin-bottom: 15px !important; }
-
-      div[data-baseweb="select"] > div {
-          min-height: 100px !important;
-          font-size: 40px !important;
-          border-radius: 12px !important;
-      }
-      div[data-baseweb="select"] span {
-          font-size: 40px !important;
-      }
-      ul[role="listbox"] li {
-          font-size: 40px !important;
-          padding-top: 25px !important;
-          padding-bottom: 25px !important;
+      [data-testid="stSelectbox"] div[data-baseweb="select"] * {
+          font-size: 32px !important;
+          font-weight: bold !important;
+          color: #0f172a !important;
       }
 
+      /* ▼▼ タップして開いたメニュー内の文字も巨大化 (32px) ▼▼ */
+      div[data-baseweb="menu"] *, 
+      ul[role="listbox"] *, 
+      li[role="option"] * {
+          font-size: 32px !important;
+          font-weight: bold !important;
+          color: #0f172a !important;
+      }
+
+      ul[role="listbox"] li, 
+      li[role="option"] {
+          min-height: 75px !important;
+          padding-top: 15px !important;
+          padding-bottom: 15px !important;
+      }
+
+      /* ▼▼ チェックボックスとラジオボタンの拡大設定（2倍拡大） ▼▼ */
       [data-testid="stCheckbox"] {
           transform: scale(2.0);
           transform-origin: left center;
@@ -183,55 +255,77 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-st.markdown("### お名前（ペンまたはテキストで記入）")
-name = st.text_area(
-    "お名前",
-    label_visibility="collapsed",
-    placeholder="ここに名前を記入してください",
-    height=140,
-)
-
-# ▼▼ 名前が入力されたら、枠一杯の特大文字で確認表示する仕組み ▼▼
-if name.strip():
-  # 入力された名前を枠の中一杯に巨大表示（CSSで枠と文字サイズを指定）
-  st.markdown(
-      f"""
-      <div style="
-          border: 4px solid #1e293b;
-          background-color: #f8fafc;
-          border-radius: 15px;
-          padding: 20px;
-          text-align: center;
-          margin-top: 10px;
-          margin-bottom: 20px;
-          box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
-      ">
-          <p style="font-size: 28px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
-          <p style="font-size: 65px; font-weight: 900; color: #0f172a; margin: 10px 0 0 0; word-break: break-all;">
-              {name.strip()} 様
-          </p>
-      </div>
-      """,
-      unsafe_allow_html=True,
+  # 1. お名前入力
+  st.markdown("### お名前（ペンまたはテキストで記入）")
+  name = st.text_area(
+      "お名前",
+      label_visibility="collapsed",
+      placeholder="ここに名前を記入してください",
+      height=140,
   )
   
+  # ▼▼ お名前入力後のリアルタイム特大確認枠 ▼▼
+  if name.strip():
+    st.markdown(
+        f"""
+        <div style="
+            border: 4px solid #1e293b;
+            background-color: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+        ">
+            <p style="font-size: 28px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
+            <p style="font-size: 65px; font-weight: 900; color: #0f172a; margin: 10px 0 0 0; word-break: break-all;">
+                {name.strip()} 様
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
   st.write("---")
+
+  # 2. 金額・言語・オプション・支払方法の入力欄（画面をフル活用するレイアウト）
+  amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
 
   col1, col2, col3 = st.columns(3, gap="large")
 
   with col1:
+    st.markdown("### 金額")
+    amount_type = st.radio(
+        "金額種別",
+        [amt_info["base"], amt_info["child"], "国別選択（その他）"],
+        label_visibility="collapsed",
+        key="amount_radio",
+    )
+
+    if amount_type == "国別選択（その他）":
+      st.write("")
+      selected_amount = st.selectbox(
+          "国別金額",
+          amt_info["countries"],
+          label_visibility="collapsed",
+          key="country_amount_select",
+      )
+    else:
+      selected_amount = amount_type
+
+  with col2:
     st.markdown("### 言語")
     language = st.selectbox("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
     
     kai_suu = "-"
     if category == "初信":
       st.write("")
-      st.write("")
       st.markdown("### 回数")
       kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
 
-  with col2:
-    st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+    # オプション（「オプション」の文字は非表示にして高さを調整）
+    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     is_kanki = st.checkbox("歓喜以上")
     st.write("")
     is_priority = st.checkbox("優先")
@@ -243,11 +337,11 @@ if name.strip():
   st.write("---")
   st.write("")
 
+  # 3. 受付完了ボタン
   if st.button("完了", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
     else:
-      # ボタンを押した瞬間、画面に「送信中...」というクルクル（スピナー）を表示して入力を完全ロックする
       with st.spinner("送信中... しばらくお待ちください"):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -255,6 +349,7 @@ if name.strip():
             "date": now,
             "category": category,
             "name": name.strip(),
+            "amount": selected_amount,
             "kaiSuu": kai_suu,
             "language": language,
             "isKanki": "〇" if is_kanki else "",
@@ -307,4 +402,3 @@ elif st.session_state.step == "completed":
   if st.button("次の人の受付をする"):
     st.session_state.step = "select_category"
     st.rerun()
-
