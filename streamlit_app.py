@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbwvuTPOYvcv34lj6j8iEmyvtJS8T95xJqJR_tPP7CZBl-_6gfnq3CgEexsfWh2ZkB0f/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbyXxUeQMvh0furd5mcCItL3b_H45dlkJT6Ou9-ocqa00IqF5ytU9Uzy3fgSvhhnSQ94/exec"
 
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
@@ -314,7 +314,8 @@ elif st.session_state.step == "input_details":
       st.warning("お名前を入力してください。")
     else:
       with st.spinner("送信中... しばらくお待ちください"):
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # 時間を含めず、日付のみ（YYYY-MM-DD）にする
+        now = datetime.now().strftime("%Y-%m-%d")
 
         post_data = {
             "date": now,
@@ -497,7 +498,7 @@ elif st.session_state.step == "completed":
   st.markdown("<h1>受付が完了いたしました</h1>", unsafe_allow_html=True)
   st.markdown(f"<h3>お名前: {st.session_state.completed_name} 様</h3>", unsafe_allow_html=True)
   
-  st.markdown(f"<h2>受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
+  st.markdown(f"<h2>受付番号: {st.ticket_id}</h2>", unsafe_allow_html=True)
 
   st.info("この番号をレシートにお書きください。")
 
