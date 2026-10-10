@@ -190,11 +190,11 @@ elif st.session_state.step == "input_details":
       button[kind="primary"] p { font-size: 45px !important; }
       h3 { font-size: 34px !important; font-weight: 900 !important; color: #1e293b !important; margin-bottom: 15px !important; }
 
-      /* お名前入力欄（超特大） */
+      /* お名前入力欄（横幅いっぱいで超特大） */
       textarea[aria-label="お名前"] {
-          font-size: 45px !important;
+          font-size: 55px !important;
           font-weight: 900 !important;
-          height: 140px !important;
+          height: 150px !important;
           color: #000000 !important;
           background-color: #f8fafc !important;
           border: 4px solid #1e293b !important;
@@ -270,46 +270,53 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
+  # -----------------------------------------------------------------
+  # 1. お名前入力欄 ＆ 確認欄（横幅1行を贅沢に使ってどーーーんと表示）
+  # -----------------------------------------------------------------
+  st.markdown("### お名前（大きくご入力ください）")
+  name = st.text_area(
+      "お名前",
+      label_visibility="collapsed",
+      placeholder="ここにお名前を記入",
+      height=150,
+  )
+  
+  if name.strip():
+    st.markdown(
+        f"""
+        <div style="
+            border: 4px solid #1e293b;
+            background-color: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0px 6px 12px rgba(0,0,0,0.15);
+        ">
+            <p style="font-size: 26px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
+            <p style="font-size: 70px; font-weight: 950; color: #0f172a; margin: 10px 0 0 0; word-break: break-all;">
+                {name.strip()} 様
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+  st.write("---")
+
+  # -----------------------------------------------------------------
+  # 2. その他の選択肢（2カラムでスッキリ配置）
+  # -----------------------------------------------------------------
   col_left, col_right = st.columns(2, gap="large")
 
   with col_left:
-    st.markdown("### お名前（大きくご入力ください）")
-    name = st.text_area(
-        "お名前",
-        label_visibility="collapsed",
-        placeholder="ここにお名前を記入",
-        height=140,
-    )
-    
-    if name.strip():
-      st.markdown(
-          f"""
-          <div style="
-              border: 4px solid #1e293b;
-              background-color: #f8fafc;
-              border-radius: 15px;
-              padding: 15px;
-              text-align: center;
-              margin-top: 10px;
-              margin-bottom: 15px;
-              box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
-          ">
-              <p style="font-size: 22px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
-              <p style="font-size: 55px; font-weight: 900; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">
-                  {name.strip()} 様
-              </p>
-          </div>
-          """,
-          unsafe_allow_html=True,
-      )
-
-    st.write("")
-    st.write("")
     st.markdown("### 言語")
     language = st.selectbox("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
     
     kai_suu = "-"
     if category == "初信":
+      st.write("")
       st.write("")
       st.markdown("### 回数")
       kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
@@ -332,12 +339,9 @@ elif st.session_state.step == "input_details":
           label_visibility="collapsed",
           key="country_amount_select",
       )
-    else:
-      selected_amount = amount_type
 
     st.write("")
     st.write("")
-    # 「### オプション」を削除し、直接歓喜以上と優先を配置
     is_kanki = st.checkbox("歓喜以上")
     is_priority = st.checkbox("優先")
 
