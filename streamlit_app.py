@@ -314,7 +314,6 @@ elif st.session_state.step == "input_details":
       st.warning("お名前を入力してください。")
     else:
       with st.spinner("送信中... しばらくお待ちください"):
-        # 時間を含めず、日付のみ（YYYY-MM-DD）にする
         now = datetime.now().strftime("%Y-%m-%d")
 
         post_data = {
@@ -453,8 +452,6 @@ elif st.session_state.step == "summary":
     st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
     st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
     st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
     st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Yen</p>", unsafe_allow_html=True)
 
   st.write("")
@@ -498,7 +495,8 @@ elif st.session_state.step == "completed":
   st.markdown("<h1>受付が完了いたしました</h1>", unsafe_allow_html=True)
   st.markdown(f"<h3>お名前: {st.session_state.completed_name} 様</h3>", unsafe_allow_html=True)
   
-  st.markdown(f"<h2>受付番号: {st.ticket_id}</h2>", unsafe_allow_html=True)
+  # 修正：st.ticket_id を st.session_state.ticket_id に修正しました
+  st.markdown(f"<h2>受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
 
   st.info("この番号をレシートにお書きください。")
 
