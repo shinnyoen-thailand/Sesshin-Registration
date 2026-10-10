@@ -6,7 +6,7 @@ import streamlit as st
 # ご自身のGASのウェブアプリのURLに書き換えてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbyGofUnzrAKmmUEeGpeX8dSs5amZQPiLC0sHnHLi-0RMItVJFwXp5gC08LJGBCrcsbO/exec"
 
-# 受付種類ごとの金額設定データ（15歳以下の表記を金額先頭に変更）
+# 受付種類ごとの金額設定データ（15歳以下表記を金額先頭に統一）
 AMOUNT_CONFIG = {
     "向上": {
         "base": "100 Bath",
@@ -345,7 +345,7 @@ elif st.session_state.step == "input_details":
 
 
 # =========================================================
-# 集計画面（今回はスプレッドシート側で集計するためプレースホルダーまたは簡易表示）
+# 集計画面（スプレッドシートの集計結果を表示 + 現金カウンター）
 # =========================================================
 elif st.session_state.step == "summary":
   st.markdown("<h1 style='text-align: center; font-size: 45px;'>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
@@ -355,10 +355,48 @@ elif st.session_state.step == "summary":
     st.rerun()
 
   st.write("---")
-  st.info("集計はスプレッドシート側の「集計」シートで行われるようになりました。以下の金庫カウントをご活用ください。")
+
+  today_str = datetime.now().strftime("%Y-%m-%d")
+  st.markdown(f"### Date: **{today_str}**")
+
+  # スプレッドシート側の集計結果をGAS経由で取得
+  summary_data = {}
+  try:
+    res = requests.post(GAS_URL, json={"action": "summary", "date": today_str})
+    if res.status_code == 200:
+      summary_data = res.json().get("summary", {})
+  except Exception as e:
+    st.error(f"集計データの取得に失敗しました: {e}")
+
+  categories = ["向上", "初信", "向上相談", "相談", "特別相談", "鑑定"]
+  
+  tot_count = 0
+  tot_qr = 0
+  tot_bath = 0
+  tot_yen = 0
+
+  # テーブルのHTML生成
+  table_html = """<table style="width:100%; border-collapse: collapse; font-size: 22px; text-align: center; background-color: #ffffff;"><thead><tr style="background-color: #f1f5f9;"><th style="border: 2px solid #1e293b; padding: 12px;"></th><th style="border: 2px solid #1e293b; padding: 12px;">人数</th><th style="border: 2px solid #1e293b; padding: 12px;">QR</th><th colspan="2" style="border: 2px solid #1e293b; padding: 12px; background-color: #e2e8f0;">Cash</th></tr><tr style="background-color: #f8fafc;"><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;">Bath</th><th style="border: 2px solid #1e293b; padding: 8px;">Yen</th></tr></thead><tbody>"""
+
+  for cat in categories:
+    d = summary_data.get(cat, {"count": 0, "qr": 0, "bath": 0, "yen": 0})
+    tot_count += d["count"]
+    tot_qr += d["qr"]
+    tot_bath += d["bath"]
+    tot_yen += d["yen"]
+
+    table_html += f"""<tr><td style="border: 2px solid #1e293b; padding: 12px; font-weight: bold; background-color: #f8fafc;">{cat}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["count"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["qr"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["bath"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["yen"]}</td></tr>"""
+
+  table_html += f"""<tr style="background-color: #cbd5e1; font-weight: bold;"><td style="border: 2px solid #1e293b; padding: 12px;">合計</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_count}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_qr}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_bath}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_yen}</td></tr></tbody></table>"""
+  
+  st.markdown(table_html, unsafe_allow_html=True)
+
+  st.write("")
+  st.write("---")
 
   st.markdown("### 💰 金庫の現金カウント（実査・入力枠）")
-  
+  st.markdown("黄色の枠内に金庫にある紙幣の枚数を入力してください。金額が自動計算されます。")
+
   st.markdown(
       """
       <style>
