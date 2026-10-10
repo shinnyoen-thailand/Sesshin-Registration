@@ -4,7 +4,47 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbyTMfOuVuNqIvKecJ32TmjBgEGW4MpqcRtVXkkDIUtC7ZeAGlxScLKLzHXiCZEOJ31Q/exec"
+GAS_URL = "function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    
+    // シート名を「Sesshin」に変更
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sesshin");
+    if (!sheet) {
+      sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    }
+    
+    // 現在の行数からシンプルな番号（J1, J2...）を生成する
+    var lastRow = sheet.getLastRow();
+    // 1行目がタイトルの場合、データ数＝行数になるので、そのまま「J + 行番号」にする
+    var ticketNumber = "J" + lastRow;
+
+    // スプレッドシートに保存 [日時, 受付番号, 受付種類, 名前, 回数, 言語, 歓喜以上, 優先, 支払方法]
+    sheet.appendRow([
+      data.date,
+      ticketNumber,
+      data.category,
+      data.name,
+      data.kaiSuu,
+      data.language,
+      data.isKanki,
+      data.isPriority,
+      data.payment
+    ]);
+    
+    // Python側へ受付番号を返却
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "success",
+      "ticketId": ticketNumber
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "error", 
+      "message": error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}"
 
 # =========================================================
 # 受付種類ごとの金額設定データ
