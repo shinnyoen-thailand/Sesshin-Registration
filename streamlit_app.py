@@ -1,54 +1,12 @@
 import datetime
-from datetime import datetime
+from datetime import datetime, date
 import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "function doPost(e) {
-  try {
-    var data = JSON.parse(e.postData.contents);
-    
-    // シート名を「Sesshin」に変更
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sesshin");
-    if (!sheet) {
-      sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-    }
-    
-    // 現在の行数からシンプルな番号（J1, J2...）を生成する
-    var lastRow = sheet.getLastRow();
-    // 1行目がタイトルの場合、データ数＝行数になるので、そのまま「J + 行番号」にする
-    var ticketNumber = "J" + lastRow;
+GAS_URL = "https://script.google.com/macros/s/AKfycbzs_arwQvb_198gZFVqndX2nWgdI5H_Moedjvq577iHJvceSWBG68myW19yIwhgn1jZ/exec"
 
-    // スプレッドシートに保存 [日時, 受付番号, 受付種類, 名前, 回数, 言語, 歓喜以上, 優先, 支払方法]
-    sheet.appendRow([
-      data.date,
-      ticketNumber,
-      data.category,
-      data.name,
-      data.kaiSuu,
-      data.language,
-      data.isKanki,
-      data.isPriority,
-      data.payment
-    ]);
-    
-    // Python側へ受付番号を返却
-    return ContentService.createTextOutput(JSON.stringify({
-      "status": "success",
-      "ticketId": ticketNumber
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      "status": "error", 
-      "message": error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}"
-
-# =========================================================
 # 受付種類ごとの金額設定データ
-# =========================================================
 AMOUNT_CONFIG = {
     "向上": {
         "base": "100 Bath",
@@ -108,12 +66,11 @@ AMOUNT_CONFIG = {
 }
 
 # =========================================================
-# 全画面共通：ベース設定（iPadフル活用＆特大UI）
+# 全画面共通：ベース設定
 # =========================================================
 st.markdown(
     """
     <style>
-    /* 画面の左右の余白を極限まで減らして、iPadの画面をフルに使う */
     .block-container {
         max-width: 98% !important;
         padding-top: 1rem !important;
@@ -121,25 +78,21 @@ st.markdown(
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
     }
-
-    /* 全てのボタンに最低高さを設定して薄くなるのを防止 */
     .stButton > button {
         width: 100% !important;
-        min-height: 160px !important;
+        min-height: 140px !important;
         border-radius: 20px !important;
         border: 4px solid #1e293b !important;
         background-color: #ffffff !important;
         box-shadow: 0px 8px 16px rgba(0,0,0,0.15) !important;
         transition: all 0.2s !important;
     }
-    
     .stButton > button p {
-        font-size: 50px !important;
+        font-size: 45px !important;
         font-weight: 900 !important;
         color: #0f172a !important;
         margin: 0 !important;
     }
-
     .stButton > button:hover {
         background-color: #f8fafc !important;
         border-color: #000000 !important;
@@ -157,7 +110,7 @@ if "selected_category" not in st.session_state:
 
 
 # =========================================================
-# 画面1：受付種類の選択
+# 画面1：接心受付 ＆ 集計ボタン
 # =========================================================
 if st.session_state.step == "select_category":
   st.markdown(
@@ -165,17 +118,16 @@ if st.session_state.step == "select_category":
       <style>
       div[data-testid="column"]:first-child .stButton > button,
       div[data-testid="stColumn"]:first-child .stButton > button {
-          min-height: 350px !important;
-          margin-bottom: 20px !important;
+          min-height: 300px !important;
+          margin-bottom: 15px !important;
       }
       div[data-testid="column"]:first-child .stButton > button p,
       div[data-testid="stColumn"]:first-child .stButton > button p {
-          font-size: 70px !important;
+          font-size: 65px !important;
       }
-
       div[data-testid="column"]:last-child .stButton > button,
       div[data-testid="stColumn"]:last-child .stButton > button {
-          min-height: 160px !important;
+          min-height: 140px !important;
           margin-bottom: 10px !important;
       }
       </style>
@@ -183,7 +135,8 @@ if st.session_state.step == "select_category":
       unsafe_allow_html=True,
   )
 
-  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 30px;'>接心受付</h1>", unsafe_allow_html=True)
+  # タイトルを「接心受付」に変更
+  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 20px;'>接心受付</h1>", unsafe_allow_html=True)
 
   col_left, col_right = st.columns(2, gap="large")
 
@@ -219,6 +172,11 @@ if st.session_state.step == "select_category":
       st.session_state.step = "input_details"
       st.rerun()
 
+  st.write("")
+  if st.button("📊 本日の集計・金庫確認を開く", key="btn_summary", use_container_width=True):
+    st.session_state.step = "summary"
+    st.rerun()
+
 
 # =========================================================
 # 画面2：詳細情報の入力画面
@@ -227,58 +185,38 @@ elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      /* 「最初の画面に戻る」ボタン */
-      button[kind="secondary"] { min-height: 90px !important; }
-      button[kind="secondary"] p { font-size: 32px !important; }
-
-      /* 「受付を完了する」ボタン */
-      button[kind="primary"] { min-height: 140px !important; }
-      button[kind="primary"] p { font-size: 45px !important; }
-      
-      /* ラベルの見出しサイズ */
+      button[kind="secondary"] { min-height: 80px !important; }
+      button[kind="secondary"] p { font-size: 30px !important; }
+      button[kind="primary"] { min-height: 120px !important; }
+      button[kind="primary"] p { font-size: 40px !important; }
       h3 { font-size: 28px !important; color: #1e293b !important; margin-bottom: 10px !important; }
 
-      /* ▼▼ プルダウン（選択ボックス）の枠と文字サイズを巨大化 (32px) ▼▼ */
       [data-testid="stSelectbox"] div[data-baseweb="select"] {
-          min-height: 85px !important;
+          min-height: 75px !important;
           border-radius: 12px !important;
           border: 3px solid #1e293b !important;
       }
-      
       [data-testid="stSelectbox"] div[data-baseweb="select"] * {
-          font-size: 32px !important;
+          font-size: 30px !important;
           font-weight: bold !important;
           color: #0f172a !important;
       }
-
-      /* ▼▼ タップして開いたメニュー内の文字も巨大化 (32px) ▼▼ */
-      div[data-baseweb="menu"] *, 
-      ul[role="listbox"] *, 
-      li[role="option"] * {
-          font-size: 32px !important;
+      div[data-baseweb="menu"] *, ul[role="listbox"] *, li[role="option"] * {
+          font-size: 30px !important;
           font-weight: bold !important;
           color: #0f172a !important;
       }
-
-      ul[role="listbox"] li, 
-      li[role="option"] {
-          min-height: 75px !important;
-          padding-top: 15px !important;
-          padding-bottom: 15px !important;
-      }
-
-      /* ▼▼ チェックボックスとラジオボタンの拡大設定（2倍拡大） ▼▼ */
       [data-testid="stCheckbox"] {
-          transform: scale(2.0);
+          transform: scale(1.8);
           transform-origin: left center;
-          margin-top: 15px;
-          margin-bottom: 35px;
-          margin-left: 15px;
+          margin-top: 10px;
+          margin-bottom: 25px;
+          margin-left: 10px;
       }
       [data-testid="stRadio"] {
-          transform: scale(2.0);
+          transform: scale(1.8);
           transform-origin: left center;
-          margin-left: 15px;
+          margin-left: 10px;
           margin-top: 10px;
       }
       </style>
@@ -287,24 +225,23 @@ elif st.session_state.step == "input_details":
   )
 
   category = st.session_state.selected_category
-  st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
+  st.markdown(f"<h1 style='font-size: 40px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
+  # 「最初の画面に戻る」を「戻る」に変更
   if st.button("← 戻る"):
     st.session_state.step = "select_category"
     st.rerun()
 
   st.write("---")
 
-  # 1. お名前入力
   st.markdown("### お名前（ペンまたはテキストで記入）")
   name = st.text_area(
       "お名前",
       label_visibility="collapsed",
       placeholder="ここに名前を記入してください",
-      height=140,
+      height=120,
   )
   
-  # ▼▼ お名前入力後のリアルタイム特大確認枠 ▼▼
   if name.strip():
     st.markdown(
         f"""
@@ -312,14 +249,14 @@ elif st.session_state.step == "input_details":
             border: 4px solid #1e293b;
             background-color: #f8fafc;
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            margin-top: 10px;
-            margin-bottom: 20px;
+            margin-top: 5px;
+            margin-bottom: 15px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
         ">
-            <p style="font-size: 28px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
-            <p style="font-size: 65px; font-weight: 900; color: #0f172a; margin: 10px 0 0 0; word-break: break-all;">
+            <p style="font-size: 24px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
+            <p style="font-size: 55px; font-weight: 900; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">
                 {name.strip()} 様
             </p>
         </div>
@@ -329,9 +266,7 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-  # 2. 金額・言語・オプション・支払方法の入力欄（画面をフル活用するレイアウト）
   amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
-
   col1, col2, col3 = st.columns(3, gap="large")
 
   with col1:
@@ -364,8 +299,7 @@ elif st.session_state.step == "input_details":
       st.markdown("### 回数")
       kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
 
-    # オプション（「オプション」の文字は非表示にして高さを調整）
-    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
     is_kanki = st.checkbox("歓喜以上")
     st.write("")
     is_priority = st.checkbox("優先")
@@ -377,7 +311,7 @@ elif st.session_state.step == "input_details":
   st.write("---")
   st.write("")
 
-  # 3. 受付完了ボタン
+  # 「受付を完了する」を「完了」に変更
   if st.button("完了", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
@@ -388,8 +322,8 @@ elif st.session_state.step == "input_details":
         post_data = {
             "date": now,
             "category": category,
-            "name": name.strip(),
             "amount": selected_amount,
+            "name": name.strip(),
             "kaiSuu": kai_suu,
             "language": language,
             "isKanki": "〇" if is_kanki else "",
@@ -411,6 +345,174 @@ elif st.session_state.step == "input_details":
             st.error("データの送信に失敗しました。もう一度お試しください。")
         except Exception as e:
           st.error(f"エラーが発生しました: {e}")
+
+
+# =========================================================
+# 集計画面
+# =========================================================
+elif st.session_state.step == "summary":
+  st.markdown("<h1 style='text-align: center; font-size: 45px;'>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
+
+  if st.button("← 戻る"):
+    st.session_state.step = "select_category"
+    st.rerun()
+
+  st.write("---")
+
+  today_str = datetime.now().strftime("%Y-%m-%d")
+  st.markdown(f"### Date: **{today_str}**")
+
+  summary_data = {}
+  try:
+    res = requests.post(GAS_URL, json={"action": "summary", "date": today_str})
+    if res.status_code == 200:
+      summary_data = res.json().get("summary", {})
+  except Exception as e:
+    st.error(f"集計データの取得に失敗しました: {e}")
+
+  categories = ["向上", "初信", "向上相談", "相談", "特別相談", "鑑定"]
+  
+  tot_count = 0
+  tot_qr = 0
+  tot_bath = 0
+  tot_yen = 0
+
+  table_html = f"""
+  <table style="width:100%; border-collapse: collapse; font-size: 22px; text-align: center; background-color: #ffffff;">
+    <thead>
+      <tr style="background-color: #f1f5f9;">
+        <th style="border: 2px solid #1e293b; padding: 12px;"></th>
+        <th style="border: 2px solid #1e293b; padding: 12px;">人数</th>
+        <th style="border: 2px solid #1e293b; padding: 12px;">QR</th>
+        <th colspan="2" style="border: 2px solid #1e293b; padding: 12px; background-color: #e2e8f0;">Cash</th>
+      </tr>
+      <tr style="background-color: #f8fafc;">
+        <th style="border: 2px solid #1e293b; padding: 8px;"></th>
+        <th style="border: 2px solid #1e293b; padding: 8px;"></th>
+        <th style="border: 2px solid #1e293b; padding: 8px;"></th>
+        <th style="border: 2px solid #1e293b; padding: 8px;">Bath</th>
+        <th style="border: 2px solid #1e293b; padding: 8px;">Yen</th>
+      </tr>
+    </thead>
+    <tbody>
+  """
+
+  for cat in categories:
+    d = summary_data.get(cat, {"count": 0, "qr": 0, "bath": 0, "yen": 0})
+    tot_count += d["count"]
+    tot_qr += d["qr"]
+    tot_bath += d["bath"]
+    tot_yen += d["yen"]
+
+    table_html += f"""
+      <tr>
+        <td style="border: 2px solid #1e293b; padding: 12px; font-weight: bold; background-color: #f8fafc;">{cat}</td>
+        <td style="border: 2px solid #1e293b; padding: 12px;">{d["count"]}</td>
+        <td style="border: 2px solid #1e293b; padding: 12px;">{d["qr"]}</td>
+        <td style="border: 2px solid #1e293b; padding: 12px;">{d["bath"]}</td>
+        <td style="border: 2px solid #1e293b; padding: 12px;">{d["yen"]}</td>
+      </tr>
+    """
+
+  table_html += f"""
+      <tr style="background-color: #cbd5e1; font-weight: bold;">
+        <td style="border: 2px solid #1e293b; padding: 12px;">合計</td>
+        <td style="border: 2px solid #1e293b; padding: 12px;">{tot_count}</td>
+        <td style="border: 2px solid #1e293b; padding: 12px;">{tot_qr}</td>
+        <td style="border: 2px solid #1e293b; padding: 12px;">{tot_bath}</td>
+        <td style="border: 2px solid #1e293b; padding: 12px;">{tot_yen}</td>
+      </tr>
+    </tbody>
+  </table>
+  """
+  st.markdown(table_html, unsafe_allow_html=True)
+
+  st.write("")
+  st.write("---")
+
+  st.markdown("### 💰 金庫の現金カウント（実査・入力枠）")
+  st.markdown("黄色の枠内に金庫にある紙幣の枚数を入力してください。金額が自動計算されます。")
+
+  st.markdown(
+      """
+      <style>
+      input[type="number"] {
+          background-color: #fef08a !important;
+          font-size: 28px !important;
+          font-weight: bold !important;
+          color: #0f172a !important;
+          height: 60px !important;
+          border-radius: 8px !important;
+          border: 2px solid #ca8a04 !important;
+      }
+      </style>
+      """,
+      unsafe_allow_html=True,
+  )
+
+  col_a, col_b, col_c, col_d = st.columns([2, 3, 2, 3])
+
+  with col_a:
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>50 ×</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>100 ×</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>500 ×</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>1000 ×</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>250 ×</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>1000 ×</p>", unsafe_allow_html=True)
+
+  with col_b:
+    p_50 = st.number_input("50枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_50")
+    p_100 = st.number_input("100枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_100")
+    p_500 = st.number_input("500枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_500")
+    p_1000 = st.number_input("1000枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_1000")
+    p_250 = st.number_input("250枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_250")
+    p_1000y = st.number_input("1000Yen枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_1000y")
+
+  calc_50 = p_50 * 50
+  calc_100 = p_100 * 100
+  calc_500 = p_500 * 500
+  calc_1000 = p_1000 * 1000
+  calc_250 = p_250 * 250
+  calc_1000y = p_1000y * 1000
+
+  total_bath = calc_50 + calc_100 + calc_500 + calc_1000 + calc_250
+  total_yen = calc_1000y
+
+  with col_c:
+    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_50:,}</b></p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_100:,}</b></p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_500:,}</b></p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_1000:,}</b></p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_250:,}</b></p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_1000y:,}</b></p>", unsafe_allow_html=True)
+
+  with col_d:
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Yen</p>", unsafe_allow_html=True)
+
+  st.write("")
+  st.markdown(
+      f"""
+      <div style="
+          background-color: #dcfce7;
+          border: 3px solid #16a34a;
+          border-radius: 12px;
+          padding: 20px;
+          text-align: center;
+          margin-top: 20px;
+      ">
+          <p style="font-size: 28px; font-weight: bold; color: #166534; margin: 0;">【現金合計】</p>
+          <p style="font-size: 45px; font-weight: 950; color: #14532d; margin: 10px 0 0 0;">
+              🇹🇭 <b>{total_bath:,} Bath</b> / 🇯🇵 <b>{total_yen:,} Yen</b>
+          </p>
+      </div>
+      """,
+      unsafe_allow_html=True,
+  )
 
 
 # =========================================================
