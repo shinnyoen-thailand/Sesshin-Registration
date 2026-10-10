@@ -288,33 +288,57 @@ elif st.session_state.step == "input_details":
     is_infant = st.checkbox("乳児連れ")
 
   with col_right:
-    amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
+amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
     st.markdown("### 金額")
     
-    # 表記を「その他（お典供）」に変更
     amount_type = st.radio(
         "金額種別",
-        [amt_info["base"], amt_info["child"], "お典供"],
+        [amt_info["base"], amt_info["child"], "その他（お典供）"],
         label_visibility="collapsed",
         key="amount_radio",
     )
 
-    if amount_type == "お典供":
+    if amount_type == "その他（お典供）":
       st.markdown(
           """
           <div style='background-color: #fef9c3; padding: 25px; border-radius: 15px; border: 4px solid #facc15; margin-top: 15px;'>
-          <p style='font-size: 28px; font-weight: 900; color: #854d0e; margin-bottom: 15px;'>ペンで金額を記入し、通貨を選んでください</p>
+          <p style='font-size: 28px; font-weight: 900; color: #854d0e; margin-bottom: 15px;'>金額を入力し、通貨を選んでください</p>
           """, 
           unsafe_allow_html=True
       )
       
+      # 手書き・文字入力欄
       custom_amount = st.text_area(
           "任意金額",
           label_visibility="collapsed",
-          placeholder="数字を記入",
+          placeholder="半角数字で入力",
           height=110,
           key="custom_amount"
       )
+
+      # -------------------------------------------------------------
+      # 💡 ここに【方法2：数字以外の入力警告チェック】を組み込みます！
+      # -------------------------------------------------------------
+      custom_val = custom_amount.strip()
+      
+      if custom_val:
+        # 入力された文字が「半角数字のみ」かチェック
+        if not custom_val.isdigit():
+          st.error("⚠️ エラー：数字以外（アルファベットの「O」など）が入っています。数字だけで入力してください。")
+          selected_amount = "ERROR" # エラー時は送信されないようにする
+        else:
+          st.success(f"確認：{custom_val} と入力されました")
+          selected_amount = f"{custom_val} {st.session_state.get('custom_currency', 'Bath')}"
+      else:
+        selected_amount = "0 Bath"
+
+      st.write("")
+      custom_currency = st.radio("通貨", ["Bath", "円"], horizontal=True, label_visibility="collapsed", key="custom_currency")
+      
+      st.markdown("</div>", unsafe_allow_html=True)
+        
+    else:
+      selected_amount = amount_type
       
       st.write("")
       custom_currency = st.radio("通貨", ["Bath", "円"], horizontal=True, label_visibility="collapsed", key="custom_currency")
