@@ -308,5 +308,3 @@ elif st.session_state.step == "completed":
     st.session_state.step = "select_category"
     st.rerun()
 
-このコード内で言語を選ぶプルダウンがある。
-言語という文字自体を小さくし、プルダウンの箱を大きくし、日本語、英語、タイ語の文字をお年寄りにもよく見え選択しやすい大きさに変更。
