@@ -126,49 +126,36 @@ elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      /* 「最初の画面に戻る」ボタン */
-      button[kind="secondary"] { min-height: 90px !important; }
-      button[kind="secondary"] p { font-size: 32px !important; }
+      button[kind="secondary"] { 
+          min-height: 100px !important; 
+      }
+      button[kind="secondary"] p { 
+          font-size: 35px !important; 
+      }
 
-      /* 「受付を完了する」ボタン */
-      button[kind="primary"] { min-height: 140px !important; }
-      button[kind="primary"] p { font-size: 45px !important; }
+      button[kind="primary"] { 
+          min-height: 140px !important; 
+      }
+      button[kind="primary"] p { 
+          font-size: 45px !important; 
+      }
       
-      /* ラベルの見出しサイズ（控えめな大きさ） */
-      h3 { font-size: 28px !important; color: #1e293b !important; margin-bottom: 10px !important; }
+      h3 { font-size: 40px !important; color: #1e293b !important; margin-bottom: 15px !important; }
 
-      /* ▼▼ プルダウン（選択ボックス）の枠と中身の文字を強制巨大化 (32px) ▼▼ */
-      [data-testid="stSelectbox"] div[data-baseweb="select"] {
-          min-height: 85px !important;
+      div[data-baseweb="select"] > div {
+          min-height: 100px !important;
+          font-size: 40px !important;
           border-radius: 12px !important;
-          border: 3px solid #1e293b !important;
       }
-      
-      /* 選択ボックス内のすべての要素（現在表示されている日本語・英語・タイ語など） */
-      [data-testid="stSelectbox"] div[data-baseweb="select"] * {
-          font-size: 32px !important;
-          font-weight: bold !important;
-          color: #0f172a !important;
+      div[data-baseweb="select"] span {
+          font-size: 40px !important;
       }
-
-      /* ▼▼ タップして開いたリストメニュー内の文字（日本語・英語・タイ語など）を強制巨大化 ▼▼ */
-      div[data-baseweb="menu"] *, 
-      ul[role="listbox"] *, 
-      li[role="option"] * {
-          font-size: 32px !important;
-          font-weight: bold !important;
-          color: #0f172a !important;
+      ul[role="listbox"] li {
+          font-size: 40px !important;
+          padding-top: 25px !important;
+          padding-bottom: 25px !important;
       }
 
-      /* メニュー項目の上下幅（押しやすさ）を確保 */
-      ul[role="listbox"] li, 
-      li[role="option"] {
-          min-height: 75px !important;
-          padding-top: 15px !important;
-          padding-bottom: 15px !important;
-      }
-
-      /* ▼▼ チェックボックスとラジオボタンの拡大設定 ▼▼ */
       [data-testid="stCheckbox"] {
           transform: scale(2.0);
           transform-origin: left center;
@@ -196,12 +183,36 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-  st.markdown("### お名前（ペンまたはテキストで記入）")
-  name = st.text_area(
-      "お名前",
-      label_visibility="collapsed",
-      placeholder="ここに名前を記入してください",
-      height=180,
+st.markdown("### お名前（ペンまたはテキストで記入）")
+name = st.text_area(
+    "お名前",
+    label_visibility="collapsed",
+    placeholder="ここに名前を記入してください",
+    height=140,
+)
+
+# ▼▼ 名前が入力されたら、枠一杯の特大文字で確認表示する仕組み ▼▼
+if name.strip():
+  # 入力された名前を枠の中一杯に巨大表示（CSSで枠と文字サイズを指定）
+  st.markdown(
+      f"""
+      <div style="
+          border: 4px solid #1e293b;
+          background-color: #f8fafc;
+          border-radius: 15px;
+          padding: 20px;
+          text-align: center;
+          margin-top: 10px;
+          margin-bottom: 20px;
+          box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+      ">
+          <p style="font-size: 28px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
+          <p style="font-size: 65px; font-weight: 900; color: #0f172a; margin: 10px 0 0 0; word-break: break-all;">
+              {name.strip()} 様
+          </p>
+      </div>
+      """,
+      unsafe_allow_html=True,
   )
   
   st.write("---")
@@ -236,6 +247,7 @@ elif st.session_state.step == "input_details":
     if name.strip() == "":
       st.warning("お名前を入力してください。")
     else:
+      # ボタンを押した瞬間、画面に「送信中...」というクルクル（スピナー）を表示して入力を完全ロックする
       with st.spinner("送信中... しばらくお待ちください"):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
