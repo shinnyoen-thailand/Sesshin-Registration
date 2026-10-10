@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbxtaYEDz0B7j3rhehONDnto8dCfaBSnjgiUW6WvGuU9EIpSnWiBxBLtdNBimq_n-wIR/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbx8Wa_VRAJhHQJYAA6oNgzdDSUAVkVgaVoucXvncbbK_5jXZzd3EUJEQzPNtgam6_9l/exec"
 
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
@@ -135,7 +135,6 @@ if st.session_state.step == "select_category":
       unsafe_allow_html=True,
   )
 
-  # タイトルを「接心受付」に変更
   st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 20px;'>接心受付</h1>", unsafe_allow_html=True)
 
   col_left, col_right = st.columns(2, gap="large")
@@ -227,7 +226,6 @@ elif st.session_state.step == "input_details":
   category = st.session_state.selected_category
   st.markdown(f"<h1 style='font-size: 40px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
-  # 「最初の画面に戻る」を「戻る」に変更
   if st.button("← 戻る"):
     st.session_state.step = "select_category"
     st.rerun()
@@ -311,7 +309,6 @@ elif st.session_state.step == "input_details":
   st.write("---")
   st.write("")
 
-  # 「受付を完了する」を「完了」に変更
   if st.button("完了", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
@@ -377,25 +374,7 @@ elif st.session_state.step == "summary":
   tot_bath = 0
   tot_yen = 0
 
-  table_html = f"""
-  <table style="width:100%; border-collapse: collapse; font-size: 22px; text-align: center; background-color: #ffffff;">
-    <thead>
-      <tr style="background-color: #f1f5f9;">
-        <th style="border: 2px solid #1e293b; padding: 12px;"></th>
-        <th style="border: 2px solid #1e293b; padding: 12px;">人数</th>
-        <th style="border: 2px solid #1e293b; padding: 12px;">QR</th>
-        <th colspan="2" style="border: 2px solid #1e293b; padding: 12px; background-color: #e2e8f0;">Cash</th>
-      </tr>
-      <tr style="background-color: #f8fafc;">
-        <th style="border: 2px solid #1e293b; padding: 8px;"></th>
-        <th style="border: 2px solid #1e293b; padding: 8px;"></th>
-        <th style="border: 2px solid #1e293b; padding: 8px;"></th>
-        <th style="border: 2px solid #1e293b; padding: 8px;">Bath</th>
-        <th style="border: 2px solid #1e293b; padding: 8px;">Yen</th>
-      </tr>
-    </thead>
-    <tbody>
-  """
+  table_html = """<table style="width:100%; border-collapse: collapse; font-size: 22px; text-align: center; background-color: #ffffff;"><thead><tr style="background-color: #f1f5f9;"><th style="border: 2px solid #1e293b; padding: 12px;"></th><th style="border: 2px solid #1e293b; padding: 12px;">人数</th><th style="border: 2px solid #1e293b; padding: 12px;">QR</th><th colspan="2" style="border: 2px solid #1e293b; padding: 12px; background-color: #e2e8f0;">Cash</th></tr><tr style="background-color: #f8fafc;"><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;">Bath</th><th style="border: 2px solid #1e293b; padding: 8px;">Yen</th></tr></thead><tbody>"""
 
   for cat in categories:
     d = summary_data.get(cat, {"count": 0, "qr": 0, "bath": 0, "yen": 0})
@@ -404,27 +383,10 @@ elif st.session_state.step == "summary":
     tot_bath += d["bath"]
     tot_yen += d["yen"]
 
-    table_html += f"""
-      <tr>
-        <td style="border: 2px solid #1e293b; padding: 12px; font-weight: bold; background-color: #f8fafc;">{cat}</td>
-        <td style="border: 2px solid #1e293b; padding: 12px;">{d["count"]}</td>
-        <td style="border: 2px solid #1e293b; padding: 12px;">{d["qr"]}</td>
-        <td style="border: 2px solid #1e293b; padding: 12px;">{d["bath"]}</td>
-        <td style="border: 2px solid #1e293b; padding: 12px;">{d["yen"]}</td>
-      </tr>
-    """
+    table_html += f"""<tr><td style="border: 2px solid #1e293b; padding: 12px; font-weight: bold; background-color: #f8fafc;">{cat}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["count"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["qr"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["bath"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["yen"]}</td></tr>"""
 
-  table_html += f"""
-      <tr style="background-color: #cbd5e1; font-weight: bold;">
-        <td style="border: 2px solid #1e293b; padding: 12px;">合計</td>
-        <td style="border: 2px solid #1e293b; padding: 12px;">{tot_count}</td>
-        <td style="border: 2px solid #1e293b; padding: 12px;">{tot_qr}</td>
-        <td style="border: 2px solid #1e293b; padding: 12px;">{tot_bath}</td>
-        <td style="border: 2px solid #1e293b; padding: 12px;">{tot_yen}</td>
-      </tr>
-    </tbody>
-  </table>
-  """
+  table_html += f"""<tr style="background-color: #cbd5e1; font-weight: bold;"><td style="border: 2px solid #1e293b; padding: 12px;">合計</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_count}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_qr}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_bath}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_yen}</td></tr></tbody></table>"""
+  
   st.markdown(table_html, unsafe_allow_html=True)
 
   st.write("")
