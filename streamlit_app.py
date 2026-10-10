@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbzs_arwQvb_198gZFVqndX2nWgdI5H_Moedjvq577iHJvceSWBG68myW19yIwhgn1jZ/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbxtaYEDz0B7j3rhehONDnto8dCfaBSnjgiUW6WvGuU9EIpSnWiBxBLtdNBimq_n-wIR/exec"
 
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
