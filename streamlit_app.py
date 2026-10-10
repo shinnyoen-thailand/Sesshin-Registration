@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbxC5dpDpqYDIwtPRRCaBxggEmmuYrBPaYoN0wqK3z5npZcUE5eFY4aILIBpXIxWAf6T/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbxGwm-EWQiR4YKfAHue8T7RE_crx2GL-am6HcU5snPRKLp5EK4lB8yYPluwEMaLGxFs/exec"
 
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
@@ -452,6 +452,8 @@ elif st.session_state.step == "summary":
     st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
     st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
     st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
     st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Yen</p>", unsafe_allow_html=True)
 
   st.write("")
@@ -493,9 +495,8 @@ elif st.session_state.step == "completed":
   )
 
   st.markdown("<h1>受付が完了いたしました</h1>", unsafe_allow_html=True)
-  st.markdown(f"<h3>お名前: {st.session_state.completed_name} 様</h3>", unsafe_allow_html=True)
+  st.markdown(f"### お名前: {st.session_state.completed_name} 様</h3>", unsafe_allow_html=True)
   
-  # 修正：st.ticket_id を st.session_state.ticket_id に修正しました
   st.markdown(f"<h2>受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
 
   st.info("この番号をレシートにお書きください。")
