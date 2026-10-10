@@ -6,7 +6,7 @@ import streamlit as st
 # ご自身のGASのウェブアプリのURLに書き換えてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbyGofUnzrAKmmUEeGpeX8dSs5amZQPiLC0sHnHLi-0RMItVJFwXp5gC08LJGBCrcsbO/exec"
 
-# 受付種類ごとの金額設定データ（15歳以下表記を金額先頭に統一）
+# 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
     "向上": {
         "base": "100 Bath",
@@ -345,7 +345,7 @@ elif st.session_state.step == "input_details":
 
 
 # =========================================================
-# 集計画面（スプレッドシートの集計結果を表示 + 現金カウンター）
+# 集計画面（スプレッドシートの集計結果 + 視認性重視の金庫カウント）
 # =========================================================
 elif st.session_state.step == "summary":
   st.markdown("<h1 style='text-align: center; font-size: 45px;'>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
@@ -375,8 +375,7 @@ elif st.session_state.step == "summary":
   tot_bath = 0
   tot_yen = 0
 
-  # テーブルのHTML生成
-  table_html = """<table style="width:100%; border-collapse: collapse; font-size: 22px; text-align: center; background-color: #ffffff;"><thead><tr style="background-color: #f1f5f9;"><th style="border: 2px solid #1e293b; padding: 12px;"></th><th style="border: 2px solid #1e293b; padding: 12px;">人数</th><th style="border: 2px solid #1e293b; padding: 12px;">QR</th><th colspan="2" style="border: 2px solid #1e293b; padding: 12px; background-color: #e2e8f0;">Cash</th></tr><tr style="background-color: #f8fafc;"><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;">Bath</th><th style="border: 2px solid #1e293b; padding: 8px;">Yen</th></tr></thead><tbody>"""
+  table_html = """<table style="width:100%; border-collapse: collapse; font-size: 24px; text-align: center; background-color: #ffffff;"><thead><tr style="background-color: #f1f5f9;"><th style="border: 2px solid #1e293b; padding: 12px;"></th><th style="border: 2px solid #1e293b; padding: 12px;">人数</th><th style="border: 2px solid #1e293b; padding: 12px;">QR</th><th colspan="2" style="border: 2px solid #1e293b; padding: 12px; background-color: #e2e8f0;">Cash</th></tr><tr style="background-color: #f8fafc;"><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;"></th><th style="border: 2px solid #1e293b; padding: 8px;">Bath</th><th style="border: 2px solid #1e293b; padding: 8px;">Yen</th></tr></thead><tbody>"""
 
   for cat in categories:
     d = summary_data.get(cat, {"count": 0, "qr": 0, "bath": 0, "yen": 0})
@@ -402,61 +401,65 @@ elif st.session_state.step == "summary":
       <style>
       input[type="number"] {
           background-color: #fef08a !important;
-          font-size: 28px !important;
+          font-size: 32px !important;
           font-weight: bold !important;
           color: #0f172a !important;
-          height: 60px !important;
-          border-radius: 8px !important;
+          height: 55px !important;
+          border-radius: 6px !important;
           border: 2px solid #ca8a04 !important;
+          text-align: center !important;
       }
       </style>
       """,
       unsafe_allow_html=True,
   )
 
-  col_a, col_b, col_c, col_d = st.columns([2, 3, 2, 3])
+  # 金庫の入力行データ (券種, key, 通貨)
+  denominations = [
+      (50, "n_50", "Bath"),
+      (100, "n_100", "Bath"),
+      (500, "n_500", "Bath"),
+      (1000, "n_1000", "Bath"),
+      (250, "n_250", "Bath"),
+      (1000, "n_1000y", "Yen"),
+  ]
 
-  with col_a:
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>50 ×</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>100 ×</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>500 ×</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>1000 ×</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>250 ×</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>1000 ×</p>", unsafe_allow_html=True)
+  calc_totals = {"Bath": 0, "Yen": 0}
 
-  with col_b:
-    p_50 = st.number_input("50枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_50")
-    p_100 = st.number_input("100枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_100")
-    p_500 = st.number_input("500枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_500")
-    p_1000 = st.number_input("1000枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_1000")
-    p_250 = st.number_input("250枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_250")
-    p_1000y = st.number_input("1000Yen枚数", min_value=0, value=0, step=1, label_visibility="collapsed", key="n_1000y")
+  for denom, key, currency in denominations:
+    c1, c2, c3, c4, c5 = st.columns([1.5, 0.8, 2.5, 0.8, 3.5])
+    
+    with c1:
+      st.markdown(f"<p style='font-size:32px; font-weight:bold; text-align:right; margin-top:10px;'>{denom}</p>", unsafe_allow_html=True)
+    with c2:
+      st.markdown("<p style='font-size:40px; font-weight:900; text-align:center; margin-top:5px; color:#1e293b;'>×</p>", unsafe_allow_html=True)
+    with c3:
+      count = st.number_input(f"{denom}", min_value=0, value=0, step=1, label_visibility="collapsed", key=key)
+    with c4:
+      st.markdown("<p style='font-size:40px; font-weight:900; text-align:center; margin-top:5px; color:#1e293b;'>＝</p>", unsafe_allow_html=True)
+    with c5:
+      subtotal = denom * count
+      calc_totals[currency] += subtotal
+      st.markdown(
+          f"""
+          <div style="
+              background-color: #fef08a;
+              border: 2px solid #ca8a04;
+              border-radius: 6px;
+              height: 55px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-top: 5px;
+          ">
+              <span style="font-size: 30px; font-weight: bold; color: #0f172a;">{subtotal:,} {currency}</span>
+          </div>
+          """,
+          unsafe_allow_html=True,
+      )
 
-  calc_50 = p_50 * 50
-  calc_100 = p_100 * 100
-  calc_500 = p_500 * 500
-  calc_1000 = p_1000 * 1000
-  calc_250 = p_250 * 250
-  calc_1000y = p_1000y * 1000
-
-  total_bath = calc_50 + calc_100 + calc_500 + calc_1000 + calc_250
-  total_yen = calc_1000y
-
-  with col_c:
-    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_50:,}</b></p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_100:,}</b></p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_500:,}</b></p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_1000:,}</b></p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_250:,}</b></p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='font-size:26px; font-weight:bold; padding-top:25px;'>人 = <b>{calc_1000y:,}</b></p>", unsafe_allow_html=True)
-
-  with col_d:
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Bath</p>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:26px; font-weight:bold; padding-top:20px;'>Yen</p>", unsafe_allow_html=True)
+  total_bath = calc_totals["Bath"]
+  total_yen = calc_totals["Yen"]
 
   st.write("")
   st.markdown(
