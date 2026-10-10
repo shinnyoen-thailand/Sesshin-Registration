@@ -219,7 +219,7 @@ elif st.session_state.step == "input_details":
   st.write("---")
   st.write("")
 
-  if st.button("受付を完了する", type="primary"):
+  if st.button("完了", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
     else:
