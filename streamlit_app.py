@@ -122,40 +122,50 @@ if st.session_state.step == "select_category":
 # =========================================================
 # 画面2：詳細情報の入力画面
 # =========================================================
+# =========================================================
+# 画面2：詳細情報の入力画面
+# =========================================================
 elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      button[kind="secondary"] { 
-          min-height: 100px !important; 
-      }
-      button[kind="secondary"] p { 
-          font-size: 35px !important; 
-      }
-
-      button[kind="primary"] { 
-          min-height: 140px !important; 
-      }
-      button[kind="primary"] p { 
-          font-size: 45px !important; 
-      }
+      /* ボタン類のサイズ */
+      button[kind="secondary"] { min-height: 90px !important; }
+      button[kind="secondary"] p { font-size: 32px !important; }
+      button[kind="primary"] { min-height: 140px !important; }
+      button[kind="primary"] p { font-size: 45px !important; }
       
       h3 { font-size: 40px !important; color: #1e293b !important; margin-bottom: 15px !important; }
 
+      /* ▼▼ 言語・回数のプルダウンをさらに超巨大化 ▼▼ */
+      /* 1. 選択ボックス（外枠）の高さと文字サイズ */
       div[data-baseweb="select"] > div {
-          min-height: 100px !important;
-          font-size: 40px !important;
-          border-radius: 12px !important;
+          min-height: 110px !important;  /* 枠の高さをさらにアップ */
+          font-size: 45px !important;    /* 選択中の文字サイズ */
+          font-weight: bold !important;
+          border-radius: 15px !important;
+          border: 3px solid #1e293b !important;
       }
+      
+      /* 2. ボックス内の表示文字サイズ */
       div[data-baseweb="select"] span {
-          font-size: 40px !important;
-      }
-      ul[role="listbox"] li {
-          font-size: 40px !important;
-          padding-top: 25px !important;
-          padding-bottom: 25px !important;
+          font-size: 45px !important;
+          font-weight: bold !important;
       }
 
+      /* 3. プルダウンを開いたときの選択肢（日本語、英語、タイ語など）の巨大化 */
+      ul[role="listbox"] {
+          border-radius: 15px !important;
+      }
+      ul[role="listbox"] li {
+          font-size: 45px !important;        /* 選択肢の文字を大きく */
+          font-weight: bold !important;
+          padding-top: 30px !important;      /* 上下の押し幅（余白）を大きく */
+          padding-bottom: 30px !important;
+          min-height: 90px !important;
+      }
+
+      /* ▼▼ チェックボックスとラジオボタンの拡大 ▼▼ */
       [data-testid="stCheckbox"] {
           transform: scale(2.0);
           transform-origin: left center;
@@ -173,7 +183,6 @@ elif st.session_state.step == "input_details":
       """,
       unsafe_allow_html=True,
   )
-
   category = st.session_state.selected_category
   st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
