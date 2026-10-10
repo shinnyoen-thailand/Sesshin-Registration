@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbyGofUnzrAKmmUEeGpeX8dSs5amZQPiLC0sHnHLi-0RMItVJFwXp5gC08LJGBCrcsbO/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbz1soj-hY6_oTNGv4C4z4WAXAAp0ArCqjrBXsM9MKK60gVTSq3f1aidFrktlQ9OYzgk/exec"
 
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
@@ -211,8 +211,8 @@ elif st.session_state.step == "input_details":
       [data-testid="stCheckbox"] {
           transform: scale(1.8);
           transform-origin: left center;
-          margin-top: 25px;
-          margin-bottom: 25px;
+          margin-top: 20px;
+          margin-bottom: 20px;
           margin-left: 15px;
       }
       </style>
@@ -230,9 +230,9 @@ elif st.session_state.step == "input_details":
   st.write("---")
 
   # -----------------------------------------------------------------
-  # 1. お名前入力欄 ＆ 確認欄（横幅1行を贅沢に使ってどーーーんと表示）
+  # 1. お名前入力欄 ＆ 確認欄（横幅1行でどーーーんと表示）
   # -----------------------------------------------------------------
-  st.markdown("### お名前（大きくご入力ください）")
+  st.markdown("### お名前（英語で入力ください）")
   name = st.text_area(
       "お名前",
       label_visibility="collapsed",
@@ -265,7 +265,7 @@ elif st.session_state.step == "input_details":
   st.write("---")
 
   # -----------------------------------------------------------------
-  # 2. その他の選択肢（すべてタップしやすいラジオボタンに変更）
+  # 2. その他の選択肢（左右バランス良く配置）
   # -----------------------------------------------------------------
   col_left, col_right = st.columns(2, gap="large")
 
@@ -280,19 +280,26 @@ elif st.session_state.step == "input_details":
       st.markdown("### 回数")
       kai_suu = st.radio("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
 
+    st.write("")
+    st.write("")
+    st.markdown("### その他")
+    is_kanki = st.checkbox("歓喜以上")
+    is_priority = st.checkbox("優先")
+    is_infant = st.checkbox("乳児連れ")
+
   with col_right:
     amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
     st.markdown("### 金額")
     
-    # 金額の選択肢を「その他（お典供）」に変更
+    # 表記を「その他（お典供）」に変更
     amount_type = st.radio(
         "金額種別",
-        [amt_info["base"], amt_info["child"], "その他（お典供）"],
+        [amt_info["base"], amt_info["child"], "お典供"],
         label_visibility="collapsed",
         key="amount_radio",
     )
 
-    if amount_type == "その他（お典供）":
+    if amount_type == "お典供":
       st.markdown(
           """
           <div style='background-color: #fef9c3; padding: 25px; border-radius: 15px; border: 4px solid #facc15; margin-top: 15px;'>
@@ -301,7 +308,6 @@ elif st.session_state.step == "input_details":
           unsafe_allow_html=True
       )
       
-      # 手書き用の金額入力枠（特大）
       custom_amount = st.text_area(
           "任意金額",
           label_visibility="collapsed",
@@ -311,12 +317,10 @@ elif st.session_state.step == "input_details":
       )
       
       st.write("")
-      # 通貨選択（バーツか円か）
       custom_currency = st.radio("通貨", ["Bath", "円"], horizontal=True, label_visibility="collapsed", key="custom_currency")
       
       st.markdown("</div>", unsafe_allow_html=True)
       
-      # スプレッドシートに送信する金額データを作成
       if custom_amount.strip():
         selected_amount = f"{custom_amount.strip()} {custom_currency}"
       else:
@@ -324,11 +328,6 @@ elif st.session_state.step == "input_details":
         
     else:
       selected_amount = amount_type
-
-    st.write("")
-    st.write("")
-    is_kanki = st.checkbox("歓喜以上")
-    is_priority = st.checkbox("優先")
 
     st.write("")
     st.write("")
@@ -345,6 +344,13 @@ elif st.session_state.step == "input_details":
       with st.spinner("送信中... しばらくお待ちください"):
         now = datetime.now().strftime("%Y-%m-%d")
 
+        # 優先判定などのまとめ（乳児連れも記録可能）
+        priority_str = ""
+        if is_priority:
+          priority_str = "〇"
+        elif is_infant:
+          priority_str = "乳児連れ"
+
         post_data = {
             "date": now,
             "category": category,
@@ -353,7 +359,8 @@ elif st.session_state.step == "input_details":
             "kaiSuu": kai_suu,
             "language": language,
             "isKanki": "〇" if is_kanki else "",
-            "isPriority": "〇" if is_priority else "",
+            "isPriority": "〇" if is_priority else "",  # 優先
+            "isInfant": "〇" if is_infant else "",  # 乳児連れ（独立）
             "payment": payment,
         }
 
