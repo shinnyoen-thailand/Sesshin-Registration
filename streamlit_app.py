@@ -11,57 +11,22 @@ AMOUNT_CONFIG = {
     "向上": {
         "base": "100 Bath",
         "child": "50 Bath（15歳以下）",
-        "countries": [
-            "日本 1000円",
-            "日本 250Bath",
-            "シンガポール 150Bath",
-            "アメリカ 200Bath",
-            "フランス 300Bath",
-        ],
     },
     "向上相談": {
         "base": "200 Bath",
         "child": "100 Bath（15歳以下）",
-        "countries": [
-            "日本 2000円",
-            "日本 400Bath",
-            "シンガポール 250Bath",
-            "アメリカ 300Bath",
-            "フランス 400Bath",
-        ],
     },
     "相談": {
         "base": "300 Bath",
         "child": "150 Bath（15歳以下）",
-        "countries": [
-            "日本 3000円",
-            "日本 600Bath",
-            "シンガポール 300Bath",
-            "アメリカ 400Bath",
-            "フランス 500Bath",
-        ],
     },
     "特別相談": {
         "base": "600 Bath",
         "child": "300 Bath（15歳以下）",
-        "countries": [
-            "日本 6000円",
-            "日本 1200Bath",
-            "シンガポール 500Bath",
-            "アメリカ 600Bath",
-            "フランス 700Bath",
-        ],
     },
     "鑑定": {
         "base": "900 Bath",
         "child": "450 Bath（15歳以下）",
-        "countries": [
-            "日本 9000円",
-            "日本 1900Bath",
-            "シンガポール 1100Bath",
-            "アメリカ 12000Bath",
-            "フランス 1400Bath",
-        ],
     },
 }
 
@@ -188,7 +153,17 @@ elif st.session_state.step == "input_details":
       button[kind="secondary"] p { font-size: 30px !important; }
       button[kind="primary"] { min-height: 130px !important; }
       button[kind="primary"] p { font-size: 45px !important; }
-      h3 { font-size: 34px !important; font-weight: 900 !important; color: #1e293b !important; margin-bottom: 15px !important; }
+      
+      /* 見出しの装飾 */
+      h3 { 
+          font-size: 36px !important; 
+          font-weight: 900 !important; 
+          color: #1e293b !important; 
+          border-left: 10px solid #3b82f6;
+          padding-left: 15px;
+          margin-bottom: 20px !important; 
+          margin-top: 10px !important; 
+      }
 
       /* お名前入力欄（横幅いっぱいで超特大） */
       textarea[aria-label="お名前"] {
@@ -200,33 +175,16 @@ elif st.session_state.step == "input_details":
           border: 4px solid #1e293b !important;
           border-radius: 15px !important;
       }
-
-      /* プルダウンの箱を大きく */
-      [data-testid="stSelectbox"] div[data-baseweb="select"] {
-          min-height: 90px !important;
-          border-radius: 12px !important;
-          border: 4px solid #1e293b !important;
+      
+      /* 任意金額入力欄（特大） */
+      textarea[aria-label="任意金額"] {
+          font-size: 50px !important;
+          font-weight: 900 !important;
+          height: 110px !important;
+          color: #000000 !important;
           background-color: #ffffff !important;
-      }
-      /* プルダウンが閉じている時の文字（超特大） */
-      [data-testid="stSelectbox"] div[data-baseweb="select"] div {
-          font-size: 38px !important;
-          font-weight: 900 !important;
-          color: #000000 !important;
-      }
-      /* プルダウンを開いたときの選択肢リスト全体と文字（超特大＆余白たっぷり） */
-      ul[role="listbox"] {
-          border: 4px solid #1e293b !important;
+          border: 4px solid #ca8a04 !important;
           border-radius: 12px !important;
-      }
-      li[role="option"] {
-          padding-top: 25px !important;
-          padding-bottom: 25px !important;
-      }
-      li[role="option"] span {
-          font-size: 38px !important;
-          font-weight: 900 !important;
-          color: #000000 !important;
       }
 
       /* ラジオボタンの文字（超特大） */
@@ -235,12 +193,13 @@ elif st.session_state.step == "input_details":
           font-weight: 900 !important;
           color: #000000 !important;
       }
+      /* ラジオボタン自体のサイズを拡大して押しやすく */
       [data-testid="stRadio"] {
           transform: scale(1.6);
           transform-origin: left center;
-          margin-left: 10px;
+          margin-left: 15px;
           margin-top: 15px;
-          margin-bottom: 15px;
+          margin-bottom: 25px;
       }
 
       /* チェックボックスの文字（超特大） */
@@ -252,9 +211,9 @@ elif st.session_state.step == "input_details":
       [data-testid="stCheckbox"] {
           transform: scale(1.8);
           transform-origin: left center;
-          margin-top: 20px;
-          margin-bottom: 20px;
-          margin-left: 10px;
+          margin-top: 25px;
+          margin-bottom: 25px;
+          margin-left: 15px;
       }
       </style>
       """,
@@ -306,39 +265,65 @@ elif st.session_state.step == "input_details":
   st.write("---")
 
   # -----------------------------------------------------------------
-  # 2. その他の選択肢（2カラムでスッキリ配置）
+  # 2. その他の選択肢（すべてタップしやすいラジオボタンに変更）
   # -----------------------------------------------------------------
   col_left, col_right = st.columns(2, gap="large")
 
   with col_left:
     st.markdown("### 言語")
-    language = st.selectbox("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
+    language = st.radio("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
     
     kai_suu = "-"
     if category == "初信":
       st.write("")
       st.write("")
       st.markdown("### 回数")
-      kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
+      kai_suu = st.radio("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
 
   with col_right:
     amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
     st.markdown("### 金額")
+    
+    # 金額の選択肢を「その他（お典供）」に変更
     amount_type = st.radio(
         "金額種別",
-        [amt_info["base"], amt_info["child"], "国別選択（その他）"],
+        [amt_info["base"], amt_info["child"], "その他（お典供）"],
         label_visibility="collapsed",
         key="amount_radio",
     )
 
-    if amount_type == "国別選択（その他）":
-      st.write("")
-      selected_amount = st.selectbox(
-          "国別金額",
-          amt_info["countries"],
-          label_visibility="collapsed",
-          key="country_amount_select",
+    if amount_type == "その他（お典供）":
+      st.markdown(
+          """
+          <div style='background-color: #fef9c3; padding: 25px; border-radius: 15px; border: 4px solid #facc15; margin-top: 15px;'>
+          <p style='font-size: 28px; font-weight: 900; color: #854d0e; margin-bottom: 15px;'>ペンで金額を記入し、通貨を選んでください</p>
+          """, 
+          unsafe_allow_html=True
       )
+      
+      # 手書き用の金額入力枠（特大）
+      custom_amount = st.text_area(
+          "任意金額",
+          label_visibility="collapsed",
+          placeholder="数字を記入",
+          height=110,
+          key="custom_amount"
+      )
+      
+      st.write("")
+      # 通貨選択（バーツか円か）
+      custom_currency = st.radio("通貨", ["Bath", "円"], horizontal=True, label_visibility="collapsed", key="custom_currency")
+      
+      st.markdown("</div>", unsafe_allow_html=True)
+      
+      # スプレッドシートに送信する金額データを作成
+      if custom_amount.strip():
+        selected_amount = f"{custom_amount.strip()} {custom_currency}"
+      else:
+        selected_amount = f"0 {custom_currency}"
+        
+    else:
+      selected_amount = amount_type
 
     st.write("")
     st.write("")
