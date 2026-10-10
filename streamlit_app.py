@@ -82,7 +82,7 @@ if st.session_state.step == "select_category":
       unsafe_allow_html=True,
   )
 
-  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 30px;'>受付システム - 種類を選択</h1>", unsafe_allow_html=True)
+  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 30px;'>接心受付</h1>", unsafe_allow_html=True)
 
   col_left, col_right = st.columns(2, gap="large")
 
@@ -190,7 +190,7 @@ elif st.session_state.step == "input_details":
   category = st.session_state.selected_category
   st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
-  if st.button("← 最初の画面に戻る"):
+  if st.button("← 戻る"):
     st.session_state.step = "select_category"
     st.rerun()
 
@@ -232,7 +232,7 @@ elif st.session_state.step == "input_details":
   st.write("---")
   st.write("")
 
-  if st.button("受付を完了する", type="primary"):
+  if st.button("完了", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
     else:
