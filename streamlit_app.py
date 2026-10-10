@@ -190,33 +190,51 @@ elif st.session_state.step == "input_details":
       button[kind="primary"] p { font-size: 40px !important; }
       h3 { font-size: 28px !important; color: #1e293b !important; margin-bottom: 10px !important; }
 
+      /* プルダウン（セレクトボックスの箱自体）の高さを大きく（約2倍）し、枠線を太く */
       [data-testid="stSelectbox"] div[data-baseweb="select"] {
-          min-height: 75px !important;
+          min-height: 100px !important;
           border-radius: 12px !important;
-          border: 3px solid #1e293b !important;
+          border: 4px solid #1e293b !important;
       }
+      /* プルダウン内で選択されている文字を大きく太く */
       [data-testid="stSelectbox"] div[data-baseweb="select"] * {
-          font-size: 30px !important;
+          font-size: 32px !important;
           font-weight: bold !important;
           color: #0f172a !important;
       }
+      /* プルダウンを開いたときの中身（メニュー一覧）の文字と余白を大きく */
       div[data-baseweb="menu"] *, ul[role="listbox"] *, li[role="option"] * {
-          font-size: 30px !important;
+          font-size: 32px !important;
+          font-weight: bold !important;
+          color: #0f172a !important;
+          padding-top: 12px !important;
+          padding-bottom: 12px !important;
+      }
+      /* ラジオボタン（金額・支払方法）の文字を大きく太く */
+      [data-testid="stRadio"] label p {
+          font-size: 32px !important;
+          font-weight: bold !important;
+          color: #0f172a !important;
+      }
+      /* チェックボックスの文字を大きく太く */
+      [data-testid="stCheckbox"] label p {
+          font-size: 32px !important;
           font-weight: bold !important;
           color: #0f172a !important;
       }
       [data-testid="stCheckbox"] {
-          transform: scale(1.8);
+          transform: scale(1.6);
           transform-origin: left center;
-          margin-top: 10px;
+          margin-top: 15px;
           margin-bottom: 25px;
           margin-left: 10px;
       }
       [data-testid="stRadio"] {
-          transform: scale(1.8);
+          transform: scale(1.5);
           transform-origin: left center;
           margin-left: 10px;
           margin-top: 10px;
+          margin-bottom: 10px;
       }
       </style>
       """,
@@ -359,7 +377,6 @@ elif st.session_state.step == "summary":
   today_str = datetime.now().strftime("%Y-%m-%d")
   st.markdown(f"### Date: **{today_str}**")
 
-  # スプレッドシート側の集計結果をGAS経由で取得
   summary_data = {}
   try:
     res = requests.post(GAS_URL, json={"action": "summary", "date": today_str})
@@ -414,7 +431,6 @@ elif st.session_state.step == "summary":
       unsafe_allow_html=True,
   )
 
-  # 金庫の入力行データ (券種, key, 通貨)
   denominations = [
       (50, "n_50", "Bath"),
       (100, "n_100", "Bath"),
