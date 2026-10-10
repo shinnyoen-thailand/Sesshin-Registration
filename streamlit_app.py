@@ -232,7 +232,7 @@ elif st.session_state.step == "input_details":
   # -----------------------------------------------------------------
   # 1. お名前入力欄 ＆ 確認欄（横幅1行でどーーーんと表示）
   # -----------------------------------------------------------------
-  st.markdown("### お名前（英語で入力ください）")
+  st.markdown("### お名前（大きくご入力ください）")
   name = st.text_area(
       "お名前",
       label_visibility="collapsed",
@@ -282,13 +282,13 @@ elif st.session_state.step == "input_details":
 
     st.write("")
     st.write("")
-    st.markdown("### その他")
+    st.markdown("### 区分・オプション")
     is_kanki = st.checkbox("歓喜以上")
     is_priority = st.checkbox("優先")
     is_infant = st.checkbox("乳児連れ")
 
   with col_right:
-amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
+    amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
     st.markdown("### 金額")
     
     amount_type = st.radio(
@@ -298,57 +298,45 @@ amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
         key="amount_radio",
     )
 
+    is_amount_error = False
+
     if amount_type == "その他（お典供）":
       st.markdown(
           """
           <div style='background-color: #fef9c3; padding: 25px; border-radius: 15px; border: 4px solid #facc15; margin-top: 15px;'>
-          <p style='font-size: 28px; font-weight: 900; color: #854d0e; margin-bottom: 15px;'>金額を入力し、通貨を選んでください</p>
+          <p style='font-size: 28px; font-weight: 900; color: #854d0e; margin-bottom: 15px;'>金額を半角数字で記入し、通貨を選んでください</p>
           """, 
           unsafe_allow_html=True
       )
       
-      # 手書き・文字入力欄
       custom_amount = st.text_area(
           "任意金額",
           label_visibility="collapsed",
-          placeholder="半角数字で入力",
+          placeholder="数字を記入（例: 2000）",
           height=110,
           key="custom_amount"
       )
 
       # -------------------------------------------------------------
-      # 💡 ここに【方法2：数字以外の入力警告チェック】を組み込みます！
+      # 💡 入力された金額の「数字チェック（誤入力警告）」処理
       # -------------------------------------------------------------
       custom_val = custom_amount.strip()
       
+      st.write("")
+      custom_currency = st.radio("通貨", ["Bath", "円"], horizontal=True, label_visibility="collapsed", key="custom_currency")
+
       if custom_val:
-        # 入力された文字が「半角数字のみ」かチェック
         if not custom_val.isdigit():
           st.error("⚠️ エラー：数字以外（アルファベットの「O」など）が入っています。数字だけで入力してください。")
-          selected_amount = "ERROR" # エラー時は送信されないようにする
+          is_amount_error = True
+          selected_amount = f"{custom_val} {custom_currency}"
         else:
-          st.success(f"確認：{custom_val} と入力されました")
-          selected_amount = f"{custom_val} {st.session_state.get('custom_currency', 'Bath')}"
-      else:
-        selected_amount = "0 Bath"
-
-      st.write("")
-      custom_currency = st.radio("通貨", ["Bath", "円"], horizontal=True, label_visibility="collapsed", key="custom_currency")
-      
-      st.markdown("</div>", unsafe_allow_html=True)
-        
-    else:
-      selected_amount = amount_type
-      
-      st.write("")
-      custom_currency = st.radio("通貨", ["Bath", "円"], horizontal=True, label_visibility="collapsed", key="custom_currency")
-      
-      st.markdown("</div>", unsafe_allow_html=True)
-      
-      if custom_amount.strip():
-        selected_amount = f"{custom_amount.strip()} {custom_currency}"
+          st.success(f"確認：{custom_val} {custom_currency} と入力されました")
+          selected_amount = f"{custom_val} {custom_currency}"
       else:
         selected_amount = f"0 {custom_currency}"
+
+      st.markdown("</div>", unsafe_allow_html=True)
         
     else:
       selected_amount = amount_type
@@ -364,13 +352,17 @@ amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
   if st.button("完了", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
+    elif is_amount_error:
+      st.error("金額欄に不適切な文字（アルファベット等）が含まれています。修正してから完了ボタンを押してください。")
     else:
       with st.spinner("送信中... しばらくお待ちください"):
         now = datetime.now().strftime("%Y-%m-%d")
 
-        # 優先判定などのまとめ（乳児連れも記録可能）
+        # 優先判定（優先と乳児連れの両方が記録可能）
         priority_str = ""
-        if is_priority:
+        if is_priority and is_infant:
+          priority_str = "〇 / 乳児連れ"
+        elif is_priority:
           priority_str = "〇"
         elif is_infant:
           priority_str = "乳児連れ"
@@ -383,8 +375,7 @@ amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
             "kaiSuu": kai_suu,
             "language": language,
             "isKanki": "〇" if is_kanki else "",
-            "isPriority": "〇" if is_priority else "",  # 優先
-            "isInfant": "〇" if is_infant else "",  # 乳児連れ（独立）
+            "isPriority": priority_str,
             "payment": payment,
         }
 
