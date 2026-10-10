@@ -190,47 +190,43 @@ elif st.session_state.step == "input_details":
       button[kind="primary"] p { font-size: 40px !important; }
       h3 { font-size: 28px !important; color: #1e293b !important; margin-bottom: 10px !important; }
 
-      /* プルダウン（セレクトボックスの箱自体）の高さを大きく（約2倍）し、枠線を太く */
+      /* プルダウンの高さ・文字サイズ */
       [data-testid="stSelectbox"] div[data-baseweb="select"] {
-          min-height: 100px !important;
+          min-height: 80px !important;
           border-radius: 12px !important;
           border: 4px solid #1e293b !important;
       }
-      /* プルダウン内で選択されている文字を大きく太く */
       [data-testid="stSelectbox"] div[data-baseweb="select"] * {
-          font-size: 32px !important;
+          font-size: 28px !important;
           font-weight: bold !important;
           color: #0f172a !important;
       }
-      /* プルダウンを開いたときの中身（メニュー一覧）の文字と余白を大きく */
       div[data-baseweb="menu"] *, ul[role="listbox"] *, li[role="option"] * {
-          font-size: 32px !important;
+          font-size: 28px !important;
           font-weight: bold !important;
           color: #0f172a !important;
-          padding-top: 12px !important;
-          padding-bottom: 12px !important;
+          padding-top: 10px !important;
+          padding-bottom: 10px !important;
       }
-      /* ラジオボタン（金額・支払方法）の文字を大きく太く */
       [data-testid="stRadio"] label p {
-          font-size: 32px !important;
+          font-size: 28px !important;
           font-weight: bold !important;
           color: #0f172a !important;
       }
-      /* チェックボックスの文字を大きく太く */
       [data-testid="stCheckbox"] label p {
-          font-size: 32px !important;
+          font-size: 28px !important;
           font-weight: bold !important;
           color: #0f172a !important;
       }
       [data-testid="stCheckbox"] {
-          transform: scale(1.6);
+          transform: scale(1.5);
           transform-origin: left center;
           margin-top: 15px;
-          margin-bottom: 25px;
+          margin-bottom: 15px;
           margin-left: 10px;
       }
       [data-testid="stRadio"] {
-          transform: scale(1.5);
+          transform: scale(1.4);
           transform-origin: left center;
           margin-left: 10px;
           margin-top: 10px;
@@ -250,42 +246,52 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-  st.markdown("### お名前（ペンまたはテキストで記入）")
-  name = st.text_area(
-      "お名前",
-      label_visibility="collapsed",
-      placeholder="ここに名前を記入してください",
-      height=120,
-  )
-  
-  if name.strip():
-    st.markdown(
-        f"""
-        <div style="
-            border: 4px solid #1e293b;
-            background-color: #f8fafc;
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
-        ">
-            <p style="font-size: 24px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
-            <p style="font-size: 55px; font-weight: 900; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">
-                {name.strip()} 様
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+  # 2カラム構成に変更（iPadでも横にはみ出さない）
+  col_left, col_right = st.columns(2, gap="large")
+
+  with col_left:
+    st.markdown("### 言語")
+    language = st.selectbox("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
+    
+    kai_suu = "-"
+    if category == "初信":
+      st.write("")
+      st.markdown("### 回数")
+      kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
+
+    st.write("")
+    st.markdown("### お名前（ペンまたはテキストで記入）")
+    name = st.text_area(
+        "お名前",
+        label_visibility="collapsed",
+        placeholder="ここに名前を記入してください",
+        height=100,
     )
+    
+    if name.strip():
+      st.markdown(
+          f"""
+          <div style="
+              border: 4px solid #1e293b;
+              background-color: #f8fafc;
+              border-radius: 15px;
+              padding: 15px;
+              text-align: center;
+              margin-top: 5px;
+              margin-bottom: 15px;
+              box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+          ">
+              <p style="font-size: 20px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
+              <p style="font-size: 45px; font-weight: 900; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">
+                  {name.strip()} 様
+              </p>
+          </div>
+          """,
+          unsafe_allow_html=True,
+      )
 
-  st.write("---")
-
-  amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
-  col1, col2, col3 = st.columns(3, gap="large")
-
-  with col1:
+  with col_right:
+    amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
     st.markdown("### 金額")
     amount_type = st.radio(
         "金額種別",
@@ -305,22 +311,12 @@ elif st.session_state.step == "input_details":
     else:
       selected_amount = amount_type
 
-  with col2:
-    st.markdown("### 言語")
-    language = st.selectbox("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
-    
-    kai_suu = "-"
-    if category == "初信":
-      st.write("")
-      st.markdown("### 回数")
-      kai_suu = st.selectbox("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
-
-    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
-    is_kanki = st.checkbox("歓喜以上")
     st.write("")
+    st.markdown("### オプション（歓喜以上・優先）")
+    is_kanki = st.checkbox("歓喜以上")
     is_priority = st.checkbox("優先")
 
-  with col3:
+    st.write("")
     st.markdown("### 支払方法")
     payment = st.radio("支払方法", ["QR", "Cash"], label_visibility="collapsed")
 
