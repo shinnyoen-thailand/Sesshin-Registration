@@ -183,12 +183,36 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-  st.markdown("### お名前（ペンまたはテキストで記入）")
-  name = st.text_area(
-      "お名前",
-      label_visibility="collapsed",
-      placeholder="ここに名前を記入してください",
-      height=180,
+st.markdown("### お名前（ペンまたはテキストで記入）")
+name = st.text_area(
+    "お名前",
+    label_visibility="collapsed",
+    placeholder="ここに名前を記入してください",
+    height=140,
+)
+
+# ▼▼ 名前が入力されたら、枠一杯の特大文字で確認表示する仕組み ▼▼
+if name.strip():
+  # 入力された名前を枠の中一杯に巨大表示（CSSで枠と文字サイズを指定）
+  st.markdown(
+      f"""
+      <div style="
+          border: 4px solid #1e293b;
+          background-color: #f8fafc;
+          border-radius: 15px;
+          padding: 20px;
+          text-align: center;
+          margin-top: 10px;
+          margin-bottom: 20px;
+          box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+      ">
+          <p style="font-size: 28px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
+          <p style="font-size: 65px; font-weight: 900; color: #0f172a; margin: 10px 0 0 0; word-break: break-all;">
+              {name.strip()} 様
+          </p>
+      </div>
+      """,
+      unsafe_allow_html=True,
   )
   
   st.write("---")
