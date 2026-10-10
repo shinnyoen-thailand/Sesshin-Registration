@@ -82,7 +82,7 @@ if st.session_state.step == "select_category":
       unsafe_allow_html=True,
   )
 
-  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 30px;'>接心受付</h1>", unsafe_allow_html=True)
+  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 30px;'>受付システム - 種類を選択</h1>", unsafe_allow_html=True)
 
   col_left, col_right = st.columns(2, gap="large")
 
@@ -118,6 +118,7 @@ if st.session_state.step == "select_category":
       st.session_state.step = "input_details"
       st.rerun()
 
+
 # =========================================================
 # 画面2：詳細情報の入力画面
 # =========================================================
@@ -125,40 +126,49 @@ elif st.session_state.step == "input_details":
   st.markdown(
       """
       <style>
-      /* 戻るボタンや完了ボタンのサイズ */
+      /* 「最初の画面に戻る」ボタン */
       button[kind="secondary"] { min-height: 90px !important; }
       button[kind="secondary"] p { font-size: 32px !important; }
+
+      /* 「受付を完了する」ボタン */
       button[kind="primary"] { min-height: 140px !important; }
       button[kind="primary"] p { font-size: 45px !important; }
       
-      /* 「お名前」や「支払方法」などの見出し文字（控えめなサイズ調整） */
+      /* ラベルの見出しサイズ（控えめな大きさ） */
       h3 { font-size: 28px !important; color: #1e293b !important; margin-bottom: 10px !important; }
 
-      /* ▼▼ プルダウン（言語・回数）の選択文字サイズを「歓喜以上」「優先」に統一 ▼▼ */
-      div[data-baseweb="select"] > div {
-          min-height: 80px !important;
+      /* ▼▼ プルダウン（選択ボックス）の枠と中身の文字を強制巨大化 (32px) ▼▼ */
+      [data-testid="stSelectbox"] div[data-baseweb="select"] {
+          min-height: 85px !important;
           border-radius: 12px !important;
           border: 3px solid #1e293b !important;
       }
       
-      /* プルダウンの枠内に表示される文字（日本語・英語・タイ語など） */
-      div[data-baseweb="select"] span {
-          font-size: 32px !important;   /* 「歓喜以上」「優先」と同じサイズ */
+      /* 選択ボックス内のすべての要素（現在表示されている日本語・英語・タイ語など） */
+      [data-testid="stSelectbox"] div[data-baseweb="select"] * {
+          font-size: 32px !important;
           font-weight: bold !important;
+          color: #0f172a !important;
       }
 
-      /* タップして開いたメニュー（日本語・英語・タイ語）の文字サイズ */
-      ul[role="listbox"] {
-          border-radius: 12px !important;
-      }
-      ul[role="listbox"] li {
-          font-size: 32px !important;   /* 「歓喜以上」「優先」と同じサイズ */
+      /* ▼▼ タップして開いたリストメニュー内の文字（日本語・英語・タイ語など）を強制巨大化 ▼▼ */
+      div[data-baseweb="menu"] *, 
+      ul[role="listbox"] *, 
+      li[role="option"] * {
+          font-size: 32px !important;
           font-weight: bold !important;
-          padding-top: 20px !important;
-          padding-bottom: 20px !important;
+          color: #0f172a !important;
       }
 
-      /* ▼▼ チェックボックスとラジオボタンの拡大設定（font-size: 32px 相当） ▼▼ */
+      /* メニュー項目の上下幅（押しやすさ）を確保 */
+      ul[role="listbox"] li, 
+      li[role="option"] {
+          min-height: 75px !important;
+          padding-top: 15px !important;
+          padding-bottom: 15px !important;
+      }
+
+      /* ▼▼ チェックボックスとラジオボタンの拡大設定 ▼▼ */
       [data-testid="stCheckbox"] {
           transform: scale(2.0);
           transform-origin: left center;
@@ -176,45 +186,22 @@ elif st.session_state.step == "input_details":
       """,
       unsafe_allow_html=True,
   )
+
   category = st.session_state.selected_category
   st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
 
-  if st.button("← 戻る"):
+  if st.button("← 最初の画面に戻る"):
     st.session_state.step = "select_category"
     st.rerun()
 
   st.write("---")
 
-st.markdown("### お名前（ペンまたはテキストで記入）")
-name = st.text_area(
-    "お名前",
-    label_visibility="collapsed",
-    placeholder="ここに名前を記入してください",
-    height=140,
-)
-
-# ▼▼ 名前が入力されたら、枠一杯の特大文字で確認表示する仕組み ▼▼
-if name.strip():
-  # 入力された名前を枠の中一杯に巨大表示（CSSで枠と文字サイズを指定）
-  st.markdown(
-      f"""
-      <div style="
-          border: 4px solid #1e293b;
-          background-color: #f8fafc;
-          border-radius: 15px;
-          padding: 20px;
-          text-align: center;
-          margin-top: 10px;
-          margin-bottom: 20px;
-          box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
-      ">
-          <p style="font-size: 28px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
-          <p style="font-size: 65px; font-weight: 900; color: #0f172a; margin: 10px 0 0 0; word-break: break-all;">
-              {name.strip()} 様
-          </p>
-      </div>
-      """,
-      unsafe_allow_html=True,
+  st.markdown("### お名前（ペンまたはテキストで記入）")
+  name = st.text_area(
+      "お名前",
+      label_visibility="collapsed",
+      placeholder="ここに名前を記入してください",
+      height=180,
   )
   
   st.write("---")
@@ -245,11 +232,10 @@ if name.strip():
   st.write("---")
   st.write("")
 
-  if st.button("完了", type="primary"):
+  if st.button("受付を完了する", type="primary"):
     if name.strip() == "":
       st.warning("お名前を入力してください。")
     else:
-      # ボタンを押した瞬間、画面に「送信中...」というクルクル（スピナー）を表示して入力を完全ロックする
       with st.spinner("送信中... しばらくお待ちください"):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
