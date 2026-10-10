@@ -142,19 +142,26 @@ elif st.session_state.step == "input_details":
       
       h3 { font-size: 40px !important; color: #1e293b !important; margin-bottom: 15px !important; }
 
-      div[data-baseweb="select"] > div {
-          min-height: 100px !important;
-          font-size: 40px !important;
-          border-radius: 12px !important;
-      }
-      div[data-baseweb="select"] span {
-          font-size: 40px !important;
-      }
-      ul[role="listbox"] li {
-          font-size: 40px !important;
-          padding-top: 25px !important;
-          padding-bottom: 25px !important;
-      }
+/* 言語のプルダウン：箱を大きくする */
+.st-key-language_select div[data-baseweb="select"] > div {
+    min-height: 140px !important;
+    font-size: 50px !important;
+    border-radius: 16px !important;
+}
+
+/* 選択済みの言語：文字を特大にする */
+.st-key-language_select div[data-baseweb="select"] span {
+    font-size: 50px !important;
+    line-height: 1.2 !important;
+}
+
+/* プルダウンを開いたときの選択肢：大きく、押しやすく */
+ul[role="listbox"] li {
+    font-size: 50px !important;
+    padding-top: 30px !important;
+    padding-bottom: 30px !important;
+    min-height: 90px !important;
+}
 
       [data-testid="stCheckbox"] {
           transform: scale(2.0);
@@ -220,8 +227,16 @@ if name.strip():
   col1, col2, col3 = st.columns(3, gap="large")
 
   with col1:
-    st.markdown("### 言語")
-    language = st.selectbox("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
+    st.markdown(
+    "<p style='font-size:26px; font-weight:bold; margin-bottom:12px;'>言語</p>",
+    unsafe_allow_html=True,
+)
+   language = st.selectbox(
+    "言語",
+    ["日本語", "英語", "タイ語"],
+    label_visibility="collapsed",
+    key="language_select"
+)
     
     kai_suu = "-"
     if category == "初信":
