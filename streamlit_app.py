@@ -111,7 +111,7 @@ div[data-testid="stColumn"]:last-child .stButton > button {
       unsafe_allow_html=True,
   )
 
-  st.markdown("<h1 style='text-align: center; font-size: 45px; margin-bottom: 20px;'>ลงทะเบียน / 接心受付</h1>", unsafe_allow_html=True)
+  st.markdown("<h1 style='text-align: center; font-size: 45px; margin-bottom: 20px;'>Sesshin Registration / 接心受付</h1>", unsafe_allow_html=True)
 
   col_left, col_right = st.columns(2, gap="large")
 
@@ -251,7 +251,7 @@ textarea[aria-label="任意金額"] {
 
   st.write("---")
 
-  st.markdown("### Name （ภาษาอังกฤษ/English) / お名前")
+  st.markdown("### Name （ภาษาอังกฤษ/English)")
   name = st.text_area(
       "お名前",
       label_visibility="collapsed",
@@ -429,7 +429,7 @@ elif st.session_state.step == "cancel_page":
   st.write("---")
 
   today_str = datetime.now().strftime("%Y-%m-%d")
-  st.markdown(f"### 本日の受付データ一覧 ({today_str})")
+  st.markdown(f"### Today's Registration Data List ({today_str})")
 
   # 本日の受付データの読み込み
   records = []
@@ -438,10 +438,10 @@ elif st.session_state.step == "cancel_page":
     if res.status_code == 200:
       records = res.json().get("records", [])
   except Exception as e:
-    st.error(f"データ取得エラー: {e}")
+    st.error(f"Data Retrieval Error: {e}")
 
   if not records:
-    st.info("本日登録された受付データはありません。")
+    st.info("There are no registration records for today.")
   else:
     for rec in records:
       t_id = rec.get("ticketId")
@@ -457,9 +457,9 @@ elif st.session_state.step == "cancel_page":
             f"""
 <div style="background-color: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 10px;">
 <span style="font-size: 24px; font-weight: 900; color: #1e293b;">【{t_id}】 {name_str} 様</span><br>
-<span style="font-size: 20px; font-weight: bold; color: #0284c7;">種類: {cat_str}</span> │ 
-<span style="font-size: 20px; font-weight: bold; color: #16a34a;">金額: {amt_str}</span> │ 
-<span style="font-size: 20px; font-weight: bold; color: #d97706;">支払: {pay_str}</span>
+<span style="font-size: 20px; font-weight: bold; color: #0284c7;">Category: {cat_str}</span> │ 
+<span style="font-size: 20px; font-weight: bold; color: #16a34a;">Amount: {amt_str}</span> │ 
+<span style="font-size: 20px; font-weight: bold; color: #d97706;">Payment: {pay_str}</span>
 </div>
 """,
             unsafe_allow_html=True,
@@ -467,17 +467,17 @@ elif st.session_state.step == "cancel_page":
 
       with c_btn:
         st.write("")
-        if st.button(f"❌ 取り消す\n({t_id})", key=f"del_{t_id}", use_container_width=True):
-          with st.spinner("取り消し処理中..."):
+        if st.button(f"❌ Cancell\n({t_id})", key=f"del_{t_id}", use_container_width=True):
+          with st.spinner("Cancellation in progress..."):
             try:
               c_res = requests.post(GAS_URL, json={"action": "cancel_record", "ticketId": t_id})
               if c_res.status_code == 200 and c_res.json().get("status") == "success":
-                st.success(f"【{t_id}】{name_str} 様の受付を取り消しました。")
+                st.success(f"【{t_id}】{name_str} The registration has been cancelled.")
                 st.rerun()
               else:
-                st.error("取り消しに失敗しました。")
+                st.error("Cancellation failed.")
             except Exception as e:
-              st.error(f"エラー: {e}")
+              st.error(f"error: {e}")
 
 
 # =========================================================
@@ -517,7 +517,7 @@ elif st.session_state.step == "summary":
     if res.status_code == 200:
       summary_data = res.json().get("summary", {})
   except Exception as e:
-    st.error(f"集計エラー: {e}")
+    st.error(f"Calculation Error: {e}")
 
   baht_cash_amt = 0
   yen_cash_amt = 0
@@ -613,7 +613,7 @@ elif st.session_state.step == "summary":
   st.write("---")
 
   # CASH ONLY エリア
-  st.markdown("### CASH ONLY（金庫内のお金を数えて入力）")
+  st.markdown("### CASH ONLY（Count the cash in the safe and enter the amount.）")
 
   st.markdown(
       """
@@ -703,8 +703,8 @@ input[type="number"] {
   st.write("")
   st.write("")
   
-  if st.button("💾 CASH ONLY（金庫実査内容）をスプレッドシートに保存する", use_container_width=True):
-    with st.spinner("スプレッドシートに保存中..."):
+  if st.button("💾 Save", use_container_width=True):
+    with st.spinner("Saving..."):
       save_payload = {
           "action": "save_cash_only",
           "date": today_str,
@@ -718,11 +718,11 @@ input[type="number"] {
         res = requests.post(GAS_URL, json=save_payload)
         res_j = res.json()
         if res_j.get("status") == "success":
-          st.success("✅ スプレッドシート（Summaryシート）のCASH ONLY欄に正常に保存されました！")
+          st.success("✅ Saved successfully！")
         else:
-          st.error("保存に失敗しました。")
+          st.error("Failed to save")
       except Exception as e:
-        st.error(f"送信エラー: {e}")
+        st.error(f"Failed to send: {e}")
 
 
 # =========================================================
