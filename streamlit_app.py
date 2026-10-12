@@ -635,7 +635,7 @@ input[type="number"] {
   st.write("")
   
   # スプレッドシートへの保存ボタン
-  if st.button("💾 CASH ONLY（金庫実査内容）をスプレッドシートに保存する", use_container_width=True):
+  if st.button("💾 SAVE", use_container_width=True):
     with st.spinner("スプレッドシートに保存中..."):
       save_payload = {
           "action": "save_cash_only",
@@ -650,7 +650,7 @@ input[type="number"] {
         res = requests.post(GAS_URL, json=save_payload)
         res_j = res.json()
         if res_j.get("status") == "success":
-          st.success("✅ スプレッドシート（Summaryシート）のCASH ONLY欄に正常に保存されました！")
+          st.success("✅Saved Successfully ！")
         else:
           st.error("保存に失敗しました。")
       except Exception as e:
