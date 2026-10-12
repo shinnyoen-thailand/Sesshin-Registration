@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbwBNCEx_R5as8bdZmYDupybB3m7xDDKIaM7nQmiEbAGBo1d29gg-jzfgdlLOa8Ehnye/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbzlN8IB8PYwWsoUs5Uy_Y5vTG_o37Pf47ASHdS4DKKi6hcTu4O1Xi_DjFS1yMmA5-S2/exec"
 
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
@@ -86,7 +86,7 @@ if "selected_category" not in st.session_state:
 
 
 # =========================================================
-# 画面1：接心受付 ＆ 集計ボタン
+# 画面1：接心受付 ＆ 集計ボタン・取り消しボタン
 # =========================================================
 if st.session_state.step == "select_category":
   st.markdown(
@@ -153,9 +153,16 @@ div[data-testid="stColumn"]:last-child .stButton > button {
       st.rerun()
 
   st.write("")
-  if st.button("📊 Today's Summary and Cash Verification\n本日の集計・金庫確認を開く", key="btn_summary", use_container_width=True):
-    st.session_state.step = "summary"
-    st.rerun()
+  
+  c_sum, c_cancel = st.columns(2, gap="medium")
+  with c_sum:
+    if st.button("📊 Today's Summary\n本日の集計・現金確認", key="btn_summary", use_container_width=True):
+      st.session_state.step = "summary"
+      st.rerun()
+  with c_cancel:
+    if st.button("🗑️ Cancel Registration\n受付の取り消し・修正", key="btn_cancel_page", use_container_width=True):
+      st.session_state.step = "cancel_page"
+      st.rerun()
 
 
 # =========================================================
@@ -410,7 +417,71 @@ textarea[aria-label="任意金額"] {
 
 
 # =========================================================
-# 画面3：集計画面（スプレッドシート表構造 完全一致）
+# 画面3：受付の取り消し・キャンセル画面 (新規追加機能)
+# =========================================================
+elif st.session_state.step == "cancel_page":
+  st.markdown("<h1 style='text-align: center; font-size: 38px;'>Cancel Registration / 受付の取り消し</h1>", unsafe_allow_html=True)
+
+  if st.button("← 戻る / ย้อนกลับ"):
+    st.session_state.step = "select_category"
+    st.rerun()
+
+  st.write("---")
+
+  today_str = datetime.now().strftime("%Y-%m-%d")
+  st.markdown(f"### 本日の受付データ一覧 ({today_str})")
+
+  # 本日の受付データの読み込み
+  records = []
+  try:
+    res = requests.post(GAS_URL, json={"action": "get_records", "date": today_str})
+    if res.status_code == 200:
+      records = res.json().get("records", [])
+  except Exception as e:
+    st.error(f"データ取得エラー: {e}")
+
+  if not records:
+    st.info("本日登録された受付データはありません。")
+  else:
+    for rec in records:
+      t_id = rec.get("ticketId")
+      name_str = rec.get("name")
+      cat_str = rec.get("category")
+      amt_str = rec.get("amount")
+      pay_str = rec.get("payment")
+
+      c_info, c_btn = st.columns([3.5, 1.5])
+
+      with c_info:
+        st.markdown(
+            f"""
+<div style="background-color: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 10px;">
+<span style="font-size: 24px; font-weight: 900; color: #1e293b;">【{t_id}】 {name_str} 様</span><br>
+<span style="font-size: 20px; font-weight: bold; color: #0284c7;">種類: {cat_str}</span> │ 
+<span style="font-size: 20px; font-weight: bold; color: #16a34a;">金額: {amt_str}</span> │ 
+<span style="font-size: 20px; font-weight: bold; color: #d97706;">支払: {pay_str}</span>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+
+      with c_btn:
+        st.write("")
+        if st.button(f"❌ 取り消す\n({t_id})", key=f"del_{t_id}", use_container_width=True):
+          with st.spinner("取り消し処理中..."):
+            try:
+              c_res = requests.post(GAS_URL, json={"action": "cancel_record", "ticketId": t_id})
+              if c_res.status_code == 200 and c_res.json().get("status") == "success":
+                st.success(f"【{t_id}】{name_str} 様の受付を取り消しました。")
+                st.rerun()
+              else:
+                st.error("取り消しに失敗しました。")
+            except Exception as e:
+              st.error(f"エラー: {e}")
+
+
+# =========================================================
+# 画面4：集計画面
 # =========================================================
 elif st.session_state.step == "summary":
   st.markdown("<h1 style='text-align: center; font-size: 36px;'>Today's Summary and Cash Verification<br>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
@@ -541,7 +612,7 @@ elif st.session_state.step == "summary":
   st.write("")
   st.write("---")
 
-  # 2. 下段：CASH ONLY（金庫実査カウント枠・ペン/数字直接入力対応）
+  # CASH ONLY エリア
   st.markdown("### CASH ONLY（金庫内のお金を数えて入力）")
 
   st.markdown(
@@ -602,7 +673,6 @@ input[type="number"] {
           unsafe_allow_html=True,
       )
 
-  # 現金残高 Baht / Yen および 「おつり (เงินทอน)」 & 「Total」エリア
   st.write("")
   
   c_label, c_baht_val, c_otsuri_label, c_otsuri_val, c_total_label, c_total_val = st.columns([2.5, 2.0, 2.0, 2.0, 1.5, 2.0])
@@ -624,7 +694,6 @@ input[type="number"] {
     st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold;'>{total_after_otsuri:,}</div>", unsafe_allow_html=True)
 
   st.write("")
-  # Yen残高行
   cy_label, cy_val, cy_dummy1, cy_dummy2 = st.columns([2.5, 2.0, 4.0, 3.5])
   with cy_label:
     st.markdown("<p style='font-size:20px; font-weight:bold;'>ยอดเงินสดคงเหลือ 現金残高</p>", unsafe_allow_html=True)
@@ -634,8 +703,7 @@ input[type="number"] {
   st.write("")
   st.write("")
   
-  # スプレッドシートへの保存ボタン
-  if st.button("💾 SAVE", use_container_width=True):
+  if st.button("💾 CASH ONLY（金庫実査内容）をスプレッドシートに保存する", use_container_width=True):
     with st.spinner("スプレッドシートに保存中..."):
       save_payload = {
           "action": "save_cash_only",
@@ -650,7 +718,7 @@ input[type="number"] {
         res = requests.post(GAS_URL, json=save_payload)
         res_j = res.json()
         if res_j.get("status") == "success":
-          st.success("✅Saved Successfully ！")
+          st.success("✅ スプレッドシート（Summaryシート）のCASH ONLY欄に正常に保存されました！")
         else:
           st.error("保存に失敗しました。")
       except Exception as e:
@@ -658,7 +726,7 @@ input[type="number"] {
 
 
 # =========================================================
-# 画面4：完了画面
+# 画面5：完了画面
 # =========================================================
 elif st.session_state.step == "completed":
   st.markdown(
