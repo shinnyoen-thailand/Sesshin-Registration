@@ -153,7 +153,7 @@ if st.session_state.step == "select_category":
       st.rerun()
 
   st.write("")
-  if st.button("📊 Today's Summary and Cash Verification\n本日の集計・金庫確認を開く", key="btn_summary", use_container_width=True):
+  if st.button("📊 Today's Summary and Cash Verification\n本日の集計・金庫確認", key="btn_summary", use_container_width=True):
     st.session_state.step = "summary"
     st.rerun()
 
@@ -434,9 +434,7 @@ elif st.session_state.step == "summary":
 
   today_str = datetime.now().strftime("%Y-%m-%d")
   
-  # スプレッドシートと完全一致する集計表の定義データ
   rows_def = [
-      # (カテゴリ表示名, 単価数値, 通貨, GASキー)
       ("โคโจเซสชิน\n向上", 50, "Bath", "kojo_50"),
       ("", 100, "Bath", "kojo_100"),
       ("", 125, "Bath", "kojo_125"),
@@ -461,9 +459,58 @@ elif st.session_state.step == "summary":
   except Exception as e:
     st.error(f"集計エラー: {e}")
 
-  # 1. 上段：集計テーブル（スプレッドシートデザイン再現）
-  table_html = f"""
-  <div style="overflow-x:auto;">
+  baht_cash_amt = 0
+  yen_cash_amt = 0
+  baht_qr_amt = 0
+  yen_qr_amt = 0
+
+  tbody_html = ""
+
+  for cat_label, price, curr, key in rows_def:
+    d = summary_data.get(key, {"cash_p": 0, "qr_p": 0})
+    
+    c_person = d.get("cash_p", 0)
+    q_person = d.get("qr_p", 0)
+
+    c_amount = c_person * price
+    q_amount = q_person * price
+
+    if curr == "Bath":
+      baht_cash_amt += c_amount
+      baht_qr_amt += q_amount
+    else:
+      yen_cash_amt += c_amount
+      yen_qr_amt += q_amount
+
+    qr_person_style = "background-color: #00e5ff;"
+    qr_amount_style = ""
+    if curr == "Yen":
+      qr_person_style = "background-color: #555555;"
+      qr_amount_style = "background-color: #555555;"
+
+    cat_td = ""
+    if cat_label == "โคโจเซสชิน\n向上":
+      cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
+    elif cat_label == "Beginner\n初信":
+      cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
+    elif cat_label != "":
+      cat_td = f'<td style="border: 1px solid #000; font-weight: bold; text-align: left; padding-left: 10px;">{cat_label}</td>'
+
+    c_amt_str = f"{c_amount:,}" if c_amount > 0 else ""
+    q_amt_str = f"{q_amount:,}" if q_amount > 0 and curr != "Yen" else ""
+    c_p_str = str(c_person) if c_person > 0 else ""
+    q_p_str = str(q_person) if q_person > 0 and curr != "Yen" else ""
+
+    tbody_html += f"""<tr>
+      {cat_td}
+      <td style="border: 1px solid #000;">{price} {curr}</td>
+      <td style="border: 1px solid #000; background-color: #00e5ff; font-weight: bold;">{c_p_str}</td>
+      <td style="border: 1px solid #000;">{c_amt_str}</td>
+      <td style="border: 1px solid #000; {qr_person_style} font-weight: bold;">{" " if curr=="Yen" else q_p_str}</td>
+      <td style="border: 1px solid #000; {qr_amount_style}">{" " if curr=="Yen" else q_amt_str}</td>
+    </tr>"""
+
+  table_html = f"""<div style="overflow-x:auto;">
   <table style="width:100%; border-collapse: collapse; font-size: 18px; text-align: center; background-color: #ffffff; border: 2px solid #000000;">
     <thead>
       <tr style="background-color: #f1f5f9;">
@@ -488,82 +535,25 @@ elif st.session_state.step == "summary":
       </tr>
     </thead>
     <tbody>
-  """
-
-  baht_cash_amt = 0
-  yen_cash_amt = 0
-  baht_qr_amt = 0
-  yen_qr_amt = 0
-
-  for cat_label, price, curr, key in rows_def:
-    d = summary_data.get(key, {"cash_p": 0, "qr_p": 0})
-    
-    c_person = d.get("cash_p", 0)
-    q_person = d.get("qr_p", 0)
-
-    c_amount = c_person * price
-    q_amount = q_person * price
-
-    if curr == "Bath":
-      baht_cash_amt += c_amount
-      baht_qr_amt += q_amount
-    else:
-      yen_cash_amt += c_amount
-      yen_qr_amt += q_amount
-
-    # グレーアウト処理 (1000YenのQR Amount/Personエリア)
-    qr_person_style = "background-color: #00e5ff;"
-    qr_amount_style = ""
-    if curr == "Yen":
-      qr_person_style = "background-color: #555555;"
-      qr_amount_style = "background-color: #555555;"
-
-    # 複数行カテゴリのセル統合（向上・初信）
-    cat_td = ""
-    if cat_label == "โคโจเซสชิน\n向上":
-      cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
-    elif cat_label == "Beginner\n初信":
-      cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
-    elif cat_label != "":
-      cat_td = f'<td style="border: 1px solid #000; font-weight: bold; text-align: left; padding-left: 10px;">{cat_label}</td>'
-
-    c_amt_str = f"{c_amount:,}" if c_amount > 0 else ""
-    q_amt_str = f"{q_amount:,}" if q_amount > 0 and curr != "Yen" else ""
-    c_p_str = str(c_person) if c_person > 0 else ""
-    q_p_str = str(q_person) if q_person > 0 and curr != "Yen" else ""
-
-    table_html += f"""
-    <tr>
-      {cat_td}
-      <td style="border: 1px solid #000;">{price} {curr}</td>
-      <td style="border: 1px solid #000; background-color: #00e5ff; font-weight: bold;">{c_p_str}</td>
-      <td style="border: 1px solid #000;">{c_amt_str}</td>
-      <td style="border: 1px solid #000; {qr_person_style} font-weight: bold;">{" " if curr=="Yen" else q_p_str}</td>
-      <td style="border: 1px solid #000; {qr_amount_style}">{" " if curr=="Yen" else q_amt_str}</td>
-    </tr>
-    """
-
-  # Total行
-  table_html += f"""
-    <tr style="background-color: #d1d5db; font-weight: bold;">
-      <td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Baht Total</td>
-      <td style="border: 1px solid #000;"></td>
-      <td style="border: 1px solid #000;">{baht_cash_amt:,}</td>
-      <td style="border: 1px solid #000; background-color: #555555;"></td>
-      <td style="border: 1px solid #000;">{baht_qr_amt:,}</td>
-    </tr>
-    <tr style="background-color: #d1d5db; font-weight: bold;">
-      <td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Yen Total</td>
-      <td style="border: 1px solid #000;"></td>
-      <td style="border: 1px solid #000;">{yen_cash_amt:,}</td>
-      <td style="border: 1px solid #000; background-color: #555555;"></td>
-      <td style="border: 1px solid #000; background-color: #555555;"></td>
-    </tr>
+      {tbody_html}
+      <tr style="background-color: #d1d5db; font-weight: bold;">
+        <td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Baht Total</td>
+        <td style="border: 1px solid #000;"></td>
+        <td style="border: 1px solid #000;">{baht_cash_amt:,}</td>
+        <td style="border: 1px solid #000; background-color: #555555;"></td>
+        <td style="border: 1px solid #000;">{baht_qr_amt:,}</td>
+      </tr>
+      <tr style="background-color: #d1d5db; font-weight: bold;">
+        <td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Yen Total</td>
+        <td style="border: 1px solid #000;"></td>
+        <td style="border: 1px solid #000;">{yen_cash_amt:,}</td>
+        <td style="border: 1px solid #000; background-color: #555555;"></td>
+        <td style="border: 1px solid #000; background-color: #555555;"></td>
+      </tr>
     </tbody>
   </table>
-  </div>
-  """
-  
+  </div>"""
+
   st.markdown(table_html, unsafe_allow_html=True)
 
   st.write("")
@@ -590,7 +580,6 @@ elif st.session_state.step == "summary":
       unsafe_allow_html=True,
   )
 
-  # スプレッドシート順 (50, 10, 20, 50, 100, 500, 1000 Bath / 1000 Yen)
   cash_denom_def = [
       (50, "n_50_1", "Bath"),
       (10, "n_10", "Bath"),
@@ -636,7 +625,6 @@ elif st.session_state.step == "summary":
           unsafe_allow_html=True,
       )
 
-  # 残高合計の表示
   st.write("")
   st.markdown(
       f"""
@@ -679,7 +667,7 @@ elif st.session_state.step == "completed":
   
   st.markdown(f"<h2>หมายเลข / 受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
 
-  st.info("กรุณากรอกหมายเลขนี้ในใบเสร็จ / この番号をレシートに記入。")
+  st.info("กรุณากรอกหมายเลขนี้ในใบเสร็จ / この番号をレシートにお書きください。")
 
   st.write("")
   st.write("")
