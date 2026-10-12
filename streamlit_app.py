@@ -4,29 +4,45 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbz1soj-hY6_oTNGv4C4z4WAXAAp0ArCqjrBXsM9MKK60gVTSq3f1aidFrktlQ9OYzgk/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbxuLepC6AnvSTG4A2qufRUczqgYFmuRzkBXhydO4Ww9dnpuyixRfjxyyUyA3zlgYkJl/exec"
 
-# 受付種類ごとの金額設定データ
+# 受付種類ごとの金額設定データ（タイ語・日本語併記）
 AMOUNT_CONFIG = {
     "向上": {
+        "thai": "โคโจเซสชิน",
+        "jp": "向上",
         "base": "100 Bath",
-        "child": "50 Bath（15歳以下）",
+        "child": "50 Bath（15 years or under）",
     },
     "向上相談": {
+        "thai": "โคโจโซดันเซสชิน",
+        "jp": "向上相談",
         "base": "200 Bath",
-        "child": "100 Bath（15歳以下）",
+        "child": "100 Bath（15 years or under）",
+    },
+    "初信": {
+        "thai": "Beginner",
+        "jp": "初信",
+        "base": "100 Bath",
+        "child": "50 Bath（15 years or under）",
     },
     "相談": {
+        "thai": "เซสชินปรึกษา",
+        "jp": "相談",
         "base": "300 Bath",
-        "child": "150 Bath（15歳以下）",
+        "child": "150 Bath（15 years or under）",
     },
     "特別相談": {
+        "thai": "เซสชินปรึกษาพิเศษ",
+        "jp": "特別相談",
         "base": "600 Bath",
-        "child": "300 Bath（15歳以下）",
+        "child": "300 Bath（15 years or under）",
     },
     "鑑定": {
+        "thai": "เซสชินเพื่อการตัดสินใจ",
+        "jp": "鑑定",
         "base": "900 Bath",
-        "child": "450 Bath（15歳以下）",
+        "child": "450 Bath（15 years or under）",
     },
 }
 
@@ -83,61 +99,79 @@ if st.session_state.step == "select_category":
       <style>
       div[data-testid="column"]:first-child .stButton > button,
       div[data-testid="stColumn"]:first-child .stButton > button {
-          min-height: 300px !important;
+          min-height: 280px !important;
           margin-bottom: 15px !important;
-      }
-      div[data-testid="column"]:first-child .stButton > button p,
-      div[data-testid="stColumn"]:first-child .stButton > button p {
-          font-size: 65px !important;
       }
       div[data-testid="column"]:last-child .stButton > button,
       div[data-testid="stColumn"]:last-child .stButton > button {
           min-height: 140px !important;
           margin-bottom: 10px !important;
       }
+      .stButton > button div[data-testid="stMarkdownContainer"] p {
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+          line-height: 1.2 !important;
+      }
+      .thai-label {
+          font-size: 28px !important;
+          font-weight: bold !important;
+          color: #334155 !important;
+      }
+      .jp-label {
+          font-size: 42px !important;
+          font-weight: 900 !important;
+          color: #0f172a !important;
+      }
       </style>
       """,
       unsafe_allow_html=True,
   )
 
-  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 20px;'>接心受付</h1>", unsafe_allow_html=True)
+  st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 20px;'>ลงทะเบียน / 接心受付</h1>", unsafe_allow_html=True)
 
   col_left, col_right = st.columns(2, gap="large")
 
+  def make_label(jp_name):
+    cfg = AMOUNT_CONFIG.get(jp_name, {})
+    thai = cfg.get("thai", "")
+    return f"""<span class='thai-label'>{thai}</span><span class='jp-label'>{jp_name}</span>"""
+
   with col_left:
-    if st.button("向上", key="btn_kojo", use_container_width=True):
+    if st.button(make_label("向上"), key="btn_kojo", use_container_width=True):
       st.session_state.selected_category = "向上"
       st.session_state.step = "input_details"
       st.rerun()
 
-    if st.button("向上相談", key="btn_kojosodan", use_container_width=True):
+    if st.button(make_label("向上相談"), key="btn_kojosodan", use_container_width=True):
       st.session_state.selected_category = "向上相談"
       st.session_state.step = "input_details"
       st.rerun()
 
   with col_right:
-    if st.button("初信", key="btn_shoshin", use_container_width=True):
+    if st.button(make_label("初信"), key="btn_shoshin", use_container_width=True):
       st.session_state.selected_category = "初信"
       st.session_state.step = "input_details"
       st.rerun()
 
-    if st.button("相談", key="btn_sodan", use_container_width=True):
+    if st.button(make_label("相談"), key="btn_sodan", use_container_width=True):
       st.session_state.selected_category = "相談"
       st.session_state.step = "input_details"
       st.rerun()
 
-    if st.button("特別相談", key="btn_tokubetsusodan", use_container_width=True):
+    if st.button(make_label("特別相談"), key="btn_tokubetsusodan", use_container_width=True):
       st.session_state.selected_category = "特別相談"
       st.session_state.step = "input_details"
       st.rerun()
 
-    if st.button("鑑定", key="btn_kantei", use_container_width=True):
+    if st.button(make_label("鑑定"), key="btn_kantei", use_container_width=True):
       st.session_state.selected_category = "鑑定"
       st.session_state.step = "input_details"
       st.rerun()
 
   st.write("")
-  if st.button("📊 本日の集計・金庫確認を開く", key="btn_summary", use_container_width=True):
+  if st.button("📊 Today's Summary and Cash Verification\n本日の集計・金庫確認を開く", key="btn_summary", use_container_width=True):
     st.session_state.step = "summary"
     st.rerun()
 
@@ -154,9 +188,8 @@ elif st.session_state.step == "input_details":
       button[kind="primary"] { min-height: 130px !important; }
       button[kind="primary"] p { font-size: 45px !important; }
       
-      /* 見出しの装飾 */
       h3 { 
-          font-size: 36px !important; 
+          font-size: 34px !important; 
           font-weight: 900 !important; 
           color: #1e293b !important; 
           border-left: 10px solid #3b82f6;
@@ -165,7 +198,7 @@ elif st.session_state.step == "input_details":
           margin-top: 10px !important; 
       }
 
-      /* お名前入力欄（横幅いっぱいで超特大） */
+      /* お名前入力欄 */
       textarea[aria-label="お名前"] {
           font-size: 55px !important;
           font-weight: 900 !important;
@@ -176,7 +209,7 @@ elif st.session_state.step == "input_details":
           border-radius: 15px !important;
       }
       
-      /* 任意金額入力欄（特大） */
+      /* 任意金額入力欄 */
       textarea[aria-label="任意金額"] {
           font-size: 50px !important;
           font-weight: 900 !important;
@@ -187,29 +220,28 @@ elif st.session_state.step == "input_details":
           border-radius: 12px !important;
       }
 
-      /* ラジオボタンの文字（超特大） */
+      /* ラジオボタンの文字 */
       [data-testid="stRadio"] label p {
-          font-size: 38px !important;
+          font-size: 34px !important;
           font-weight: 900 !important;
           color: #000000 !important;
       }
-      /* ラジオボタン自体のサイズを拡大して押しやすく */
       [data-testid="stRadio"] {
-          transform: scale(1.6);
+          transform: scale(1.5);
           transform-origin: left center;
           margin-left: 15px;
           margin-top: 15px;
           margin-bottom: 25px;
       }
 
-      /* チェックボックスの文字（超特大） */
+      /* チェックボックスの文字 */
       [data-testid="stCheckbox"] label p {
-          font-size: 38px !important;
+          font-size: 34px !important;
           font-weight: 900 !important;
           color: #000000 !important;
       }
       [data-testid="stCheckbox"] {
-          transform: scale(1.8);
+          transform: scale(1.7);
           transform-origin: left center;
           margin-top: 20px;
           margin-bottom: 20px;
@@ -221,22 +253,23 @@ elif st.session_state.step == "input_details":
   )
 
   category = st.session_state.selected_category
-  st.markdown(f"<h1 style='font-size: 45px;'>受付: 【 {category} 】</h1>", unsafe_allow_html=True)
+  amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
+  thai_title = amt_info.get("thai", "")
+  
+  st.markdown(f"<h1 style='font-size: 40px;'>受付 / ลงทะเบียน: 【 {category} ({thai_title}) 】</h1>", unsafe_allow_html=True)
 
-  if st.button("← 戻る"):
+  if st.button("← 戻る / ย้อนกลับ"):
     st.session_state.step = "select_category"
     st.rerun()
 
   st.write("---")
 
-  # -----------------------------------------------------------------
-  # 1. お名前入力欄 ＆ 確認欄（横幅1行でどーーーんと表示）
-  # -----------------------------------------------------------------
-  st.markdown("### お名前（大きくご入力ください）")
+  # 1. お名前入力欄 ＆ 確認欄
+  st.markdown("### Name （ภาษาอังกฤษ/English) / お名前")
   name = st.text_area(
       "お名前",
       label_visibility="collapsed",
-      placeholder="ここにお名前を記入",
+      placeholder="กรอกชื่อภาษาอังกฤษ / Type Name in English",
       height=150,
   )
   
@@ -253,9 +286,9 @@ elif st.session_state.step == "input_details":
             margin-bottom: 25px;
             box-shadow: 0px 6px 12px rgba(0,0,0,0.15);
         ">
-            <p style="font-size: 26px; font-weight: bold; color: #475569; margin: 0;">【ご入力名のご確認】</p>
+            <p style="font-size: 26px; font-weight: bold; color: #475569; margin: 0;">ตรวจสอบชื่อ / ご入力名のご確認</p>
             <p style="font-size: 70px; font-weight: 950; color: #0f172a; margin: 10px 0 0 0; word-break: break-all;">
-                {name.strip()} 様
+                {name.strip()} ท่าน / 様
             </p>
         </div>
         """,
@@ -264,47 +297,52 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-  # -----------------------------------------------------------------
-  # 2. その他の選択肢（左右バランス良く配置）
-  # -----------------------------------------------------------------
+  # 2. その他の選択肢
   col_left, col_right = st.columns(2, gap="large")
 
   with col_left:
-    st.markdown("### 言語")
-    language = st.radio("言語", ["日本語", "英語", "タイ語"], label_visibility="collapsed")
+    st.markdown("### ภาษา / 言語")
+    language = st.radio(
+        "言語", 
+        ["日本語 / Japanese", "英語 / English", "タイ語 / ภาษาไทย"], 
+        label_visibility="collapsed"
+    )
     
     kai_suu = "-"
     if category == "初信":
       st.write("")
       st.write("")
-      st.markdown("### 回数")
-      kai_suu = st.radio("回数", ["1回目", "2回目", "3回目", "1年以上"], label_visibility="collapsed")
+      st.markdown("### จำนวนครั้ง / 回数")
+      kai_suu = st.radio(
+          "回数", 
+          ["ครั้งที่ 1 / 1回目", "ครั้งที่ 2 / 2回目", "ครั้งที่ 3 / 3回目", "มากกว่า 1 ปี / 1年以上"], 
+          label_visibility="collapsed"
+      )
 
     st.write("")
     st.write("")
-    st.markdown("### 区分・オプション")
-    is_kanki = st.checkbox("歓喜以上")
-    is_priority = st.checkbox("優先")
-    is_infant = st.checkbox("乳児連れ")
+    st.markdown("### ตัวเลือกอื่น ๆ / その他")
+    is_kanki = st.checkbox("ปีติขึ้นไป / 歓喜以上")
+    is_priority = st.checkbox("Priority / 優先")
+    is_infant = st.checkbox("พร้อมทารก / 乳児連れ")
 
   with col_right:
-    amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
-    st.markdown("### 金額")
+    st.markdown("### จำนวนเงิน / 金額")
     
     amount_type = st.radio(
         "金額種別",
-        [amt_info["base"], amt_info["child"], "その他（お典供）"],
+        [amt_info["base"], amt_info["child"], "อื่น ๆ (ถวายปัจจัย) / その他（お典供）"],
         label_visibility="collapsed",
         key="amount_radio",
     )
 
     is_amount_error = False
 
-    if amount_type == "その他（お典供）":
+    if "อื่น ๆ" in amount_type:
       st.markdown(
           """
           <div style='background-color: #fef9c3; padding: 25px; border-radius: 15px; border: 4px solid #facc15; margin-top: 15px;'>
-          <p style='font-size: 28px; font-weight: 900; color: #854d0e; margin-bottom: 15px;'>金額を半角数字で記入し、通貨を選んでください</p>
+          <p style='font-size: 26px; font-weight: 900; color: #854d0e; margin-bottom: 15px;'>กรอกตัวเลข / 半角数字で記入</p>
           """, 
           unsafe_allow_html=True
       )
@@ -312,29 +350,28 @@ elif st.session_state.step == "input_details":
       custom_amount = st.text_area(
           "任意金額",
           label_visibility="collapsed",
-          placeholder="数字を記入（例: 2000）",
+          placeholder="Ex: 2000",
           height=110,
           key="custom_amount"
       )
 
-      # -------------------------------------------------------------
-      # 💡 入力された金額の「数字チェック（誤入力警告）」処理
-      # -------------------------------------------------------------
       custom_val = custom_amount.strip()
       
       st.write("")
-      custom_currency = st.radio("通貨", ["Bath", "円"], horizontal=True, label_visibility="collapsed", key="custom_currency")
+      custom_currency = st.radio("通貨", ["Bath", "円 / Yen"], horizontal=True, label_visibility="collapsed", key="custom_currency")
+
+      clean_currency = "円" if "円" in custom_currency else "Bath"
 
       if custom_val:
         if not custom_val.isdigit():
-          st.error("⚠️ エラー：数字以外（アルファベットの「O」など）が入っています。数字だけで入力してください。")
+          st.error("⚠️ Error: กรอกเฉพาะตัวเลข / 数字のみで入力してください。")
           is_amount_error = True
-          selected_amount = f"{custom_val} {custom_currency}"
+          selected_amount = f"{custom_val} {clean_currency}"
         else:
-          st.success(f"確認：{custom_val} {custom_currency} と入力されました")
-          selected_amount = f"{custom_val} {custom_currency}"
+          st.success(f"確認 / OK: {custom_val} {clean_currency}")
+          selected_amount = f"{custom_val} {clean_currency}"
       else:
-        selected_amount = f"0 {custom_currency}"
+        selected_amount = f"0 {clean_currency}"
 
       st.markdown("</div>", unsafe_allow_html=True)
         
@@ -343,22 +380,36 @@ elif st.session_state.step == "input_details":
 
     st.write("")
     st.write("")
-    st.markdown("### 支払方法")
+    st.markdown("### วิธีชำระเงิน / 支払方法")
     payment = st.radio("支払方法", ["QR", "Cash"], label_visibility="collapsed")
 
   st.write("---")
   st.write("")
 
-  if st.button("完了", type="primary"):
+  if st.button("เสร็จสิ้น / 完了", type="primary"):
     if name.strip() == "":
-      st.warning("お名前を入力してください。")
+      st.warning("กรุณากรอกชื่อ / お名前を入力してください。")
     elif is_amount_error:
-      st.error("金額欄に不適切な文字（アルファベット等）が含まれています。修正してから完了ボタンを押してください。")
+      st.error("กรุณาลบตัวอักษรในช่องจำนวนเงิน / 金額欄の誤入力を修正してください。")
     else:
-      with st.spinner("送信中... しばらくお待ちください"):
+      with st.spinner("กำลังส่งข้อมูล... / 送信中..."):
         now = datetime.now().strftime("%Y-%m-%d")
 
-        # 優先判定（優先と乳児連れの両方が記録可能）
+        # 言語データ整形（GAS保存用）
+        clean_lang = "日本語"
+        if "English" in language:
+          clean_lang = "英語"
+        elif "ภาษาไทย" in language:
+          clean_lang = "タイ語"
+
+        # 回数データ整形
+        clean_kai = "-"
+        if "1" in kai_suu: clean_kai = "1回目"
+        elif "2" in kai_suu: clean_kai = "2回目"
+        elif "3" in kai_suu: clean_kai = "3回目"
+        elif "มากกว่า" in kai_suu or "1年" in kai_suu: clean_kai = "1年以上"
+
+        # 優先判定
         priority_str = ""
         if is_priority and is_infant:
           priority_str = "〇 / 乳児連れ"
@@ -372,8 +423,8 @@ elif st.session_state.step == "input_details":
             "category": category,
             "amount": selected_amount,
             "name": name.strip(),
-            "kaiSuu": kai_suu,
-            "language": language,
+            "kaiSuu": clean_kai,
+            "language": clean_lang,
             "isKanki": "〇" if is_kanki else "",
             "isPriority": priority_str,
             "payment": payment,
@@ -390,18 +441,18 @@ elif st.session_state.step == "input_details":
             st.session_state.step = "completed"
             st.rerun()
           else:
-            st.error("データの送信に失敗しました。もう一度お試しください。")
+            st.error("การส่งข้อมูลล้มเหลว / データの送信に失敗しました。")
         except Exception as e:
-          st.error(f"エラーが発生しました: {e}")
+          st.error(f"Error: {e}")
 
 
 # =========================================================
 # 集計画面（スプレッドシートの集計結果 + 視認性重視の金庫カウント）
 # =========================================================
 elif st.session_state.step == "summary":
-  st.markdown("<h1 style='text-align: center; font-size: 45px;'>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
+  st.markdown("<h1 style='text-align: center; font-size: 45px;'>Today's Summary and Cash Verification<br>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
 
-  if st.button("← 戻る"):
+  if st.button("← 戻る / ย้อนกลับ"):
     st.session_state.step = "select_category"
     st.rerun()
 
@@ -416,7 +467,7 @@ elif st.session_state.step == "summary":
     if res.status_code == 200:
       summary_data = res.json().get("summary", {})
   except Exception as e:
-    st.error(f"集計データの取得に失敗しました: {e}")
+    st.error(f"エラー: {e}")
 
   categories = ["向上", "初信", "向上相談", "相談", "特別相談", "鑑定"]
   
@@ -436,7 +487,7 @@ elif st.session_state.step == "summary":
 
     table_html += f"""<tr><td style="border: 2px solid #1e293b; padding: 12px; font-weight: bold; background-color: #f8fafc;">{cat}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["count"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["qr"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["bath"]}</td><td style="border: 2px solid #1e293b; padding: 12px;">{d["yen"]}</td></tr>"""
 
-  table_html += f"""<tr style="background-color: #cbd5e1; font-weight: bold;"><td style="border: 2px solid #1e293b; padding: 12px;">合計</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_count}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_qr}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_bath}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_yen}</td></tr></tbody></table>"""
+  table_html += f"""<tr style="background-color: #cbd5e1; font-weight: bold;"><td style="border: 2px solid #1e293b; padding: 12px;">合計 / Total</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_count}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_qr}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_bath}</td><td style="border: 2px solid #1e293b; padding: 12px;">{tot_yen}</td></tr></tbody></table>"""
   
   st.markdown(table_html, unsafe_allow_html=True)
 
@@ -444,7 +495,6 @@ elif st.session_state.step == "summary":
   st.write("---")
 
   st.markdown("### 💰 金庫の現金カウント（実査・入力枠）")
-  st.markdown("黄色の枠内に金庫にある紙幣の枚数を入力してください。金額が自動計算されます。")
 
   st.markdown(
       """
@@ -521,7 +571,7 @@ elif st.session_state.step == "summary":
           text-align: center;
           margin-top: 20px;
       ">
-          <p style="font-size: 28px; font-weight: bold; color: #166534; margin: 0;">【現金合計】</p>
+          <p style="font-size: 28px; font-weight: bold; color: #166534; margin: 0;">【現金合計 / Cash Total】</p>
           <p style="font-size: 45px; font-weight: 950; color: #14532d; margin: 10px 0 0 0;">
               🇹🇭 <b>{total_bath:,} Bath</b> / 🇯🇵 <b>{total_yen:,} Yen</b>
           </p>
@@ -540,23 +590,23 @@ elif st.session_state.step == "completed":
       <style>
       .stButton > button { min-height: 150px !important; }
       .stButton > button p { font-size: 50px !important; font-weight: bold !important; }
-      h1 { font-size: 60px !important; text-align: center; }
-      h2 { font-size: 120px !important; text-align: center; color: #1e293b; margin-top: 30px; margin-bottom: 30px;}
-      h3 { font-size: 50px !important; text-align: center; }
+      h1 { font-size: 55px !important; text-align: center; }
+      h2 { font-size: 110px !important; text-align: center; color: #1e293b; margin-top: 30px; margin-bottom: 30px;}
+      h3 { font-size: 45px !important; text-align: center; }
       </style>
       """,
       unsafe_allow_html=True,
   )
 
-  st.markdown("<h1>受付が完了いたしました</h1>", unsafe_allow_html=True)
-  st.markdown(f"<h3>お名前: {st.session_state.completed_name} 様</h3>", unsafe_allow_html=True)
+  st.markdown("<h1>ลงทะเบียนเสร็จสิ้น / 受付が完了いたしました</h1>", unsafe_allow_html=True)
+  st.markdown(f"<h3>ชื่อ / お名前: {st.session_state.completed_name} ท่าน / 様</h3>", unsafe_allow_html=True)
   
-  st.markdown(f"<h2>受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
+  st.markdown(f"<h2>หมายเลข / 受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
 
-  st.info("この番号をレシートにお書きください。")
+  st.info("กรุณากรอกหมายเลขนี้ในใบเสร็จ / この番号をレシートにお書きください。")
 
   st.write("")
   st.write("")
-  if st.button("次の人の受付をする"):
+  if st.button("ลงทะเบียนคนถัดไป / 次の人の受付をする"):
     st.session_state.step = "select_category"
     st.rerun()
