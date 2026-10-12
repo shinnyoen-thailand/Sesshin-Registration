@@ -496,12 +496,13 @@ elif st.session_state.step == "cancel_page":
     if not records:
         st.info("There are no registration records for today.")
     else:
-        for rec in records:
-            t_id = rec.get("ticketId")
-            name_str = rec.get("name")
-            cat_str = rec.get("category")
-            amt_str = rec.get("amount")
-            pay_str = rec.get("payment")
+        # 重複キーエラーを防ぐため、enumerateで一意のインデックス(i)を付与します
+        for i, rec in enumerate(records):
+            t_id = rec.get("ticketId") or f"NO_ID_{i}"
+            name_str = rec.get("name", "Unknown")
+            cat_str = rec.get("category", "-")
+            amt_str = rec.get("amount", "-")
+            pay_str = rec.get("payment", "-")
 
             c_info, c_btn = st.columns([3.5, 1.5])
 
@@ -520,7 +521,8 @@ elif st.session_state.step == "cancel_page":
 
             with c_btn:
                 st.write("")
-                if st.button(f"❌ Cancel\n({t_id})", key=f"del_{t_id}", use_container_width=True):
+                # keyにインデックス(_i)を追加して完全な一意性を確保
+                if st.button(f"❌ Cancel\n({t_id})", key=f"del_{t_id}_{i}", use_container_width=True):
                     with st.spinner("กำลังยกเลิก... / 取り消し処理中..."):
                         try:
                             c_res = requests.post(GAS_URL, json={"action": "cancel_record", "ticketId": t_id})
