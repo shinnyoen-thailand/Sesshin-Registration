@@ -66,7 +66,7 @@ st.markdown(
 /* ボタン基本設定（タイ語をメイン大きく、日本語を少し小さく） */
 .stButton > button {
     width: 100% !important;
-    min-height: 120px !important;
+    min-height: 110px !important;
     border-radius: 16px !important;
     border: 3px solid #1e293b !important;
     background-color: #ffffff !important;
@@ -134,48 +134,53 @@ if st.session_state.step == "select_category":
     st.markdown(
         """
 <style>
-/* 上段左側（向上・向上相談）ボタン：高さを240pxに設定 */
-button[aria-label*="โคโจเซสชิน"],
-button[aria-label*="โคโจโซดันเซสชิน"] {
+/* 左列：向上ボタン（右列のボタン2つ分の特大サイズ：240px） */
+div.st-key-btn_kojo > button {
     min-height: 240px !important;
     margin-bottom: 15px !important;
 }
 
-/* 上段右側（初信・相談・特別相談・鑑定）ボタン：高さを115pxに設定 */
-button[aria-label*="Beginner"],
-button[aria-label*="เซสชินปรึกษา"],
-button[aria-label*="特別相談"],
-button[aria-label*="鑑定"] {
-    min-height: 115px !important;
+/* 左列：向上相談ボタン（右列のボタン2つ分の特大サイズ：240px） */
+div.st-key-btn_kojosodan > button {
+    min-height: 240px !important;
+    margin-bottom: 15px !important;
+}
+
+/* 右列：初信・相談・特別相談・鑑定（各112px） */
+div.st-key-btn_shoshin > button,
+div.st-key-btn_sodan > button,
+div.st-key-btn_tokubetsusodan > button,
+div.st-key-btn_kantei > button {
+    min-height: 112px !important;
     margin-bottom: 10px !important;
 }
 
 /* 本日の集計・現金確認（高さ90px・とても薄い黄色） */
-button[aria-label*="Today's Summary"] {
+div.st-key-btn_summary > button {
     min-height: 90px !important;
     background-color: #fef9c3 !important;
     border: 3px solid #eab308 !important;
 }
-button[aria-label*="Today's Summary"] p::first-line {
+div.st-key-btn_summary > button p::first-line {
     font-size: 24px !important;
     color: #854d0e !important;
 }
-button[aria-label*="Today's Summary"] p {
+div.st-key-btn_summary > button p {
     font-size: 19px !important;
     color: #a16207 !important;
 }
 
 /* 受付の取り消し・修正（高さ90px・薄いグレー） */
-button[aria-label*="Cancel Registration"] {
+div.st-key-btn_cancel_page > button {
     min-height: 90px !important;
     background-color: #f1f5f9 !important;
     border: 3px solid #64748b !important;
 }
-button[aria-label*="Cancel Registration"] p::first-line {
+div.st-key-btn_cancel_page > button p::first-line {
     font-size: 24px !important;
     color: #334155 !important;
 }
-button[aria-label*="Cancel Registration"] p {
+div.st-key-btn_cancel_page > button p {
     font-size: 19px !important;
     color: #475569 !important;
 }
