@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbx2vLHE5Ujb6sVDIXB2FSQx-xxUbbkmzYKP88oE7HfbAY73xa7qdkTBx-3FfsORQnJC/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbwwLAbZXEdiKeRSkMC6YHsPWl6dUjhuL6zGt8tyYeO0oXArJ2Bz11s0YPaUcEiITNz0/exec"
 
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
@@ -541,7 +541,7 @@ elif st.session_state.step == "summary":
   st.write("")
   st.write("---")
 
-  # 2. 下段：CASH ONLY（金庫実査カウント枠）
+  # 2. 下段：CASH ONLY（金庫実査カウント枠・ペン/数字直接入力対応）
   st.markdown("### CASH ONLY（金庫内のお金を数えて入力）")
 
   st.markdown(
@@ -552,9 +552,9 @@ input[type="number"] {
     font-size: 26px !important;
     font-weight: bold !important;
     color: #0f172a !important;
-    height: 48px !important;
+    height: 52px !important;
     border-radius: 4px !important;
-    border: 1.5px solid #000000 !important;
+    border: 2px solid #000000 !important;
     text-align: center !important;
 }
 </style>
@@ -575,16 +575,18 @@ input[type="number"] {
 
   calc_baht_total = 0
   calc_yen_total = 0
+  counts_dict = {}
 
   for denom, key, currency in cash_denom_def:
     c1, c2, c3, c4 = st.columns([1.5, 1.0, 2.5, 3.0])
     
     with c1:
-      st.markdown(f"<p style='font-size:24px; font-weight:bold; text-align:right; margin-top:5px;'>{denom}</p>", unsafe_allow_html=True)
+      st.markdown(f"<p style='font-size:24px; font-weight:bold; text-align:right; margin-top:8px;'>{denom}</p>", unsafe_allow_html=True)
     with c2:
-      st.markdown(f"<p style='font-size:22px; font-weight:bold; text-align:left; margin-top:5px;'>{currency}</p>", unsafe_allow_html=True)
+      st.markdown(f"<p style='font-size:22px; font-weight:bold; text-align:left; margin-top:8px;'>{currency}</p>", unsafe_allow_html=True)
     with c3:
       count = st.number_input(f"{key}", min_value=0, value=0, step=1, label_visibility="collapsed", key=key)
+      counts_dict[key] = count
     with c4:
       subtotal = denom * count
       if currency == "Bath":
@@ -593,31 +595,66 @@ input[type="number"] {
         calc_yen_total += subtotal
       st.markdown(
           f"""
-<div style="background-color: #ffffff; border: 1.5px solid #000000; height: 48px; display: flex; align-items: center; justify-content: center;">
+<div style="background-color: #ffffff; border: 1.5px solid #000000; height: 52px; display: flex; align-items: center; justify-content: center;">
 <span style="font-size: 24px; font-weight: bold; color: #000000;">{subtotal:,}</span>
 </div>
 """,
           unsafe_allow_html=True,
       )
 
+  # 現金残高 Baht / Yen および 「おつり (เงินทอน)」 & 「Total」エリア
   st.write("")
-  st.markdown(
-      f"""
-<table style="width:100%; border-collapse: collapse; font-size: 22px; font-weight: bold; border: 2px solid #000000; margin-top: 10px;">
-<tr style="background-color: #ffffff;">
-<td style="border: 1px solid #000; width: 35%; padding: 8px;">ยอดเงินสดคงเหลือ 現金残高</td>
-<td style="border: 1px solid #000; width: 15%; text-align: center;">Baht</td>
-<td style="border: 1px solid #000; width: 50%; text-align: center; background-color: #ffff00; font-size: 28px;">{calc_baht_total:,}</td>
-</tr>
-<tr style="background-color: #ffffff;">
-<td style="border: 1px solid #000; padding: 8px;">ยอดเงินสดคงเหลือ 現金残高</td>
-<td style="border: 1px solid #000; text-align: center;">Yen</td>
-<td style="border: 1px solid #000; text-align: center; background-color: #ffff00; font-size: 28px;">{calc_yen_total:,}</td>
-</tr>
-</table>
-""",
-      unsafe_allow_html=True,
-  )
+  
+  c_label, c_baht_val, c_otsuri_label, c_otsuri_val, c_total_label, c_total_val = st.columns([2.5, 2.0, 2.0, 2.0, 1.5, 2.0])
+  
+  with c_label:
+    st.markdown("<p style='font-size:20px; font-weight:bold; margin-top:10px;'>ยอดเงินสดคงเหลือ 現金残高</p>", unsafe_allow_html=True)
+  with c_baht_val:
+    st.markdown(f"<div style='background-color:#ffff00; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold;'>{calc_baht_total:,} Bath</div>", unsafe_allow_html=True)
+  
+  with c_otsuri_label:
+    st.markdown("<p style='font-size:18px; font-weight:bold; text-align:right; margin-top:10px;'>เงินทอน(おつり)</p>", unsafe_allow_html=True)
+  with c_otsuri_val:
+    otsuri = st.number_input("おつり", min_value=0, value=0, step=100, label_visibility="collapsed", key="otsuri_val")
+  
+  with c_total_label:
+    st.markdown("<p style='font-size:20px; font-weight:bold; text-align:center; margin-top:10px;'>Total</p>", unsafe_allow_html=True)
+  with c_total_val:
+    total_after_otsuri = calc_baht_total - otsuri
+    st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold;'>{total_after_otsuri:,}</div>", unsafe_allow_html=True)
+
+  st.write("")
+  # Yen残高行
+  cy_label, cy_val, cy_dummy1, cy_dummy2 = st.columns([2.5, 2.0, 4.0, 3.5])
+  with cy_label:
+    st.markdown("<p style='font-size:20px; font-weight:bold;'>ยอดเงินสดคงเหลือ 現金残高</p>", unsafe_allow_html=True)
+  with cy_val:
+    st.markdown(f"<div style='background-color:#ffff00; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold;'>{calc_yen_total:,} Yen</div>", unsafe_allow_html=True)
+
+  st.write("")
+  st.write("")
+  
+  # スプレッドシートへの保存ボタン
+  if st.button("💾 CASH ONLY（金庫実査内容）をスプレッドシートに保存する", use_container_width=True):
+    with st.spinner("スプレッドシートに保存中..."):
+      save_payload = {
+          "action": "save_cash_only",
+          "date": today_str,
+          "counts": counts_dict,
+          "otsuri": otsuri,
+          "baht_total": calc_baht_total,
+          "yen_total": calc_yen_total,
+          "total_after_otsuri": total_after_otsuri
+      }
+      try:
+        res = requests.post(GAS_URL, json=save_payload)
+        res_j = res.json()
+        if res_j.get("status") == "success":
+          st.success("✅ スプレッドシート（Summaryシート）のCASH ONLY欄に正常に保存されました！")
+        else:
+          st.error("保存に失敗しました。")
+      except Exception as e:
+        st.error(f"送信エラー: {e}")
 
 
 # =========================================================
