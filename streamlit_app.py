@@ -4,9 +4,9 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbxuLepC6AnvSTG4A2qufRUczqgYFmuRzkBXhydO4Ww9dnpuyixRfjxyyUyA3zlgYkJl/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbwwM4iX8FtyxKMsc1iSxi4mn0OIoTYNwMiszdxS2vOi2GU7Vxfmw8_D5qgZ4bMbgbMa/exec"
 
-# 受付種類ごとの金額設定データ（タイ語・日本語・英語併記）
+# 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
     "向上": {
         "thai": "โคโจเซสชิน",
@@ -41,14 +41,12 @@ AMOUNT_CONFIG = {
     "鑑定": {
         "thai": "เซสชินเพื่อการตัดสินใจ",
         "jp": "鑑定",
-        "base": "900 Bath",
-        "child": "450 Bath\n(15 years or under)",
+        "base": "800 Bath",
+        "child": "400 Bath\n(15 years or under)",
     },
 }
 
-# =========================================================
-# 全画面共通：ベース設定
-# =========================================================
+# 全画面共通ベース設定
 st.markdown(
     """
     <style>
@@ -66,7 +64,6 @@ st.markdown(
         border: 3px solid #1e293b !important;
         background-color: #ffffff !important;
         box-shadow: 0px 6px 12px rgba(0,0,0,0.12) !important;
-        transition: all 0.2s !important;
     }
     .stButton > button p {
         font-size: 36px !important;
@@ -77,16 +74,11 @@ st.markdown(
         text-align: center !important;
         line-height: 1.2 !important;
     }
-    .stButton > button:hover {
-        background-color: #f8fafc !important;
-        border-color: #000000 !important;
-    }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# 画面の状態管理
 if "step" not in st.session_state:
   st.session_state.step = "select_category"
 if "selected_category" not in st.session_state:
@@ -119,7 +111,7 @@ if st.session_state.step == "select_category":
       unsafe_allow_html=True,
   )
 
-  st.markdown("<h1 style='text-align: center; font-size: 45px; margin-bottom: 20px;'>Sesshin Registration / 接心受付</h1>", unsafe_allow_html=True)
+  st.markdown("<h1 style='text-align: center; font-size: 45px; margin-bottom: 20px;'>ลงทะเบียน / 接心受付</h1>", unsafe_allow_html=True)
 
   col_left, col_right = st.columns(2, gap="large")
 
@@ -161,13 +153,13 @@ if st.session_state.step == "select_category":
       st.rerun()
 
   st.write("")
-  if st.button("📊 Today's Summary and Cash Verification\n本日の集計・金庫確認", key="btn_summary", use_container_width=True):
+  if st.button("📊 Today's Summary and Cash Verification\n本日の集計・金庫確認を開く", key="btn_summary", use_container_width=True):
     st.session_state.step = "summary"
     st.rerun()
 
 
 # =========================================================
-# 画面2：詳細情報の入力画面 (iPad最適化サイズ)
+# 画面2：詳細情報の入力画面
 # =========================================================
 elif st.session_state.step == "input_details":
   st.markdown(
@@ -185,10 +177,8 @@ elif st.session_state.step == "input_details":
           border-left: 8px solid #3b82f6;
           padding-left: 12px;
           margin-bottom: 12px !important; 
-          margin-top: 5px !important; 
       }
 
-      /* お名前入力欄 */
       textarea[aria-label="お名前"] {
           font-size: 40px !important;
           font-weight: 900 !important;
@@ -199,7 +189,6 @@ elif st.session_state.step == "input_details":
           border-radius: 12px !important;
       }
       
-      /* 任意金額入力欄 */
       textarea[aria-label="任意金額"] {
           font-size: 38px !important;
           font-weight: 900 !important;
@@ -210,12 +199,11 @@ elif st.session_state.step == "input_details":
           border-radius: 10px !important;
       }
 
-      /* ラジオボタンの文字サイズ（iPad用最適化） */
       [data-testid="stRadio"] label p {
           font-size: 25px !important;
           font-weight: 800 !important;
           color: #000000 !important;
-          white-space: pre-line !important; /* 改行を有効化 */
+          white-space: pre-line !important;
           line-height: 1.25 !important;
       }
       [data-testid="stRadio"] {
@@ -226,7 +214,6 @@ elif st.session_state.step == "input_details":
           margin-bottom: 15px;
       }
 
-      /* チェックボックスの文字サイズ（iPad用最適化） */
       [data-testid="stCheckbox"] label p {
           font-size: 25px !important;
           font-weight: 800 !important;
@@ -257,7 +244,6 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-  # 1. お名前入力欄 ＆ 確認欄
   st.markdown("### Name （ภาษาอังกฤษ/English) / お名前")
   name = st.text_area(
       "お名前",
@@ -290,7 +276,6 @@ elif st.session_state.step == "input_details":
 
   st.write("---")
 
-  # 2. その他の選択肢 (左右カラム)
   col_left, col_right = st.columns(2, gap="large")
 
   with col_left:
@@ -320,7 +305,6 @@ elif st.session_state.step == "input_details":
   with col_right:
     st.markdown("### จำนวนเงิน / 金額")
     
-    # 金額選択肢（2段表示・小さめ文字対応）
     other_option_label = "อื่น ๆ (ถวายปัจจัย)\nその他（お典供）"
     
     amount_type = st.radio(
@@ -370,7 +354,6 @@ elif st.session_state.step == "input_details":
       st.markdown("</div>", unsafe_allow_html=True)
         
     else:
-      # 2段改行が含まれる選択肢の場合、1行（改行除去）にして保存用データを作成
       selected_amount = amount_type.replace("\n", " ")
 
     st.write("")
@@ -389,21 +372,18 @@ elif st.session_state.step == "input_details":
       with st.spinner("กำลังส่งข้อมูล... / 送信中..."):
         now = datetime.now().strftime("%Y-%m-%d")
 
-        # 言語データ整形（GAS保存用）
         clean_lang = "日本語"
         if "English" in language:
           clean_lang = "英語"
         elif "ภาษาไทย" in language:
           clean_lang = "タイ語"
 
-        # 回数データ整形
         clean_kai = "-"
         if "1" in kai_suu: clean_kai = "1回目"
         elif "2" in kai_suu: clean_kai = "2回目"
         elif "3" in kai_suu: clean_kai = "3回目"
         elif "มากกว่า" in kai_suu or "1年" in kai_suu: clean_kai = "1年以上"
 
-        # 優先判定
         priority_str = ""
         if is_priority and is_infant:
           priority_str = "〇 / 乳児連れ"
@@ -441,10 +421,10 @@ elif st.session_state.step == "input_details":
 
 
 # =========================================================
-# 集計画面（スプレッドシートの集計結果 + 視認性重視の金庫カウント）
+# 画面3：集計画面（スプレッドシート表構造 完全一致）
 # =========================================================
 elif st.session_state.step == "summary":
-  st.markdown("<h1 style='text-align: center; font-size: 38px;'>Today's Summary and Cash Verification<br>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
+  st.markdown("<h1 style='text-align: center; font-size: 36px;'>Today's Summary and Cash Verification<br>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
 
   if st.button("← 戻る / ย้อนกลับ"):
     st.session_state.step = "select_category"
@@ -453,7 +433,25 @@ elif st.session_state.step == "summary":
   st.write("---")
 
   today_str = datetime.now().strftime("%Y-%m-%d")
-  st.markdown(f"### Date: **{today_str}**")
+  
+  # スプレッドシートと完全一致する集計表の定義データ
+  rows_def = [
+      # (カテゴリ表示名, 単価数値, 通貨, GASキー)
+      ("โคโจเซสชิน\n向上", 50, "Bath", "kojo_50"),
+      ("", 100, "Bath", "kojo_100"),
+      ("", 125, "Bath", "kojo_125"),
+      ("", 250, "Bath", "kojo_250"),
+      ("", 1000, "Yen", "kojo_1000y"),
+      ("Beginner\n初信", 50, "Bath", "shoshin_50"),
+      ("", 100, "Bath", "shoshin_100"),
+      ("", 125, "Bath", "shoshin_125"),
+      ("", 250, "Bath", "shoshin_250"),
+      ("", 1000, "Yen", "shoshin_1000y"),
+      ("โคโจโซดันเซสชิน 向上相談", 200, "Bath", "kojosodan_200"),
+      ("เซสชินปรึกษา 相談", 300, "Bath", "sodan_300"),
+      ("เซสชินปรึกษาพิเศษ 特別相談", 600, "Bath", "tokubetsu_600"),
+      ("เซสชินเพื่อการตัดสินใจ 鑑定", 800, "Bath", "kantei_800"),
+  ]
 
   summary_data = {}
   try:
@@ -461,46 +459,130 @@ elif st.session_state.step == "summary":
     if res.status_code == 200:
       summary_data = res.json().get("summary", {})
   except Exception as e:
-    st.error(f"エラー: {e}")
+    st.error(f"集計エラー: {e}")
 
-  categories = ["向上", "初信", "向上相談", "相談", "特別相談", "鑑定"]
-  
-  tot_count = 0
-  tot_qr = 0
-  tot_bath = 0
-  tot_yen = 0
+  # 1. 上段：集計テーブル（スプレッドシートデザイン再現）
+  table_html = f"""
+  <div style="overflow-x:auto;">
+  <table style="width:100%; border-collapse: collapse; font-size: 18px; text-align: center; background-color: #ffffff; border: 2px solid #000000;">
+    <thead>
+      <tr style="background-color: #f1f5f9;">
+        <th rowspan="2" style="border: 1px solid #000; width: 25%; font-size: 16px;">Date</th>
+        <th rowspan="2" style="border: 1px solid #000; width: 15%; font-size: 16px;">ราคาต่อหน่วย<br>単価</th>
+        <th colspan="2" style="border: 1px solid #000; width: 30%; background-color: #f8fafc;">Cash</th>
+        <th colspan="2" style="border: 1px solid #000; width: 30%; background-color: #f8fafc;">QR</th>
+      </tr>
+      <tr style="background-color: #f8fafc;">
+        <th style="border: 1px solid #000; width: 15%;">Person</th>
+        <th style="border: 1px solid #000; width: 15%;">Amount</th>
+        <th style="border: 1px solid #000; width: 15%;">Person</th>
+        <th style="border: 1px solid #000; width: 15%;">Amount</th>
+      </tr>
+      <tr style="background-color: #ffffff;">
+        <td style="border: 1px solid #000; font-weight: bold; background-color: #f1f5f9;">{today_str}</td>
+        <td style="border: 1px solid #000;"></td>
+        <td style="border: 1px solid #000; background-color: #00e5ff;"></td>
+        <td style="border: 1px solid #000;"></td>
+        <td style="border: 1px solid #000; background-color: #00e5ff;"></td>
+        <td style="border: 1px solid #000;"></td>
+      </tr>
+    </thead>
+    <tbody>
+  """
 
-  table_html = """<table style="width:100%; border-collapse: collapse; font-size: 22px; text-align: center; background-color: #ffffff;"><thead><tr style="background-color: #f1f5f9;"><th style="border: 2px solid #1e293b; padding: 10px;"></th><th style="border: 2px solid #1e293b; padding: 10px;">人数</th><th style="border: 2px solid #1e293b; padding: 10px;">QR</th><th colspan="2" style="border: 2px solid #1e293b; padding: 10px; background-color: #e2e8f0;">Cash</th></tr><tr style="background-color: #f8fafc;"><th style="border: 2px solid #1e293b; padding: 6px;"></th><th style="border: 2px solid #1e293b; padding: 6px;"></th><th style="border: 2px solid #1e293b; padding: 6px;"></th><th style="border: 2px solid #1e293b; padding: 6px;">Bath</th><th style="border: 2px solid #1e293b; padding: 6px;">Yen</th></tr></thead><tbody>"""
+  baht_cash_amt = 0
+  yen_cash_amt = 0
+  baht_qr_amt = 0
+  yen_qr_amt = 0
 
-  for cat in categories:
-    d = summary_data.get(cat, {"count": 0, "qr": 0, "bath": 0, "yen": 0})
-    tot_count += d["count"]
-    tot_qr += d["qr"]
-    tot_bath += d["bath"]
-    tot_yen += d["yen"]
+  for cat_label, price, curr, key in rows_def:
+    d = summary_data.get(key, {"cash_p": 0, "qr_p": 0})
+    
+    c_person = d.get("cash_p", 0)
+    q_person = d.get("qr_p", 0)
 
-    table_html += f"""<tr><td style="border: 2px solid #1e293b; padding: 10px; font-weight: bold; background-color: #f8fafc;">{cat}</td><td style="border: 2px solid #1e293b; padding: 10px;">{d["count"]}</td><td style="border: 2px solid #1e293b; padding: 10px;">{d["qr"]}</td><td style="border: 2px solid #1e293b; padding: 10px;">{d["bath"]}</td><td style="border: 2px solid #1e293b; padding: 10px;">{d["yen"]}</td></tr>"""
+    c_amount = c_person * price
+    q_amount = q_person * price
 
-  table_html += f"""<tr style="background-color: #cbd5e1; font-weight: bold;"><td style="border: 2px solid #1e293b; padding: 10px;">合計 / Total</td><td style="border: 2px solid #1e293b; padding: 10px;">{tot_count}</td><td style="border: 2px solid #1e293b; padding: 10px;">{tot_qr}</td><td style="border: 2px solid #1e293b; padding: 10px;">{tot_bath}</td><td style="border: 2px solid #1e293b; padding: 10px;">{tot_yen}</td></tr></tbody></table>"""
+    if curr == "Bath":
+      baht_cash_amt += c_amount
+      baht_qr_amt += q_amount
+    else:
+      yen_cash_amt += c_amount
+      yen_qr_amt += q_amount
+
+    # グレーアウト処理 (1000YenのQR Amount/Personエリア)
+    qr_person_style = "background-color: #00e5ff;"
+    qr_amount_style = ""
+    if curr == "Yen":
+      qr_person_style = "background-color: #555555;"
+      qr_amount_style = "background-color: #555555;"
+
+    # 複数行カテゴリのセル統合（向上・初信）
+    cat_td = ""
+    if cat_label == "โคโจเซสชิน\n向上":
+      cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
+    elif cat_label == "Beginner\n初信":
+      cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
+    elif cat_label != "":
+      cat_td = f'<td style="border: 1px solid #000; font-weight: bold; text-align: left; padding-left: 10px;">{cat_label}</td>'
+
+    c_amt_str = f"{c_amount:,}" if c_amount > 0 else ""
+    q_amt_str = f"{q_amount:,}" if q_amount > 0 and curr != "Yen" else ""
+    c_p_str = str(c_person) if c_person > 0 else ""
+    q_p_str = str(q_person) if q_person > 0 and curr != "Yen" else ""
+
+    table_html += f"""
+    <tr>
+      {cat_td}
+      <td style="border: 1px solid #000;">{price} {curr}</td>
+      <td style="border: 1px solid #000; background-color: #00e5ff; font-weight: bold;">{c_p_str}</td>
+      <td style="border: 1px solid #000;">{c_amt_str}</td>
+      <td style="border: 1px solid #000; {qr_person_style} font-weight: bold;">{" " if curr=="Yen" else q_p_str}</td>
+      <td style="border: 1px solid #000; {qr_amount_style}">{" " if curr=="Yen" else q_amt_str}</td>
+    </tr>
+    """
+
+  # Total行
+  table_html += f"""
+    <tr style="background-color: #d1d5db; font-weight: bold;">
+      <td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Baht Total</td>
+      <td style="border: 1px solid #000;"></td>
+      <td style="border: 1px solid #000;">{baht_cash_amt:,}</td>
+      <td style="border: 1px solid #000; background-color: #555555;"></td>
+      <td style="border: 1px solid #000;">{baht_qr_amt:,}</td>
+    </tr>
+    <tr style="background-color: #d1d5db; font-weight: bold;">
+      <td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Yen Total</td>
+      <td style="border: 1px solid #000;"></td>
+      <td style="border: 1px solid #000;">{yen_cash_amt:,}</td>
+      <td style="border: 1px solid #000; background-color: #555555;"></td>
+      <td style="border: 1px solid #000; background-color: #555555;"></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+  """
   
   st.markdown(table_html, unsafe_allow_html=True)
 
   st.write("")
   st.write("---")
 
-  st.markdown("### 💰 金庫の現金カウント（実査・入力枠）")
+  # 2. 下段：CASH ONLY（金庫実査カウント枠）
+  st.markdown("### CASH ONLY（金庫内のお金を数えて入力）")
 
   st.markdown(
       """
       <style>
       input[type="number"] {
-          background-color: #fef08a !important;
-          font-size: 28px !important;
+          background-color: #ffff00 !important;
+          font-size: 26px !important;
           font-weight: bold !important;
           color: #0f172a !important;
-          height: 50px !important;
-          border-radius: 6px !important;
-          border: 2px solid #ca8a04 !important;
+          height: 48px !important;
+          border-radius: 4px !important;
+          border: 1.5px solid #000000 !important;
           text-align: center !important;
       }
       </style>
@@ -508,75 +590,75 @@ elif st.session_state.step == "summary":
       unsafe_allow_html=True,
   )
 
-  denominations = [
-      (50, "n_50", "Bath"),
+  # スプレッドシート順 (50, 10, 20, 50, 100, 500, 1000 Bath / 1000 Yen)
+  cash_denom_def = [
+      (50, "n_50_1", "Bath"),
+      (10, "n_10", "Bath"),
+      (20, "n_20", "Bath"),
+      (50, "n_50_2", "Bath"),
       (100, "n_100", "Bath"),
       (500, "n_500", "Bath"),
-      (1000, "n_1000", "Bath"),
-      (250, "n_250", "Bath"),
+      (1000, "n_1000b", "Bath"),
       (1000, "n_1000y", "Yen"),
   ]
 
-  calc_totals = {"Bath": 0, "Yen": 0}
+  calc_baht_total = 0
+  calc_yen_total = 0
 
-  for denom, key, currency in denominations:
-    c1, c2, c3, c4, c5 = st.columns([1.5, 0.8, 2.5, 0.8, 3.5])
+  for denom, key, currency in cash_denom_def:
+    c1, c2, c3, c4 = st.columns([1.5, 1.0, 2.5, 3.0])
     
     with c1:
-      st.markdown(f"<p style='font-size:28px; font-weight:bold; text-align:right; margin-top:8px;'>{denom}</p>", unsafe_allow_html=True)
+      st.markdown(f"<p style='font-size:24px; font-weight:bold; text-align:right; margin-top:5px;'>{denom}</p>", unsafe_allow_html=True)
     with c2:
-      st.markdown("<p style='font-size:36px; font-weight:900; text-align:center; margin-top:3px; color:#1e293b;'>×</p>", unsafe_allow_html=True)
+      st.markdown(f"<p style='font-size:22px; font-weight:bold; text-align:left; margin-top:5px;'>{currency}</p>", unsafe_allow_html=True)
     with c3:
-      count = st.number_input(f"{denom}", min_value=0, value=0, step=1, label_visibility="collapsed", key=key)
+      count = st.number_input(f"{key}", min_value=0, value=0, step=1, label_visibility="collapsed", key=key)
     with c4:
-      st.markdown("<p style='font-size:36px; font-weight:900; text-align:center; margin-top:3px; color:#1e293b;'>＝</p>", unsafe_allow_html=True)
-    with c5:
       subtotal = denom * count
-      calc_totals[currency] += subtotal
+      if currency == "Bath":
+        calc_baht_total += subtotal
+      else:
+        calc_yen_total += subtotal
       st.markdown(
           f"""
           <div style="
-              background-color: #fef08a;
-              border: 2px solid #ca8a04;
-              border-radius: 6px;
-              height: 50px;
+              background-color: #ffffff;
+              border: 1.5px solid #000000;
+              height: 48px;
               display: flex;
               align-items: center;
               justify-content: center;
-              margin-top: 3px;
           ">
-              <span style="font-size: 26px; font-weight: bold; color: #0f172a;">{subtotal:,} {currency}</span>
+              <span style="font-size: 24px; font-weight: bold; color: #000000;">{subtotal:,}</span>
           </div>
           """,
           unsafe_allow_html=True,
       )
 
-  total_bath = calc_totals["Bath"]
-  total_yen = calc_totals["Yen"]
-
+  # 残高合計の表示
   st.write("")
   st.markdown(
       f"""
-      <div style="
-          background-color: #dcfce7;
-          border: 3px solid #16a34a;
-          border-radius: 10px;
-          padding: 15px;
-          text-align: center;
-          margin-top: 15px;
-      ">
-          <p style="font-size: 24px; font-weight: bold; color: #166534; margin: 0;">【現金合計 / Cash Total】</p>
-          <p style="font-size: 38px; font-weight: 950; color: #14532d; margin: 5px 0 0 0;">
-              🇹🇭 <b>{total_bath:,} Bath</b> /別 🇯🇵 <b>{total_yen:,} Yen</b>
-          </p>
-      </div>
+      <table style="width:100%; border-collapse: collapse; font-size: 22px; font-weight: bold; border: 2px solid #000000; margin-top: 10px;">
+        <tr style="background-color: #ffffff;">
+          <td style="border: 1px solid #000; width: 35%; padding: 8px;">ยอดเงินสดคงเหลือ 現金残高</td>
+          <td style="border: 1px solid #000; width: 15%; text-align: center;">Baht</td>
+          <td style="border: 1px solid #000; width: 50%; text-align: center; background-color: #ffff00; font-size: 28px;">{calc_baht_total:,}</td>
+        </tr>
+        <tr style="background-color: #ffffff;">
+          <td style="border: 1px solid #000; padding: 8px;">ยอดเงินสดคงเหลือ 現金残高</td>
+          <td style="border: 1px solid #000; text-align: center;">Yen</td>
+          <td style="border: 1px solid #000; text-align: center; background-color: #ffff00; font-size: 28px;">{calc_yen_total:,}</td>
+        </tr>
+      </table>
       """,
       unsafe_allow_html=True,
   )
 
 
 # =========================================================
-# 画面3：完了画面
+# 画面4：完了画面
 # =========================================================
 elif st.session_state.step == "completed":
   st.markdown(
@@ -597,7 +679,7 @@ elif st.session_state.step == "completed":
   
   st.markdown(f"<h2>หมายเลข / 受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
 
-  st.info("กรุณากรอกหมายเลขนี้ในใบเสร็จ / この番号をレシートにお書きください。")
+  st.info("กรุณากรอกหมายเลขนี้ในใบเสร็จ / この番号をレシートに記入。")
 
   st.write("")
   st.write("")
