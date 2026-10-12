@@ -153,7 +153,7 @@ if st.session_state.step == "select_category":
       st.rerun()
 
   st.write("")
-  if st.button("📊 Today's Summary and Cash Verification\n本日の集計・金庫確認", key="btn_summary", use_container_width=True):
+  if st.button("📊 Today's Summary and Cash Verification\n本日の集計・金庫確認を開く", key="btn_summary", use_container_width=True):
     st.session_state.step = "summary"
     st.rerun()
 
