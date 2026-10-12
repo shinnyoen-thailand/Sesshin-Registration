@@ -49,33 +49,33 @@ AMOUNT_CONFIG = {
 # 全画面共通ベース設定
 st.markdown(
     """
-    <style>
-    .block-container {
-        max-width: 98% !important;
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-    }
-    .stButton > button {
-        width: 100% !important;
-        min-height: 120px !important;
-        border-radius: 16px !important;
-        border: 3px solid #1e293b !important;
-        background-color: #ffffff !important;
-        box-shadow: 0px 6px 12px rgba(0,0,0,0.12) !important;
-    }
-    .stButton > button p {
-        font-size: 36px !important;
-        font-weight: 900 !important;
-        color: #0f172a !important;
-        margin: 0 !important;
-        white-space: pre-line !important;
-        text-align: center !important;
-        line-height: 1.2 !important;
-    }
-    </style>
-    """,
+<style>
+.block-container {
+    max-width: 98% !important;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
+.stButton > button {
+    width: 100% !important;
+    min-height: 120px !important;
+    border-radius: 16px !important;
+    border: 3px solid #1e293b !important;
+    background-color: #ffffff !important;
+    box-shadow: 0px 6px 12px rgba(0,0,0,0.12) !important;
+}
+.stButton > button p {
+    font-size: 36px !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    white-space: pre-line !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+}
+</style>
+""",
     unsafe_allow_html=True,
 )
 
@@ -91,23 +91,23 @@ if "selected_category" not in st.session_state:
 if st.session_state.step == "select_category":
   st.markdown(
       """
-      <style>
-      div[data-testid="column"]:first-child .stButton > button,
-      div[data-testid="stColumn"]:first-child .stButton > button {
-          min-height: 240px !important;
-          margin-bottom: 15px !important;
-      }
-      div[data-testid="column"]:last-child .stButton > button,
-      div[data-testid="stColumn"]:last-child .stButton > button {
-          min-height: 120px !important;
-          margin-bottom: 10px !important;
-      }
-      .stButton > button p {
-          font-size: 32px !important;
-          font-weight: 900 !important;
-      }
-      </style>
-      """,
+<style>
+div[data-testid="column"]:first-child .stButton > button,
+div[data-testid="stColumn"]:first-child .stButton > button {
+    min-height: 240px !important;
+    margin-bottom: 15px !important;
+}
+div[data-testid="column"]:last-child .stButton > button,
+div[data-testid="stColumn"]:last-child .stButton > button {
+    min-height: 120px !important;
+    margin-bottom: 10px !important;
+}
+.stButton > button p {
+    font-size: 32px !important;
+    font-weight: 900 !important;
+}
+</style>
+""",
       unsafe_allow_html=True,
   )
 
@@ -164,71 +164,71 @@ if st.session_state.step == "select_category":
 elif st.session_state.step == "input_details":
   st.markdown(
       """
-      <style>
-      button[kind="secondary"] { min-height: 70px !important; }
-      button[kind="secondary"] p { font-size: 26px !important; }
-      button[kind="primary"] { min-height: 110px !important; }
-      button[kind="primary"] p { font-size: 38px !important; }
-      
-      h3 { 
-          font-size: 28px !important; 
-          font-weight: 900 !important; 
-          color: #1e293b !important; 
-          border-left: 8px solid #3b82f6;
-          padding-left: 12px;
-          margin-bottom: 12px !important; 
-      }
+<style>
+button[kind="secondary"] { min-height: 70px !important; }
+button[kind="secondary"] p { font-size: 26px !important; }
+button[kind="primary"] { min-height: 110px !important; }
+button[kind="primary"] p { font-size: 38px !important; }
 
-      textarea[aria-label="お名前"] {
-          font-size: 40px !important;
-          font-weight: 900 !important;
-          height: 120px !important;
-          color: #000000 !important;
-          background-color: #f8fafc !important;
-          border: 3px solid #1e293b !important;
-          border-radius: 12px !important;
-      }
-      
-      textarea[aria-label="任意金額"] {
-          font-size: 38px !important;
-          font-weight: 900 !important;
-          height: 90px !important;
-          color: #000000 !important;
-          background-color: #ffffff !important;
-          border: 3px solid #ca8a04 !important;
-          border-radius: 10px !important;
-      }
+h3 { 
+    font-size: 28px !important; 
+    font-weight: 900 !important; 
+    color: #1e293b !important; 
+    border-left: 8px solid #3b82f6;
+    padding-left: 12px;
+    margin-bottom: 12px !important; 
+}
 
-      [data-testid="stRadio"] label p {
-          font-size: 25px !important;
-          font-weight: 800 !important;
-          color: #000000 !important;
-          white-space: pre-line !important;
-          line-height: 1.25 !important;
-      }
-      [data-testid="stRadio"] {
-          transform: scale(1.2);
-          transform-origin: left center;
-          margin-left: 10px;
-          margin-top: 10px;
-          margin-bottom: 15px;
-      }
+textarea[aria-label="お名前"] {
+    font-size: 40px !important;
+    font-weight: 900 !important;
+    height: 120px !important;
+    color: #000000 !important;
+    background-color: #f8fafc !important;
+    border: 3px solid #1e293b !important;
+    border-radius: 12px !important;
+}
 
-      [data-testid="stCheckbox"] label p {
-          font-size: 25px !important;
-          font-weight: 800 !important;
-          color: #000000 !important;
-          line-height: 1.25 !important;
-      }
-      [data-testid="stCheckbox"] {
-          transform: scale(1.3);
-          transform-origin: left center;
-          margin-top: 10px;
-          margin-bottom: 10px;
-          margin-left: 10px;
-      }
-      </style>
-      """,
+textarea[aria-label="任意金額"] {
+    font-size: 38px !important;
+    font-weight: 900 !important;
+    height: 90px !important;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border: 3px solid #ca8a04 !important;
+    border-radius: 10px !important;
+}
+
+[data-testid="stRadio"] label p {
+    font-size: 25px !important;
+    font-weight: 800 !important;
+    color: #000000 !important;
+    white-space: pre-line !important;
+    line-height: 1.25 !important;
+}
+[data-testid="stRadio"] {
+    transform: scale(1.2);
+    transform-origin: left center;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+[data-testid="stCheckbox"] label p {
+    font-size: 25px !important;
+    font-weight: 800 !important;
+    color: #000000 !important;
+    line-height: 1.25 !important;
+}
+[data-testid="stCheckbox"] {
+    transform: scale(1.3);
+    transform-origin: left center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+</style>
+""",
       unsafe_allow_html=True,
   )
 
@@ -255,22 +255,11 @@ elif st.session_state.step == "input_details":
   if name.strip():
     st.markdown(
         f"""
-        <div style="
-            border: 3px solid #1e293b;
-            background-color: #f8fafc;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            margin-top: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
-        ">
-            <p style="font-size: 22px; font-weight: bold; color: #475569; margin: 0;">ตรวจสอบชื่อ / ご入力名のご確認</p>
-            <p style="font-size: 55px; font-weight: 950; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">
-                {name.strip()} ท่าน / 様
-            </p>
-        </div>
-        """,
+<div style="border: 3px solid #1e293b; background-color: #f8fafc; border-radius: 12px; padding: 15px; text-align: center; margin-top: 10px; margin-bottom: 15px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
+<p style="font-size: 22px; font-weight: bold; color: #475569; margin: 0;">ตรวจสอบชื่อ / ご入力名のご確認</p>
+<p style="font-size: 55px; font-weight: 950; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">{name.strip()} ท่าน / 様</p>
+</div>
+""",
         unsafe_allow_html=True,
     )
 
@@ -319,9 +308,9 @@ elif st.session_state.step == "input_details":
     if "อื่น ๆ" in amount_type or "その他" in amount_type:
       st.markdown(
           """
-          <div style='background-color: #fef9c3; padding: 18px; border-radius: 12px; border: 3px solid #facc15; margin-top: 10px;'>
-          <p style='font-size: 22px; font-weight: 900; color: #854d0e; margin-bottom: 10px;'>กรอกตัวเลข / 半角数字で記入</p>
-          """, 
+<div style='background-color: #fef9c3; padding: 18px; border-radius: 12px; border: 3px solid #facc15; margin-top: 10px;'>
+<p style='font-size: 22px; font-weight: 900; color: #854d0e; margin-bottom: 10px;'>กรอกตัวเลข / 半角数字で記入</p>
+""", 
           unsafe_allow_html=True
       )
       
@@ -501,58 +490,51 @@ elif st.session_state.step == "summary":
     c_p_str = str(c_person) if c_person > 0 else ""
     q_p_str = str(q_person) if q_person > 0 and curr != "Yen" else ""
 
-    tbody_html += f"""<tr>
-      {cat_td}
-      <td style="border: 1px solid #000;">{price} {curr}</td>
-      <td style="border: 1px solid #000; background-color: #00e5ff; font-weight: bold;">{c_p_str}</td>
-      <td style="border: 1px solid #000;">{c_amt_str}</td>
-      <td style="border: 1px solid #000; {qr_person_style} font-weight: bold;">{" " if curr=="Yen" else q_p_str}</td>
-      <td style="border: 1px solid #000; {qr_amount_style}">{" " if curr=="Yen" else q_amt_str}</td>
-    </tr>"""
+    tbody_html += f"<tr>{cat_td}<td style='border: 1px solid #000;'>{price} {curr}</td><td style='border: 1px solid #000; background-color: #00e5ff; font-weight: bold;'>{c_p_str}</td><td style='border: 1px solid #000;'>{c_amt_str}</td><td style='border: 1px solid #000; {qr_person_style} font-weight: bold;'>{' ' if curr=='Yen' else q_p_str}</td><td style='border: 1px solid #000; {qr_amount_style}'>{' ' if curr=='Yen' else q_amt_str}</td></tr>"
 
   table_html = f"""<div style="overflow-x:auto;">
-  <table style="width:100%; border-collapse: collapse; font-size: 18px; text-align: center; background-color: #ffffff; border: 2px solid #000000;">
-    <thead>
-      <tr style="background-color: #f1f5f9;">
-        <th rowspan="2" style="border: 1px solid #000; width: 25%; font-size: 16px;">Date</th>
-        <th rowspan="2" style="border: 1px solid #000; width: 15%; font-size: 16px;">ราคาต่อหน่วย<br>単価</th>
-        <th colspan="2" style="border: 1px solid #000; width: 30%; background-color: #f8fafc;">Cash</th>
-        <th colspan="2" style="border: 1px solid #000; width: 30%; background-color: #f8fafc;">QR</th>
-      </tr>
-      <tr style="background-color: #f8fafc;">
-        <th style="border: 1px solid #000; width: 15%;">Person</th>
-        <th style="border: 1px solid #000; width: 15%;">Amount</th>
-        <th style="border: 1px solid #000; width: 15%;">Person</th>
-        <th style="border: 1px solid #000; width: 15%;">Amount</th>
-      </tr>
-      <tr style="background-color: #ffffff;">
-        <td style="border: 1px solid #000; font-weight: bold; background-color: #f1f5f9;">{today_str}</td>
-        <td style="border: 1px solid #000;"></td>
-        <td style="border: 1px solid #000; background-color: #00e5ff;"></td>
-        <td style="border: 1px solid #000;"></td>
-        <td style="border: 1px solid #000; background-color: #00e5ff;"></td>
-        <td style="border: 1px solid #000;"></td>
-      </tr>
-    </thead>
-    <tbody>
-      {tbody_html}
-      <tr style="background-color: #d1d5db; font-weight: bold;">
-        <td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Baht Total</td>
-        <td style="border: 1px solid #000;"></td>
-        <td style="border: 1px solid #000;">{baht_cash_amt:,}</td>
-        <td style="border: 1px solid #000; background-color: #555555;"></td>
-        <td style="border: 1px solid #000;">{baht_qr_amt:,}</td>
-      </tr>
-      <tr style="background-color: #d1d5db; font-weight: bold;">
-        <td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Yen Total</td>
-        <td style="border: 1px solid #000;"></td>
-        <td style="border: 1px solid #000;">{yen_cash_amt:,}</td>
-        <td style="border: 1px solid #000; background-color: #555555;"></td>
-        <td style="border: 1px solid #000; background-color: #555555;"></td>
-      </tr>
-    </tbody>
-  </table>
-  </div>"""
+<table style="width:100%; border-collapse: collapse; font-size: 18px; text-align: center; background-color: #ffffff; border: 2px solid #000000;">
+<thead>
+<tr style="background-color: #f1f5f9;">
+<th rowspan="2" style="border: 1px solid #000; width: 25%; font-size: 16px;">Date</th>
+<th rowspan="2" style="border: 1px solid #000; width: 15%; font-size: 16px;">ราคาต่อหน่วย<br>単価</th>
+<th colspan="2" style="border: 1px solid #000; width: 30%; background-color: #f8fafc;">Cash</th>
+<th colspan="2" style="border: 1px solid #000; width: 30%; background-color: #f8fafc;">QR</th>
+</tr>
+<tr style="background-color: #f8fafc;">
+<th style="border: 1px solid #000; width: 15%;">Person</th>
+<th style="border: 1px solid #000; width: 15%;">Amount</th>
+<th style="border: 1px solid #000; width: 15%;">Person</th>
+<th style="border: 1px solid #000; width: 15%;">Amount</th>
+</tr>
+<tr style="background-color: #ffffff;">
+<td style="border: 1px solid #000; font-weight: bold; background-color: #f1f5f9;">{today_str}</td>
+<td style="border: 1px solid #000;"></td>
+<td style="border: 1px solid #000; background-color: #00e5ff;"></td>
+<td style="border: 1px solid #000;"></td>
+<td style="border: 1px solid #000; background-color: #00e5ff;"></td>
+<td style="border: 1px solid #000;"></td>
+</tr>
+</thead>
+<tbody>
+{tbody_html}
+<tr style="background-color: #d1d5db; font-weight: bold;">
+<td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Baht Total</td>
+<td style="border: 1px solid #000;"></td>
+<td style="border: 1px solid #000;">{baht_cash_amt:,}</td>
+<td style="border: 1px solid #000; background-color: #555555;"></td>
+<td style="border: 1px solid #000;">{baht_qr_amt:,}</td>
+</tr>
+<tr style="background-color: #d1d5db; font-weight: bold;">
+<td colspan="2" style="border: 1px solid #000; text-align: right; padding-right: 15px;">Yen Total</td>
+<td style="border: 1px solid #000;"></td>
+<td style="border: 1px solid #000;">{yen_cash_amt:,}</td>
+<td style="border: 1px solid #000; background-color: #555555;"></td>
+<td style="border: 1px solid #000; background-color: #555555;"></td>
+</tr>
+</tbody>
+</table>
+</div>"""
 
   st.markdown(table_html, unsafe_allow_html=True)
 
@@ -564,19 +546,19 @@ elif st.session_state.step == "summary":
 
   st.markdown(
       """
-      <style>
-      input[type="number"] {
-          background-color: #ffff00 !important;
-          font-size: 26px !important;
-          font-weight: bold !important;
-          color: #0f172a !important;
-          height: 48px !important;
-          border-radius: 4px !important;
-          border: 1.5px solid #000000 !important;
-          text-align: center !important;
-      }
-      </style>
-      """,
+<style>
+input[type="number"] {
+    background-color: #ffff00 !important;
+    font-size: 26px !important;
+    font-weight: bold !important;
+    color: #0f172a !important;
+    height: 48px !important;
+    border-radius: 4px !important;
+    border: 1.5px solid #000000 !important;
+    text-align: center !important;
+}
+</style>
+""",
       unsafe_allow_html=True,
   )
 
@@ -611,36 +593,29 @@ elif st.session_state.step == "summary":
         calc_yen_total += subtotal
       st.markdown(
           f"""
-          <div style="
-              background-color: #ffffff;
-              border: 1.5px solid #000000;
-              height: 48px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-          ">
-              <span style="font-size: 24px; font-weight: bold; color: #000000;">{subtotal:,}</span>
-          </div>
-          """,
+<div style="background-color: #ffffff; border: 1.5px solid #000000; height: 48px; display: flex; align-items: center; justify-content: center;">
+<span style="font-size: 24px; font-weight: bold; color: #000000;">{subtotal:,}</span>
+</div>
+""",
           unsafe_allow_html=True,
       )
 
   st.write("")
   st.markdown(
       f"""
-      <table style="width:100%; border-collapse: collapse; font-size: 22px; font-weight: bold; border: 2px solid #000000; margin-top: 10px;">
-        <tr style="background-color: #ffffff;">
-          <td style="border: 1px solid #000; width: 35%; padding: 8px;">ยอดเงินสดคงเหลือ 現金残高</td>
-          <td style="border: 1px solid #000; width: 15%; text-align: center;">Baht</td>
-          <td style="border: 1px solid #000; width: 50%; text-align: center; background-color: #ffff00; font-size: 28px;">{calc_baht_total:,}</td>
-        </tr>
-        <tr style="background-color: #ffffff;">
-          <td style="border: 1px solid #000; padding: 8px;">ยอดเงินสดคงเหลือ 現金残高</td>
-          <td style="border: 1px solid #000; text-align: center;">Yen</td>
-          <td style="border: 1px solid #000; text-align: center; background-color: #ffff00; font-size: 28px;">{calc_yen_total:,}</td>
-        </tr>
-      </table>
-      """,
+<table style="width:100%; border-collapse: collapse; font-size: 22px; font-weight: bold; border: 2px solid #000000; margin-top: 10px;">
+<tr style="background-color: #ffffff;">
+<td style="border: 1px solid #000; width: 35%; padding: 8px;">ยอดเงินสดคงเหลือ 現金残高</td>
+<td style="border: 1px solid #000; width: 15%; text-align: center;">Baht</td>
+<td style="border: 1px solid #000; width: 50%; text-align: center; background-color: #ffff00; font-size: 28px;">{calc_baht_total:,}</td>
+</tr>
+<tr style="background-color: #ffffff;">
+<td style="border: 1px solid #000; padding: 8px;">ยอดเงินสดคงเหลือ 現金残高</td>
+<td style="border: 1px solid #000; text-align: center;">Yen</td>
+<td style="border: 1px solid #000; text-align: center; background-color: #ffff00; font-size: 28px;">{calc_yen_total:,}</td>
+</tr>
+</table>
+""",
       unsafe_allow_html=True,
   )
 
@@ -651,14 +626,14 @@ elif st.session_state.step == "summary":
 elif st.session_state.step == "completed":
   st.markdown(
       """
-      <style>
-      .stButton > button { min-height: 120px !important; }
-      .stButton > button p { font-size: 40px !important; font-weight: bold !important; }
-      h1 { font-size: 45px !important; text-align: center; }
-      h2 { font-size: 90px !important; text-align: center; color: #1e293b; margin-top: 20px; margin-bottom: 20px;}
-      h3 { font-size: 36px !important; text-align: center; }
-      </style>
-      """,
+<style>
+.stButton > button { min-height: 120px !important; }
+.stButton > button p { font-size: 40px !important; font-weight: bold !important; }
+h1 { font-size: 45px !important; text-align: center; }
+h2 { font-size: 90px !important; text-align: center; color: #1e293b; margin-top: 20px; margin-bottom: 20px;}
+h3 { font-size: 36px !important; text-align: center; }
+</style>
+""",
       unsafe_allow_html=True,
   )
 
