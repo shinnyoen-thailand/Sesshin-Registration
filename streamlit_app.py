@@ -123,38 +123,40 @@ if st.session_state.step == "select_category":
     st.markdown(
         """
 <style>
-div[data-testid="column"]:first-child .stButton > button,
-div[data-testid="stColumn"]:first-child .stButton > button {
+/* 上段左側（向上・向上相談）ボタン：高さを240pxに設定 */
+button[aria-label*="โคโจเซสชิน"],
+button[aria-label*="โคโจโซดันเซสชิน"] {
     min-height: 240px !important;
     margin-bottom: 15px !important;
 }
-div[data-testid="column"]:last-child .stButton > button,
-div[data-testid="stColumn"]:last-child .stButton > button {
-    min-height: 120px !important;
+
+/* 上段右側（初信・相談・特別相談・鑑定）ボタン：高さを115pxに設定 */
+button[aria-label*="Beginner"],
+button[aria-label*="เซสชินปรึกษา"],
+button[aria-label*="特別相談"],
+button[aria-label*="鑑定"] {
+    min-height: 115px !important;
     margin-bottom: 10px !important;
 }
-.stButton > button p {
-    font-size: 32px !important;
-    font-weight: 900 !important;
-}
 
-/* ② & ③ 本日の集計・現金確認 ＆ 受付取り消しボタンの高さ・背景色設定 */
-div.st-key-btn_summary > button {
+/* ② & ③ 本日の集計・現金確認（高さ90px・とても薄い黄色） */
+button[aria-label*="Today's Summary"] {
     min-height: 90px !important;
-    background-color: #fef9c3 !important; /* とても薄い黄色 */
+    background-color: #fef9c3 !important;
     border: 3px solid #eab308 !important;
 }
-div.st-key-btn_summary > button p {
+button[aria-label*="Today's Summary"] p {
     font-size: 24px !important;
     color: #854d0e !important;
 }
 
-div.st-key-btn_cancel_page > button {
+/* ② & ③ 受付の取り消し・修正（高さ90px・薄いグレー） */
+button[aria-label*="Cancel Registration"] {
     min-height: 90px !important;
-    background-color: #f1f5f9 !important; /* 薄いグレー */
+    background-color: #f1f5f9 !important;
     border: 3px solid #64748b !important;
 }
-div.st-key-btn_cancel_page > button p {
+button[aria-label*="Cancel Registration"] p {
     font-size: 24px !important;
     color: #334155 !important;
 }
