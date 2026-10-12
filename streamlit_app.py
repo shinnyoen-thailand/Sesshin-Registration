@@ -62,6 +62,8 @@ st.markdown(
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
 }
+
+/* ボタン基本設定（タイ語をメイン大きく、日本語を少し小さく） */
 .stButton > button {
     width: 100% !important;
     min-height: 120px !important;
@@ -70,14 +72,23 @@ st.markdown(
     background-color: #ffffff !important;
     box-shadow: 0px 6px 12px rgba(0,0,0,0.12) !important;
 }
+
+/* ボタンテキストの基本設定（2行目: 日本語など） */
 .stButton > button p {
-    font-size: 36px !important;
-    font-weight: 900 !important;
-    color: #0f172a !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: #334155 !important;
     margin: 0 !important;
     white-space: pre-line !important;
     text-align: center !important;
-    line-height: 1.2 !important;
+    line-height: 1.25 !important;
+}
+
+/* ボタンの1行目（タイ語メイン表記）：大きく太字に指定 */
+.stButton > button p::first-line {
+    font-size: 34px !important;
+    font-weight: 950 !important;
+    color: #0f172a !important;
 }
 
 /* ④ 送信中・処理中ローディング（画面中央にポップアップ表示） */
@@ -139,33 +150,50 @@ button[aria-label*="鑑定"] {
     margin-bottom: 10px !important;
 }
 
-/* ② & ③ 本日の集計・現金確認（高さ90px・とても薄い黄色） */
+/* 本日の集計・現金確認（高さ90px・とても薄い黄色） */
 button[aria-label*="Today's Summary"] {
     min-height: 90px !important;
     background-color: #fef9c3 !important;
     border: 3px solid #eab308 !important;
 }
-button[aria-label*="Today's Summary"] p {
+button[aria-label*="Today's Summary"] p::first-line {
     font-size: 24px !important;
     color: #854d0e !important;
 }
+button[aria-label*="Today's Summary"] p {
+    font-size: 19px !important;
+    color: #a16207 !important;
+}
 
-/* ② & ③ 受付の取り消し・修正（高さ90px・薄いグレー） */
+/* 受付の取り消し・修正（高さ90px・薄いグレー） */
 button[aria-label*="Cancel Registration"] {
     min-height: 90px !important;
     background-color: #f1f5f9 !important;
     border: 3px solid #64748b !important;
 }
-button[aria-label*="Cancel Registration"] p {
+button[aria-label*="Cancel Registration"] p::first-line {
     font-size: 24px !important;
     color: #334155 !important;
+}
+button[aria-label*="Cancel Registration"] p {
+    font-size: 19px !important;
+    color: #475569 !important;
 }
 </style>
 """,
         unsafe_allow_html=True,
     )
 
-    st.markdown("<h1 style='text-align: center; font-size: 45px; margin-bottom: 20px;'>Sesshin Registration / 接心受付</h1>", unsafe_allow_html=True)
+    # 画面1ヘッダー（タイ語メイン・日本語控えめ）
+    st.markdown(
+        """
+<h1 style='text-align: center; margin-bottom: 20px;'>
+    <span style='font-size: 42px; font-weight: 950; color: #0f172a;'>ลงทะเบียน</span>
+    <span style='font-size: 24px; font-weight: 700; color: #475569; margin-left: 10px;'>( 接心受付 )</span>
+</h1>
+""",
+        unsafe_allow_html=True,
+    )
 
     col_left, col_right = st.columns(2, gap="large")
 
@@ -227,12 +255,11 @@ elif st.session_state.step == "input_details":
         """
 <style>
 button[kind="secondary"] { min-height: 70px !important; }
-button[kind="secondary"] p { font-size: 26px !important; }
+button[kind="secondary"] p { font-size: 24px !important; }
 button[kind="primary"] { min-height: 110px !important; }
-button[kind="primary"] p { font-size: 38px !important; }
 
 h3 { 
-    font-size: 28px !important; 
+    font-size: 26px !important; 
     font-weight: 900 !important; 
     color: #1e293b !important; 
     border-left: 8px solid #3b82f6;
@@ -241,7 +268,7 @@ h3 {
 }
 
 textarea[aria-label="お名前"] {
-    font-size: 40px !important;
+    font-size: 38px !important;
     font-weight: 900 !important;
     height: 120px !important;
     color: #000000 !important;
@@ -251,7 +278,7 @@ textarea[aria-label="お名前"] {
 }
 
 textarea[aria-label="任意金額"] {
-    font-size: 38px !important;
+    font-size: 36px !important;
     font-weight: 900 !important;
     height: 90px !important;
     color: #000000 !important;
@@ -261,14 +288,14 @@ textarea[aria-label="任意金額"] {
 }
 
 [data-testid="stRadio"] label p {
-    font-size: 25px !important;
+    font-size: 24px !important;
     font-weight: 800 !important;
     color: #000000 !important;
     white-space: pre-line !important;
     line-height: 1.25 !important;
 }
 [data-testid="stRadio"] {
-    transform: scale(1.2);
+    transform: scale(1.15);
     transform-origin: left center;
     margin-left: 10px;
     margin-top: 10px;
@@ -276,13 +303,13 @@ textarea[aria-label="任意金額"] {
 }
 
 [data-testid="stCheckbox"] label p {
-    font-size: 25px !important;
+    font-size: 24px !important;
     font-weight: 800 !important;
     color: #000000 !important;
     line-height: 1.25 !important;
 }
 [data-testid="stCheckbox"] {
-    transform: scale(1.3);
+    transform: scale(1.25);
     transform-origin: left center;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -297,15 +324,24 @@ textarea[aria-label="任意金額"] {
     amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
     thai_title = amt_info.get("thai", "")
 
-    st.markdown(f"<h1 style='font-size: 36px; margin-bottom: 10px;'>受付 / ลงทะเบียน: 【 {category} ({thai_title}) 】</h1>", unsafe_allow_html=True)
+    # 画面2ヘッダー（タイ語メイン・日本語控えめ）
+    st.markdown(
+        f"""
+<h1 style='margin-bottom: 10px;'>
+    <span style='font-size: 36px; font-weight: 950; color: #0f172a;'>ลงทะเบียน: 【 {thai_title} 】</span>
+    <span style='font-size: 22px; font-weight: 700; color: #475569; margin-left: 8px;'>( 受付: 【 {category} 】 )</span>
+</h1>
+""",
+        unsafe_allow_html=True,
+    )
 
-    if st.button("← 戻る / ย้อนกลับ"):
+    if st.button("← ย้อนกลับ / 戻る"):
         st.session_state.step = "select_category"
         st.rerun()
 
     st.write("---")
 
-    st.markdown("### Name （ภาษาอังกฤษ/English)")
+    st.markdown("### Name (English / ภาษาอังกฤษ)")
     name = st.text_area(
         "お名前",
         label_visibility="collapsed",
@@ -317,8 +353,8 @@ textarea[aria-label="任意金額"] {
         st.markdown(
             f"""
 <div style="border: 3px solid #1e293b; background-color: #ffffff; border-radius: 12px; padding: 15px; text-align: center; margin-top: 10px; margin-bottom: 15px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
-<p style="font-size: 22px; font-weight: bold; color: #475569; margin: 0;">ตรวจสอบชื่อ / ご入力名のご確認</p>
-<p style="font-size: 55px; font-weight: 950; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">{name.strip()} ท่าน / 様</p>
+<p style="font-size: 22px; font-weight: 900; color: #0f172a; margin: 0;">ตรวจสอบชื่อ <span style="font-size: 18px; font-weight: 700; color: #475569;">(ご入力名のご確認)</span></p>
+<p style="font-size: 52px; font-weight: 950; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">{name.strip()} <span style="font-size: 30px; font-weight: 800; color: #334155;">ท่าน / 様</span></p>
 </div>
 """,
             unsafe_allow_html=True,
@@ -332,7 +368,7 @@ textarea[aria-label="任意金額"] {
         st.markdown("### ภาษา / 言語")
         language = st.radio(
             "言語", 
-            ["日本語 / Japanese", "英語 / English", "タイ語 / ภาษาไทย"], 
+            ["ภาษาไทย / タイ語", "English / 英語", "日本語 / 日本語"], 
             label_visibility="collapsed"
         )
 
@@ -413,7 +449,7 @@ textarea[aria-label="任意金額"] {
     st.write("---")
     st.write("")
 
-    if st.button("เสร็จสิ้น / 完了", type="primary"):
+    if st.button("เสร็จสิ้น\n完了", type="primary"):
         if name.strip() == "":
             st.warning("กรุณากรอกชื่อ / お名前を入力してください。")
         elif is_amount_error:
@@ -422,11 +458,11 @@ textarea[aria-label="任意金額"] {
             with st.spinner("กำลังส่งข้อมูล... / 送信中..."):
                 now = datetime.now().strftime("%Y-%m-%d")
 
-                clean_lang = "日本語"
+                clean_lang = "タイ語"
                 if "English" in language:
                     clean_lang = "英語"
-                elif "ภาษาไทย" in language:
-                    clean_lang = "タイ語"
+                elif "日本語" in language:
+                    clean_lang = "日本語"
 
                 clean_kai = "-"
                 if "1" in kai_suu: clean_kai = "1回目"
@@ -476,7 +512,7 @@ textarea[aria-label="任意金額"] {
 elif st.session_state.step == "cancel_page":
     st.markdown("<h1 style='text-align: center; font-size: 38px;'>Cancel Registration / 受付の取り消し</h1>", unsafe_allow_html=True)
 
-    if st.button("← 戻る / ย้อนกลับ"):
+    if st.button("← ย้อนกลับ / 戻る"):
         st.session_state.step = "select_category"
         st.rerun()
 
@@ -485,7 +521,6 @@ elif st.session_state.step == "cancel_page":
     today_str = datetime.now().strftime("%Y-%m-%d")
     st.markdown(f"### Today's Registration Data List ({today_str})")
 
-    # 本日の受付データの読み込み
     records = []
     with st.spinner("กำลังโหลดข้อมูล... / データ取得中..."):
         try:
@@ -511,7 +546,7 @@ elif st.session_state.step == "cancel_page":
                 st.markdown(
                     f"""
 <div style="background-color: #ffffff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 10px;">
-<span style="font-size: 24px; font-weight: 900; color: #1e293b;">【{t_id}】 {name_str} 様</span><br>
+<span style="font-size: 24px; font-weight: 900; color: #1e293b;">【{t_id}】 {name_str} ท่าน/様</span><br>
 <span style="font-size: 20px; font-weight: bold; color: #0284c7;">Category: {cat_str}</span> │ 
 <span style="font-size: 20px; font-weight: bold; color: #16a34a;">Amount: {amt_str}</span> │ 
 <span style="font-size: 20px; font-weight: bold; color: #d97706;">Payment: {pay_str}</span>
@@ -541,7 +576,7 @@ elif st.session_state.step == "cancel_page":
 elif st.session_state.step == "summary":
     st.markdown("<h1 style='text-align: center; font-size: 36px;'>Today's Summary and Cash Verification<br>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
 
-    if st.button("← 戻る / ย้อนกลับ"):
+    if st.button("← ย้อนกลับ / 戻る"):
         st.session_state.step = "select_category"
         st.rerun()
 
@@ -789,24 +824,48 @@ elif st.session_state.step == "completed":
         """
 <style>
 .stButton > button { min-height: 120px !important; }
-.stButton > button p { font-size: 40px !important; font-weight: bold !important; }
-h1 { font-size: 45px !important; text-align: center; }
-h2 { font-size: 90px !important; text-align: center; color: #1e293b; margin-top: 20px; margin-bottom: 20px;}
-h3 { font-size: 36px !important; text-align: center; }
 </style>
 """,
         unsafe_allow_html=True,
     )
 
-    st.markdown("<h1>ลงทะเบียนเสร็จสิ้น / 受付が完了いたしました</h1>", unsafe_allow_html=True)
-    st.markdown(f"<h3>ชื่อ / お名前: {st.session_state.completed_name} ท่าน / 様</h3>", unsafe_allow_html=True)
+    # 完了画面ヘッダー（タイ語メイン・日本語控えめ）
+    st.markdown(
+        """
+<h1 style='text-align: center; margin-bottom: 25px;'>
+    <span style='font-size: 44px; font-weight: 950; color: #0f172a;'>ลงทะเบียนเสร็จสิ้น</span><br>
+    <span style='font-size: 26px; font-weight: 700; color: #475569;'>( 受付が完了いたしました )</span>
+</h1>
+""",
+        unsafe_allow_html=True,
+    )
 
-    st.markdown(f"<h2>หมายเลข / 受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
+    # お名前確認
+    st.markdown(
+        f"""
+<h3 style='text-align: center; margin-bottom: 30px;'>
+    <span style='font-size: 32px; font-weight: 900; color: #0f172a;'>ชื่อ: {st.session_state.completed_name} ท่าน</span>
+    <span style='font-size: 22px; font-weight: 700; color: #475569; margin-left: 10px;'>( お名前: {st.session_state.completed_name} 様 )</span>
+</h3>
+""",
+        unsafe_allow_html=True,
+    )
+
+    # 受付番号
+    st.markdown(
+        f"""
+<div style='text-align: center; background-color: #ffffff; border: 3px solid #1e293b; border-radius: 16px; padding: 20px; margin-bottom: 25px;'>
+    <p style='font-size: 26px; font-weight: 800; color: #475569; margin: 0;'>หมายเลข / 受付番号</p>
+    <p style='font-size: 90px; font-weight: 950; color: #0f172a; margin: 0; line-height: 1.1;'>{st.session_state.ticket_id}</p>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
     st.info("กรุณากรอกหมายเลขนี้ในใบเสร็จ / この番号をレシートにお書きください。")
 
     st.write("")
     st.write("")
-    if st.button("ลงทะเบียนคนถัดไป / 次の人の受付をする"):
+    if st.button("ลงทะเบียนคนถัดไป\n次の人の受付をする"):
         st.session_state.step = "select_category"
         st.rerun()
