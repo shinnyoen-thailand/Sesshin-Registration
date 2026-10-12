@@ -50,7 +50,7 @@ AMOUNT_CONFIG = {
 st.markdown(
     """
 <style>
-/* アプリ全体の背景色を薄いブルーに設定 */
+/* ① アプリ全体の背景色を薄いブルーに設定 */
 .stApp, [data-testid="stAppViewContainer"] {
     background-color: #f0f7ff !important;
 }
@@ -80,7 +80,7 @@ st.markdown(
     line-height: 1.2 !important;
 }
 
-/* 送信中・処理中ローディング（画面中央にポップアップ表示） */
+/* ④ 送信中・処理中ローディング（画面中央にポップアップ表示） */
 [data-testid="stSpinner"] {
     position: fixed !important;
     top: 0 !important;
@@ -139,24 +139,24 @@ button[aria-label*="鑑定"] {
     margin-bottom: 10px !important;
 }
 
-/* 本日の集計・現金確認（高さ90px・薄い黄色） */
-div.st-key-btn_summary > button {
+/* ② & ③ 本日の集計・現金確認（高さ90px・とても薄い黄色） */
+button[aria-label*="Today's Summary"] {
     min-height: 90px !important;
     background-color: #fef9c3 !important;
     border: 3px solid #eab308 !important;
 }
-div.st-key-btn_summary > button p {
+button[aria-label*="Today's Summary"] p {
     font-size: 24px !important;
     color: #854d0e !important;
 }
 
-/* 受付の取り消し・修正（高さ90px・薄いグレー） */
-div.st-key-btn_cancel_page > button {
+/* ② & ③ 受付の取り消し・修正（高さ90px・薄いグレー） */
+button[aria-label*="Cancel Registration"] {
     min-height: 90px !important;
     background-color: #f1f5f9 !important;
     border: 3px solid #64748b !important;
 }
-div.st-key-btn_cancel_page > button p {
+button[aria-label*="Cancel Registration"] p {
     font-size: 24px !important;
     color: #334155 !important;
 }
