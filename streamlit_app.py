@@ -318,7 +318,7 @@ textarea[aria-label="任意金額"] {
 
     st.markdown(f"<h1 style='font-size: 34px; margin-bottom: 10px;'>受付: 【 {category} ({thai_title}) 】 <span style='font-size:24px; color:#0284c7;'>(Terminal {st.session_state.ipad_id})</span></h1>", unsafe_allow_html=True)
 
-    if st.button("← 戻る / ย้อนกลับ"):
+    if st.button("← ย้อนกลับ / 戻る"):
         st.session_state.step = "select_category"
         st.rerun()
 
@@ -337,7 +337,7 @@ textarea[aria-label="任意金額"] {
             f"""
 <div style="border: 3px solid #1e293b; background-color: #ffffff; border-radius: 12px; padding: 15px; text-align: center; margin-top: 10px; margin-bottom: 15px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
 <p style="font-size: 22px; font-weight: bold; color: #475569; margin: 0;">ตรวจสอบชื่อ / ご入力名のご確認</p>
-<p style="font-size: 55px; font-weight: 950; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">{name.strip()} ท่าน / 様</p>
+<p style="font-size: 55px; font-weight: 950; color: #0f172a; margin: 5px 0 0 0; word-break: break-all;">{name.strip()} san </p>
 </div>
 """,
             unsafe_allow_html=True,
@@ -351,7 +351,7 @@ textarea[aria-label="任意金額"] {
         st.markdown("### ภาษา / 言語")
         language = st.radio(
             "言語", 
-            ["日本語 / Japanese", "英語 / English", "タイ語 / ภาษาไทย"], 
+            ["ภาษาไทย / タイ語","Japanese / 日本語", "English / 英語" ], 
             label_visibility="collapsed"
         )
 
@@ -496,7 +496,7 @@ textarea[aria-label="任意金額"] {
 elif st.session_state.step == "cancel_page":
     st.markdown("<h1 style='text-align: center; font-size: 38px;'>Cancel Registration / 受付の取り消し</h1>", unsafe_allow_html=True)
 
-    if st.button("← 戻る / ย้อนกลับ"):
+    if st.button("← ย้อนกลับ / 戻る"):
         st.session_state.step = "select_category"
         st.rerun()
 
@@ -530,7 +530,7 @@ elif st.session_state.step == "cancel_page":
                 st.markdown(
                     f"""
 <div style="background-color: #ffffff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 10px;">
-<span style="font-size: 24px; font-weight: 900; color: #1e293b;">【{t_id}】 {name_str} 様</span><br>
+<span style="font-size: 24px; font-weight: 900; color: #1e293b;">【{t_id}】 {name_str} san</span><br>
 <span style="font-size: 20px; font-weight: bold; color: #0284c7;">Category: {cat_str}</span> │ 
 <span style="font-size: 20px; font-weight: bold; color: #16a34a;">Amount: {amt_str}</span> │ 
 <span style="font-size: 20px; font-weight: bold; color: #d97706;">Payment: {pay_str}</span>
@@ -560,7 +560,7 @@ elif st.session_state.step == "cancel_page":
 elif st.session_state.step == "summary":
     st.markdown("<h1 style='text-align: center; font-size: 36px;'>Today's Summary and Cash Verification<br>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
 
-    if st.button("← 戻る / ย้อนกลับ"):
+    if st.button("← ย้อนกลับ / 戻る"):
         st.session_state.step = "select_category"
         st.rerun()
 
@@ -850,7 +850,7 @@ h3 { font-size: 36px !important; text-align: center; }
     )
 
     st.markdown("<h1>ลงทะเบียนเสร็จสิ้น / 受付が完了いたしました</h1>", unsafe_allow_html=True)
-    st.markdown(f"<h3>ชื่อ / お名前: {st.session_state.completed_name} ท่าน / 様</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3>ชื่อ / お名前: {st.session_state.completed_name} san</h3>", unsafe_allow_html=True)
 
     st.markdown(f"<h2>หมายเลข / 受付番号: {st.session_state.ticket_id}</h2>", unsafe_allow_html=True)
 
