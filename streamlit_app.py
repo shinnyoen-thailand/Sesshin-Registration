@@ -7,6 +7,22 @@ import streamlit as st
 # ご自身のGASのウェブアプリのURLに書き換えてください
 GAS_URL = "https://script.google.com/macros/s/AKfycbzwfs2AkayaH62yfEk71kbUyd1OZXHXAfma6EvGepDJoXniIVyD_J1Qx8E7Q8x7qxFO/exec"
 
+# =========================================================
+# ★ 端末識別子 (ipad=A / ipad=B) の確実な取得と保持処理
+# =========================================================
+if "ipad_id" not in st.session_state:
+    try:
+        raw_param = st.query_params.get("ipad", "A")
+        if isinstance(raw_param, list):
+            raw_param = raw_param[0] if raw_param else "A"
+        match = re.search(r'[A-Za-z0-9]', str(raw_param))
+        st.session_state.ipad_id = match.group(0).upper() if match else "A"
+    except Exception:
+        st.session_state.ipad_id = "A"
+
+# URLのアドレスバーにもパラメータを維持
+st.query_params["ipad"] = st.session_state.ipad_id
+
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
     "向上": {
@@ -142,7 +158,7 @@ div[data-testid="stColumn"]:last-child .stButton > button {
 /* 本日の集計・現金確認 ＆ 受付取り消しボタンの高さ・背景色設定 */
 div.st-key-btn_summary > button {
     min-height: 90px !important;
-    background-color: #fef9c3 !important; /* とても薄い黄色 */
+    background-color: #fef9c3 !important;
     border: 3px solid #eab308 !important;
 }
 div.st-key-btn_summary > button p {
@@ -152,7 +168,7 @@ div.st-key-btn_summary > button p {
 
 div.st-key-btn_cancel_page > button {
     min-height: 90px !important;
-    background-color: #f1f5f9 !important; /* 薄いグレー */
+    background-color: #f1f5f9 !important;
     border: 3px solid #64748b !important;
 }
 div.st-key-btn_cancel_page > button p {
@@ -164,7 +180,12 @@ div.st-key-btn_cancel_page > button p {
         unsafe_allow_html=True,
     )
 
-    st.markdown("<h1 style='text-align: center; font-size: 45px; margin-bottom: 20px;'>Sesshin Registration / 接心受付</h1>", unsafe_allow_html=True)
+    # タイトルに Terminal A / Terminal B を表示
+    st.markdown(
+        f"<h1 style='text-align: center; font-size: 42px; margin-bottom: 10px;'>Sesshin Registration / 接心受付</h1>"
+        f"<p style='text-align: center; font-size: 26px; font-weight: 900; color: #0284c7; margin-bottom: 20px;'>【 Terminal {st.session_state.ipad_id} 】</p>",
+        unsafe_allow_html=True,
+    )
 
     col_left, col_right = st.columns(2, gap="large")
 
@@ -296,7 +317,7 @@ textarea[aria-label="任意金額"] {
     amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
     thai_title = amt_info.get("thai", "")
 
-    st.markdown(f"<h1 style='font-size: 36px; margin-bottom: 10px;'>受付 / ลงทะเบียน: 【 {category} ({thai_title}) 】</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='font-size: 34px; margin-bottom: 10px;'>受付: 【 {category} ({thai_title}) 】 <span style='font-size:24px; color:#0284c7;'>(Terminal {st.session_state.ipad_id})</span></h1>", unsafe_allow_html=True)
 
     if st.button("← 戻る / ย้อนกลับ"):
         st.session_state.step = "select_category"
@@ -421,13 +442,6 @@ textarea[aria-label="任意金額"] {
             with st.spinner("กำลังส่งข้อมูล... / 送信中..."):
                 now = datetime.now().strftime("%Y-%m-%d")
 
-                # URLパラメータから英数字1文字だけ（AやB）を厳密に抽出
-                raw_param = st.query_params.get("ipad", "A")
-                if isinstance(raw_param, list):
-                    raw_param = raw_param[0] if raw_param else "A"
-                match = re.search(r'[A-Za-z0-9]', str(raw_param))
-                ipad_id = match.group(0).upper() if match else "A"
-
                 clean_lang = "日本語"
                 if "English" in language:
                     clean_lang = "英語"
@@ -450,7 +464,7 @@ textarea[aria-label="任意金額"] {
 
                 post_data = {
                     "date": now,
-                    "terminal": ipad_id,
+                    "terminal": st.session_state.ipad_id,
                     "category": category,
                     "amount": selected_amount,
                     "name": name.strip(),
