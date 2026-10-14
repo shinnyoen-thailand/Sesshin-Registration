@@ -420,6 +420,17 @@ textarea[aria-label="任意金額"] {
             with st.spinner("กำลังส่งข้อมูล... / 送信中..."):
                 now = datetime.now().strftime("%Y-%m-%d")
 
+                # ▼ URLパラメータから端末識別子 (A や B) を読み取ります
+                ipad_id = "A"
+                try:
+                    param_val = st.query_params.get("ipad", "A")
+                    if isinstance(param_val, list):
+                        ipad_id = param_val[0] if param_val else "A"
+                    else:
+                        ipad_id = str(param_val).upper() if param_val else "A"
+                except Exception:
+                    ipad_id = "A"
+
                 clean_lang = "日本語"
                 if "English" in language:
                     clean_lang = "英語"
@@ -442,6 +453,7 @@ textarea[aria-label="任意金額"] {
 
                 post_data = {
                     "date": now,
+                    "terminal": ipad_id,  # ← ★端末ID (A や B) を追加してGASに送信します
                     "category": category,
                     "amount": selected_amount,
                     "name": name.strip(),
@@ -457,7 +469,7 @@ textarea[aria-label="任意金額"] {
                     res_json = response.json()
 
                     if response.status_code == 200 and res_json.get("status") == "success":
-                        ticket_id = res_json.get("ticketId", "J1")
+                        ticket_id = res_json.get("ticketId", "A-1")
                         st.session_state.ticket_id = ticket_id
                         st.session_state.completed_name = name.strip()
                         st.session_state.step = "completed"
@@ -496,7 +508,6 @@ elif st.session_state.step == "cancel_page":
     if not records:
         st.info("There are no registration records for today.")
     else:
-        # 重複キーエラーを防ぐため、enumerateで一意のインデックス(i)を付与します
         for i, rec in enumerate(records):
             t_id = rec.get("ticketId") or f"NO_ID_{i}"
             name_str = rec.get("name", "Unknown")
@@ -521,7 +532,6 @@ elif st.session_state.step == "cancel_page":
 
             with c_btn:
                 st.write("")
-                # keyにインデックス(_i)を追加して完全な一意性を確保
                 if st.button(f"❌ Cancel\n({t_id})", key=f"del_{t_id}_{i}", use_container_width=True):
                     with st.spinner("กำลังยกเลิก... / 取り消し処理中..."):
                         try:
