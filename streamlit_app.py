@@ -1,10 +1,11 @@
 import datetime
 from datetime import datetime, date
+import re
 import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbyevicRDdsHtD30QoDcY-g89aYu6pUSzXOTX9Pli9poe-0yFnpbAwauzrgJkQso6Xek/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbzwfs2AkayaH62yfEk71kbUyd1OZXHXAfma6EvGepDJoXniIVyD_J1Qx8E7Q8x7qxFO/exec"
 
 # 受付種類ごとの金額設定データ
 AMOUNT_CONFIG = {
@@ -138,7 +139,7 @@ div[data-testid="stColumn"]:last-child .stButton > button {
     font-weight: 900 !important;
 }
 
-/* ② & ③ 本日の集計・現金確認 ＆ 受付取り消しボタンの高さ・背景色設定 */
+/* 本日の集計・現金確認 ＆ 受付取り消しボタンの高さ・背景色設定 */
 div.st-key-btn_summary > button {
     min-height: 90px !important;
     background-color: #fef9c3 !important; /* とても薄い黄色 */
@@ -420,16 +421,12 @@ textarea[aria-label="任意金額"] {
             with st.spinner("กำลังส่งข้อมูล... / 送信中..."):
                 now = datetime.now().strftime("%Y-%m-%d")
 
-                # ▼ URLパラメータから端末識別子 (A や B) を読み取ります
-                ipad_id = "A"
-                try:
-                    param_val = st.query_params.get("ipad", "A")
-                    if isinstance(param_val, list):
-                        ipad_id = param_val[0] if param_val else "A"
-                    else:
-                        ipad_id = str(param_val).upper() if param_val else "A"
-                except Exception:
-                    ipad_id = "A"
+                # URLパラメータから英数字1文字だけ（AやB）を厳密に抽出
+                raw_param = st.query_params.get("ipad", "A")
+                if isinstance(raw_param, list):
+                    raw_param = raw_param[0] if raw_param else "A"
+                match = re.search(r'[A-Za-z0-9]', str(raw_param))
+                ipad_id = match.group(0).upper() if match else "A"
 
                 clean_lang = "日本語"
                 if "English" in language:
@@ -453,7 +450,7 @@ textarea[aria-label="任意金額"] {
 
                 post_data = {
                     "date": now,
-                    "terminal": ipad_id,  # ← ★端末ID (A や B) を追加してGASに送信します
+                    "terminal": ipad_id,
                     "category": category,
                     "amount": selected_amount,
                     "name": name.strip(),
@@ -495,7 +492,6 @@ elif st.session_state.step == "cancel_page":
     today_str = datetime.now().strftime("%Y-%m-%d")
     st.markdown(f"### Today's Registration Data List ({today_str})")
 
-    # 本日の受付データの読み込み
     records = []
     with st.spinner("กำลังโหลดข้อมูล... / データ取得中..."):
         try:
