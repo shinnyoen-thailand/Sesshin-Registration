@@ -385,7 +385,8 @@ textarea[aria-label="任意金額"] {
 
         is_amount_error = False
 
-        if "อื่น ๆ" in amount_type or "その他" in amount_type:
+        # ★ 判定文を修正：「การถวาย」または「お典供」が含まれているかチェック
+        if "การถวาย" in amount_type or "お典供" in amount_type:
             st.markdown(
                 """
 <div style='background-color: #fef9c3; padding: 18px; border-radius: 12px; border: 3px solid #facc15; margin-top: 10px;'>
@@ -441,7 +442,7 @@ textarea[aria-label="任意金額"] {
             with st.spinner("กำลังส่งข้อมูล... / 送信中..."):
                 now = datetime.now().strftime("%Y-%m-%d")
 
-                # ★ ログ保存用 英語変換処理
+                # ログ保存用 英語変換処理
                 cat_map = {
                     "向上": "KOJO",
                     "向上相談": "KOJOSOUDAN",
