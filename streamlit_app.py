@@ -8,7 +8,7 @@ import streamlit as st
 GAS_URL = "https://script.google.com/macros/s/AKfycbzwfs2AkayaH62yfEk71kbUyd1OZXHXAfma6EvGepDJoXniIVyD_J1Qx8E7Q8x7qxFO/exec"
 
 # =========================================================
-# ★ 端末識別子 (ipad=A / ipad=B) の確実な取得と保持処理
+# 端末識別子 (ipad=A / ipad=B) の確実な取得と保持処理
 # =========================================================
 if "ipad_id" not in st.session_state:
     try:
@@ -97,7 +97,7 @@ st.markdown(
     line-height: 1.2 !important;
 }
 
-/* ④ 送信中・処理中ローディング（画面中央にポップアップ表示） */
+/* 送信中・処理中ローディング（画面中央にポップアップ表示） */
 [data-testid="stSpinner"] {
     position: fixed !important;
     top: 0 !important;
@@ -555,7 +555,7 @@ elif st.session_state.step == "cancel_page":
 
 
 # =========================================================
-# 画面4：集計画面（Cash Only調整済）
+# 画面4：集計画面（Cash Only iPad Safariズレ対策・入力欄調整済）
 # =========================================================
 elif st.session_state.step == "summary":
     st.markdown("<h1 style='text-align: center; font-size: 36px;'>Today's Summary and Cash Verification<br>本日の受付集計 ＆ 現金確認</h1>", unsafe_allow_html=True)
@@ -690,22 +690,40 @@ elif st.session_state.step == "summary":
     # CASH ONLY エリア
     st.markdown("### CASH ONLY（Count the cash in the safe and enter the amount.）")
 
-    # ★ ④ 手入力する number_input（枚数・おつり）のみ黄色（#ffff00）にするスタイル定義
+    # 手入力エリアの黄色（#ffff00）スタイル ＆ iPad Safari表示崩れ・幅ズレ完全防止CSS
     st.markdown(
         """
 <style>
+div[data-testid="stNumberInput"] {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+div[data-testid="stNumberInput"] > div {
+    width: 100% !important;
+    background-color: transparent !important;
+    border: none !important;
+}
+
 div[data-testid="stNumberInput"] input {
     background-color: #ffff00 !important;
     font-size: 24px !important;
     font-weight: bold !important;
     color: #0f172a !important;
     height: 52px !important;
+    width: 100% !important;
     border-radius: 4px !important;
     border: 2px solid #000000 !important;
     text-align: center !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+    box-sizing: border-box !important;
 }
-div[data-testid="stNumberInput"] {
-    width: 100% !important;
+
+div[data-testid="stNumberInput"] button {
+    height: 52px !important;
+    border: 1px solid #000000 !important;
 }
 </style>
 """,
@@ -735,7 +753,7 @@ div[data-testid="stNumberInput"] {
         with c2:
             st.markdown(f"<p style='font-size:22px; font-weight:bold; text-align:left; margin-top:8px;'>{currency}</p>", unsafe_allow_html=True)
         with c3:
-            # ★ ① value=None にしてデフォルトの【0】をなしに設定
+            # value=None で初期値0を表示させず空欄に設定
             count_input = st.number_input(f"{key}", min_value=0, value=None, step=1, label_visibility="collapsed", key=key)
             count = count_input if count_input is not None else 0
             counts_dict[key] = count
@@ -745,10 +763,10 @@ div[data-testid="stNumberInput"] {
                 calc_baht_total += subtotal
             else:
                 calc_yen_total += subtotal
-            # 自動計算される小計（白背景）
+            # 自動計算小計（白背景）
             st.markdown(
                 f"""
-<div style="background-color: #ffffff; border: 1.5px solid #000000; height: 52px; display: flex; align-items: center; justify-content: center;">
+<div style="background-color: #ffffff; border: 1.5px solid #000000; height: 52px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
 <span style="font-size: 24px; font-weight: bold; color: #000000;">{subtotal:,}</span>
 </div>
 """,
@@ -760,16 +778,16 @@ div[data-testid="stNumberInput"] {
     c_label, c_baht_val, c_otsuri_label, c_otsuri_val, c_total_label, c_total_val = st.columns([2.5, 2.0, 2.0, 2.0, 1.5, 2.0])
 
     with c_label:
-        # ★ ② タイ語（上段）・日本語（下段）の2段表示に修正
+        # タイ語（上段）・日本語（下段）の2段表示
         st.markdown("<p style='font-size:20px; font-weight:bold; margin:0;'>ยอดเงินสดคงเหลือ<br>現金残高</p>", unsafe_allow_html=True)
     with c_baht_val:
-        # ★ ④ 自動計算される現金残高は白背景（#ffffff）に変更
-        st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold; height:52px; display:flex; align-items:center; justify-content:center;'>{calc_baht_total:,} Bath</div>", unsafe_allow_html=True)
+        # 自動計算される現金残高 Bath（白背景）
+        st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold; height:52px; display:flex; align-items:center; justify-content:center; box-sizing: border-box;'>{calc_baht_total:,} Bath</div>", unsafe_allow_html=True)
 
     with c_otsuri_label:
         st.markdown("<p style='font-size:18px; font-weight:bold; text-align:right; margin:0;'>เงินทอน<br>(おつり)</p>", unsafe_allow_html=True)
     with c_otsuri_val:
-        # ★ ① & ③ value=None で初期値0をなしにし、高さ・デザインを出力欄と統一（黄色）
+        # 手入力おつり（黄色・初期値0なし・サイズ統一）
         otsuri_input = st.number_input("おつり", min_value=0, value=None, step=100, label_visibility="collapsed", key="otsuri_val")
         otsuri = otsuri_input if otsuri_input is not None else 0
 
@@ -777,17 +795,17 @@ div[data-testid="stNumberInput"] {
         st.markdown("<p style='font-size:20px; font-weight:bold; text-align:center; margin-top:10px;'>Total</p>", unsafe_allow_html=True)
     with c_total_val:
         total_after_otsuri = calc_baht_total - otsuri
-        # 自動計算されるTotal（白背景）
-        st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold; height:52px; display:flex; align-items:center; justify-content:center;'>{total_after_otsuri:,}</div>", unsafe_allow_html=True)
+        # 自動計算 Total（白背景）
+        st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold; height:52px; display:flex; align-items:center; justify-content:center; box-sizing: border-box;'>{total_after_otsuri:,}</div>", unsafe_allow_html=True)
 
     st.write("")
     cy_label, cy_val, cy_dummy1, cy_dummy2 = st.columns([2.5, 2.0, 4.0, 3.5])
     with cy_label:
-        # ★ ② タイ語（上段）・日本語（下段）の2段表示に修正
+        # タイ語（上段）・日本語（下段）の2段表示
         st.markdown("<p style='font-size:20px; font-weight:bold; margin:0;'>ยอดเงินสดคงเหลือ<br>現金残高</p>", unsafe_allow_html=True)
     with cy_val:
-        # ★ ④ 自動計算される現金残高は白背景（#ffffff）に変更
-        st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold; height:52px; display:flex; align-items:center; justify-content:center;'>{calc_yen_total:,} Yen</div>", unsafe_allow_html=True)
+        # 自動計算される現金残高 Yen（白背景）
+        st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold; height:52px; display:flex; align-items:center; justify-content:center; box-sizing: border-box;'>{calc_yen_total:,} Yen</div>", unsafe_allow_html=True)
 
     st.write("")
     st.write("")
