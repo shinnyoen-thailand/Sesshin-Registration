@@ -5,7 +5,7 @@ import requests
 import streamlit as st
 
 # ご自身のGASのウェブアプリのURLに書き換えてください
-GAS_URL = "https://script.google.com/macros/s/AKfycbz-b7OIJlO1M2cmMOw7l-Nf5yHuIS2bfGuT-z4xiw3SIb3kibEscaYay1iEbfS25uGk/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbx0bP-J3XyT4OtwDr670QrCs0S8yNP7vcOsGf6-rLeOxWBcJQhgMDe2xBCuwcsd4ej_/exec"
 
 # =========================================================
 # 端末識別子 (ipad=A / ipad=B) の確実な取得と保持処理
