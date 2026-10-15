@@ -23,43 +23,43 @@ if "ipad_id" not in st.session_state:
 # URLのアドレスバーにもパラメータを維持
 st.query_params["ipad"] = st.session_state.ipad_id
 
-# 受付種類ごとの金額設定データ
+# 受付種類ごとの金額設定データ (Bath -> Baht 修正済)
 AMOUNT_CONFIG = {
     "向上": {
         "thai": "โคโจเซสชิน",
         "jp": "向上",
-        "base": "100 Bath",
-        "child": "50 Bath\n(15 years or under)",
+        "base": "100 Baht",
+        "child": "50 Baht\n(15 years or under)",
     },
     "向上相談": {
         "thai": "โคโจโซดันเซสชิน",
         "jp": "向上相談",
-        "base": "200 Bath",
-        "child": "100 Bath\n(15 years or under)",
+        "base": "200 Baht",
+        "child": "100 Baht\n(15 years or under)",
     },
     "初信": {
         "thai": "Beginner",
         "jp": "初信",
-        "base": "100 Bath",
-        "child": "50 Bath\n(15 years or under)",
+        "base": "100 Baht",
+        "child": "50 Baht\n(15 years or under)",
     },
     "相談": {
         "thai": "เซสชินปรึกษา",
         "jp": "相談",
-        "base": "300 Bath",
-        "child": "150 Bath\n(15 years or under)",
+        "base": "300 Baht",
+        "child": "150 Baht\n(15 years or under)",
     },
     "特別相談": {
         "thai": "เซสชินปรึกษาพิเศษ",
         "jp": "特別相談",
-        "base": "600 Bath",
-        "child": "300 Bath\n(15 years or under)",
+        "base": "600 Baht",
+        "child": "300 Baht\n(15 years or under)",
     },
     "鑑定": {
         "thai": "เซสชินเพื่อการตัดสินใจ",
         "jp": "鑑定",
-        "base": "800 Bath",
-        "child": "400 Bath\n(15 years or under)",
+        "base": "800 Baht",
+        "child": "400 Baht\n(15 years or under)",
     },
 }
 
@@ -67,7 +67,6 @@ AMOUNT_CONFIG = {
 st.markdown(
     """
 <style>
-/* ① アプリ全体の背景色を薄いブルーに設定 */
 .stApp, [data-testid="stAppViewContainer"] {
     background-color: #f0f7ff !important;
 }
@@ -97,7 +96,7 @@ st.markdown(
     line-height: 1.2 !important;
 }
 
-/* 送信中・処理中ローディング（画面中央にポップアップ表示） */
+/* 送信中・処理中ローディング */
 [data-testid="stSpinner"] {
     position: fixed !important;
     top: 0 !important;
@@ -155,7 +154,6 @@ div[data-testid="stColumn"]:last-child .stButton > button {
     font-weight: 900 !important;
 }
 
-/* 本日の集計・現金確認 ＆ 受付取り消しボタンの高さ・背景色設定 */
 div.st-key-btn_summary > button {
     min-height: 90px !important;
     background-color: #fef9c3 !important;
@@ -351,7 +349,7 @@ textarea[aria-label="任意金額"] {
         st.markdown("### ภาษา / 言語")
         language = st.radio(
             "言語", 
-            ["ภาษาไทย / タイ語","Japanese / 日本語", "English / 英語" ], 
+            ["ภาษาไทย / タイ語", "Japanese / 日本語", "English / 英語"], 
             label_visibility="collapsed"
         )
 
@@ -385,7 +383,6 @@ textarea[aria-label="任意金額"] {
 
         is_amount_error = False
 
-        # ★ 判定文を修正：「การถวาย」または「お典供」が含まれているかチェック
         if "การถวาย" in amount_type or "お典供" in amount_type:
             st.markdown(
                 """
@@ -406,9 +403,9 @@ textarea[aria-label="任意金額"] {
             custom_val = custom_amount.strip()
 
             st.write("")
-            custom_currency = st.radio("通貨", ["Bath", "円 / Yen"], horizontal=True, label_visibility="collapsed", key="custom_currency")
+            custom_currency = st.radio("通貨", ["Baht", "円 / Yen"], horizontal=True, label_visibility="collapsed", key="custom_currency")
 
-            clean_currency = "円" if "円" in custom_currency else "Bath"
+            clean_currency = "円" if "円" in custom_currency else "Baht"
 
             if custom_val:
                 if not custom_val.isdigit():
@@ -442,7 +439,6 @@ textarea[aria-label="任意金額"] {
             with st.spinner("กำลังส่งข้อมูล... / 送信中..."):
                 now = datetime.now().strftime("%Y-%m-%d")
 
-                # ログ保存用 英語変換処理
                 cat_map = {
                     "向上": "KOJO",
                     "向上相談": "KOJOSOUDAN",
@@ -574,20 +570,20 @@ elif st.session_state.step == "summary":
     today_str = datetime.now().strftime("%Y-%m-%d")
 
     rows_def = [
-        ("โคโจเซสชิน\n向上", 50, "Bath", "kojo_50"),
-        ("", 100, "Bath", "kojo_100"),
-        ("", 125, "Bath", "kojo_125"),
-        ("", 250, "Bath", "kojo_250"),
+        ("โคโจเซสชิน\n向上", 50, "Baht", "kojo_50"),
+        ("", 100, "Baht", "kojo_100"),
+        ("", 125, "Baht", "kojo_125"),
+        ("", 250, "Baht", "kojo_250"),
         ("", 1000, "Yen", "kojo_1000y"),
-        ("Beginner\n初信", 50, "Bath", "shoshin_50"),
-        ("", 100, "Bath", "shoshin_100"),
-        ("", 125, "Bath", "shoshin_125"),
-        ("", 250, "Bath", "shoshin_250"),
+        ("Beginner\n初信", 50, "Baht", "shoshin_50"),
+        ("", 100, "Baht", "shoshin_100"),
+        ("", 125, "Baht", "shoshin_125"),
+        ("", 250, "Baht", "shoshin_250"),
         ("", 1000, "Yen", "shoshin_1000y"),
-        ("โคโจโซดันเซสชิน 向上相談", 200, "Bath", "kojosodan_200"),
-        ("เซสชินปรึกษา 相談", 300, "Bath", "sodan_300"),
-        ("เซสชินปรึกษาพิเศษ 特別相談", 600, "Bath", "tokubetsu_600"),
-        ("เซสชินเพื่อการตัดสินใจ 鑑定", 800, "Bath", "kantei_800"),
+        ("โคโจโซดันเซสชิน 向上相談", 200, "Baht", "kojosodan_200"),
+        ("เซสชินปรึกษา 相談", 300, "Baht", "sodan_300"),
+        ("เซสชินปรึกษาพิเศษ 特別相談", 600, "Baht", "tokubetsu_600"),
+        ("เซสชินเพื่อการตัดสินใจ 鑑定", 800, "Baht", "kantei_800"),
     ]
 
     summary_data = {}
@@ -615,7 +611,7 @@ elif st.session_state.step == "summary":
         c_amount = c_person * price
         q_amount = q_person * price
 
-        if curr == "Bath":
+        if curr == "Baht":
             baht_cash_amt += c_amount
             baht_qr_amt += q_amount
         else:
@@ -695,6 +691,7 @@ elif st.session_state.step == "summary":
     # CASH ONLY エリア
     st.markdown("### CASH ONLY（Count the cash in the safe and enter the amount.）")
 
+    # 手入力エリア（＋/－ボタン連動・1000 Yen専用水色スタイル追加）
     st.markdown(
         """
 <style>
@@ -716,8 +713,7 @@ div[data-testid="stNumberInput"] input {
     font-weight: bold !important;
     color: #0f172a !important;
     height: 52px !important;
-    width: 100% !important;
-    border-radius: 4px !important;
+    border-radius: 4px 0 0 4px !important;
     border: 2px solid #000000 !important;
     text-align: center !important;
     -webkit-appearance: none !important;
@@ -727,7 +723,28 @@ div[data-testid="stNumberInput"] input {
 
 div[data-testid="stNumberInput"] button {
     height: 52px !important;
-    border: 1px solid #000000 !important;
+    min-width: 36px !important;
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 2px solid #000000 !important;
+    border-left: none !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    z-index: 10 !important;
+    cursor: pointer !important;
+}
+
+/* ④ 1000 Yen 専用入力ボックスの目立つ水色スタイル */
+.yen-input-box div[data-testid="stNumberInput"] input {
+    background-color: #e0f2fe !important; /* さわやかな水色 */
+    color: #0369a1 !important;            /* 濃い青色文字 */
+    border: 2px solid #0284c7 !important; /* 青色枠線 */
+}
+.yen-input-box div[data-testid="stNumberInput"] button {
+    background-color: #bae6fd !important;
+    border: 2px solid #0284c7 !important;
+    border-left: none !important;
+    color: #0369a1 !important;
 }
 </style>
 """,
@@ -735,13 +752,13 @@ div[data-testid="stNumberInput"] button {
     )
 
     cash_denom_def = [
-        (50, "n_50_1", "Bath"),
-        (10, "n_10", "Bath"),
-        (20, "n_20", "Bath"),
-        (50, "n_50_2", "Bath"),
-        (100, "n_100", "Bath"),
-        (500, "n_500", "Bath"),
-        (1000, "n_1000b", "Bath"),
+        (50, "n_50_1", "Baht"),
+        (10, "n_10", "Baht"),
+        (20, "n_20", "Baht"),
+        (50, "n_50_2", "Baht"),
+        (100, "n_100", "Baht"),
+        (500, "n_500", "Baht"),
+        (1000, "n_1000b", "Baht"),
         (1000, "n_1000y", "Yen"),
     ]
 
@@ -757,12 +774,19 @@ div[data-testid="stNumberInput"] button {
         with c2:
             st.markdown(f"<p style='font-size:22px; font-weight:bold; text-align:left; margin-top:8px;'>{currency}</p>", unsafe_allow_html=True)
         with c3:
-            count_input = st.number_input(f"{key}", min_value=0, value=None, step=1, label_visibility="collapsed", key=key)
+            # 1000 Yen のみ専用クラスで囲んで色を変更
+            if key == "n_1000y":
+                st.markdown('<div class="yen-input-box">', unsafe_allow_html=True)
+                count_input = st.number_input(f"{key}", min_value=0, value=None, step=1, label_visibility="collapsed", key=key)
+                st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                count_input = st.number_input(f"{key}", min_value=0, value=None, step=1, label_visibility="collapsed", key=key)
+
             count = count_input if count_input is not None else 0
             counts_dict[key] = count
         with c4:
             subtotal = denom * count
-            if currency == "Bath":
+            if currency == "Baht":
                 calc_baht_total += subtotal
             else:
                 calc_yen_total += subtotal
@@ -782,7 +806,7 @@ div[data-testid="stNumberInput"] button {
     with c_label:
         st.markdown("<p style='font-size:20px; font-weight:bold; margin:0;'>ยอดเงินสดคงเหลือ<br>現金残高</p>", unsafe_allow_html=True)
     with c_baht_val:
-        st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold; height:52px; display:flex; align-items:center; justify-content:center; box-sizing: border-box;'>{calc_baht_total:,} Bath</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='background-color:#ffffff; border:2px solid #000; text-align:center; padding:8px; font-size:24px; font-weight:bold; height:52px; display:flex; align-items:center; justify-content:center; box-sizing: border-box;'>{calc_baht_total:,} Baht</div>", unsafe_allow_html=True)
 
     with c_otsuri_label:
         st.markdown("<p style='font-size:18px; font-weight:bold; text-align:right; margin:0;'>เงินทอน<br>(おつり)</p>", unsafe_allow_html=True)
