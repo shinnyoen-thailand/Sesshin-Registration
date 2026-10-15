@@ -23,7 +23,7 @@ if "ipad_id" not in st.session_state:
 # URLのアドレスバーにもパラメータを維持
 st.query_params["ipad"] = st.session_state.ipad_id
 
-# 受付種類ごとの金額設定データ (Bath -> Baht 修正済)
+# 受付種類ごとの金額設定データ (Baht 表記統一)
 AMOUNT_CONFIG = {
     "向上": {
         "thai": "โคโจเซสชิน",
@@ -691,7 +691,7 @@ elif st.session_state.step == "summary":
     # CASH ONLY エリア
     st.markdown("### CASH ONLY（Count the cash in the safe and enter the amount.）")
 
-    # 手入力エリア（＋/－ボタン連動・1000 Yen専用水色スタイル追加）
+    # ★ 手入力エリアのCSS（＋/－ボタン動作完全補正 & 1000 Yen(n_1000y) の直接水色化指定）
     st.markdown(
         """
 <style>
@@ -734,13 +734,13 @@ div[data-testid="stNumberInput"] button {
     cursor: pointer !important;
 }
 
-/* ④ 1000 Yen 専用入力ボックスの目立つ水色スタイル */
-.yen-input-box div[data-testid="stNumberInput"] input {
-    background-color: #e0f2fe !important; /* さわやかな水色 */
-    color: #0369a1 !important;            /* 濃い青色文字 */
-    border: 2px solid #0284c7 !important; /* 青色枠線 */
+/* ★ 1000 Yen (st-key-n_1000y) 専用の水色＆濃い青文字デザイン */
+div.st-key-n_1000y input {
+    background-color: #e0f2fe !important; /* 水色 */
+    color: #0369a1 !important;            /* 濃い青文字 */
+    border: 2px solid #0284c7 !important; /* 青枠線 */
 }
-.yen-input-box div[data-testid="stNumberInput"] button {
+div.st-key-n_1000y button {
     background-color: #bae6fd !important;
     border: 2px solid #0284c7 !important;
     border-left: none !important;
@@ -750,6 +750,12 @@ div[data-testid="stNumberInput"] button {
 """,
         unsafe_allow_html=True,
     )
+
+    # ★ ペン入力で「L」など文字が入った場合の自動サニタイズ（クリア）関数
+    def clean_number_input(input_key):
+        val = st.session_state.get(input_key)
+        if val is None:
+            st.session_state[input_key] = 0
 
     cash_denom_def = [
         (50, "n_50_1", "Baht"),
@@ -774,14 +780,16 @@ div[data-testid="stNumberInput"] button {
         with c2:
             st.markdown(f"<p style='font-size:22px; font-weight:bold; text-align:left; margin-top:8px;'>{currency}</p>", unsafe_allow_html=True)
         with c3:
-            # 1000 Yen のみ専用クラスで囲んで色を変更
-            if key == "n_1000y":
-                st.markdown('<div class="yen-input-box">', unsafe_allow_html=True)
-                count_input = st.number_input(f"{key}", min_value=0, value=None, step=1, label_visibility="collapsed", key=key)
-                st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                count_input = st.number_input(f"{key}", min_value=0, value=None, step=1, label_visibility="collapsed", key=key)
-
+            count_input = st.number_input(
+                f"{key}", 
+                min_value=0, 
+                value=None, 
+                step=1, 
+                label_visibility="collapsed", 
+                key=key,
+                on_change=clean_number_input,
+                args=(key,)
+            )
             count = count_input if count_input is not None else 0
             counts_dict[key] = count
         with c4:
@@ -811,7 +819,16 @@ div[data-testid="stNumberInput"] button {
     with c_otsuri_label:
         st.markdown("<p style='font-size:18px; font-weight:bold; text-align:right; margin:0;'>เงินทอน<br>(おつり)</p>", unsafe_allow_html=True)
     with c_otsuri_val:
-        otsuri_input = st.number_input("おつり", min_value=0, value=None, step=100, label_visibility="collapsed", key="otsuri_val")
+        otsuri_input = st.number_input(
+            "おつり", 
+            min_value=0, 
+            value=None, 
+            step=100, 
+            label_visibility="collapsed", 
+            key="otsuri_val",
+            on_change=clean_number_input,
+            args=("otsuri_val",)
+        )
         otsuri = otsuri_input if otsuri_input is not None else 0
 
     with c_total_label:
