@@ -2,7 +2,7 @@ import base64
 import datetime
 from datetime import datetime, date
 import re
-import requestshttps://script.goog
+import requests
 import streamlit as st
 
 # ★ご自身のGASのウェブアプリURLに書き換えてください★
