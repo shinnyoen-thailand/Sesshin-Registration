@@ -1,3 +1,4 @@
+import base64
 import datetime
 from datetime import datetime, date
 import re
@@ -23,7 +24,7 @@ if "ipad_id" not in st.session_state:
 # URLのアドレスバーにもパラメータを維持
 st.query_params["ipad"] = st.session_state.ipad_id
 
-# 受付種類ごとの金額設定データ (Baht 表記統一)
+# 受付種類ごとの金額設定データ (Baht 表記)
 AMOUNT_CONFIG = {
     "向上": {
         "thai": "โคโจเซสชิน",
@@ -63,30 +64,60 @@ AMOUNT_CONFIG = {
     },
 }
 
-# 全画面共通ベース設定（背景色・基本ボタン・中央ローディングの設定）
-st.markdown(
-    """
-<style>
-.stApp, [data-testid="stAppViewContainer"] {
-    background-color: #f0f7ff !important;
-}
+# =========================================================
+# 背景画像の読み込みとBase64エンコード処理
+# =========================================================
+def get_base64_of_bin_file(bin_file):
+    try:
+        with open(bin_file, 'rb') as f:
+            data = f.read()
+        return base64.b64encode(data).decode()
+    except Exception:
+        return ""
 
-.block-container {
+# GitHubにアップロードした背景画像ファイル名 (外観.jpg)
+bg_bin = get_base64_of_bin_file("外観.jpg")
+if not bg_bin:
+    bg_bin = get_base64_of_bin_file("外観.jpg")
+
+bg_css = f'url("data:image/jpeg;base64,{bg_bin}")' if bg_bin else '#f0f7ff'
+
+# 全画面共通ベース設定（背景写真＋半透明カード＋基本デザイン）
+st.markdown(
+    f"""
+<style>
+/* 背景写真の設定 */
+.stApp, [data-testid="stAppViewContainer"] {{
+    background-image: {bg_css} !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}}
+
+/* メインコンテンツ枠（半透明白背景で文字を見やすく保持） */
+.block-container {{
     max-width: 98% !important;
-    padding-top: 1rem !important;
-    padding-bottom: 1rem !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
-}
-.stButton > button {
+    background-color: rgba(240, 247, 255, 0.92) !important;
+    border-radius: 20px !important;
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.2) !important;
+    margin-top: 10px !important;
+}}
+
+/* ボタンの基本スタイル */
+.stButton > button {{
     width: 100% !important;
     min-height: 120px !important;
     border-radius: 16px !important;
     border: 3px solid #1e293b !important;
     background-color: #ffffff !important;
     box-shadow: 0px 6px 12px rgba(0,0,0,0.12) !important;
-}
-.stButton > button p {
+}}
+.stButton > button p {{
     font-size: 36px !important;
     font-weight: 900 !important;
     color: #0f172a !important;
@@ -94,10 +125,10 @@ st.markdown(
     white-space: pre-line !important;
     text-align: center !important;
     line-height: 1.2 !important;
-}
+}}
 
 /* 送信中・処理中ローディング */
-[data-testid="stSpinner"] {
+[data-testid="stSpinner"] {{
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -108,19 +139,19 @@ st.markdown(
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-}
-[data-testid="stSpinner"] > div {
+}}
+[data-testid="stSpinner"] > div {{
     background-color: #ffffff !important;
     padding: 35px 55px !important;
     border-radius: 20px !important;
     box-shadow: 0px 10px 30px rgba(0,0,0,0.3) !important;
     border: 4px solid #3b82f6 !important;
-}
-[data-testid="stSpinner"] * {
+}}
+[data-testid="stSpinner"] * {{
     font-size: 30px !important;
     font-weight: 900 !important;
     color: #0f172a !important;
-}
+}}
 </style>
 """,
     unsafe_allow_html=True,
@@ -455,6 +486,7 @@ textarea[aria-label="任意金額"] {
                 elif "ภาษาไทย" in language:
                     clean_lang = "Thai"
 
+                # 回数（Beginner count）の判定（「1年以上」を最優先で正しく判定）
                 clean_kai = "-"
                 if "มากกว่า" in kai_suu or "1年" in kai_suu:
                     clean_kai = "1year up"
@@ -695,7 +727,7 @@ elif st.session_state.step == "summary":
     # CASH ONLY エリア
     st.markdown("### CASH ONLY（Count the cash in the safe and enter the amount.）")
 
-    # ★ 手入力エリアのCSS（＋/－ボタン動作完全補正 & 1000 Yen(n_1000y) の直接水色化指定）
+    # 手入力エリアのCSS（＋/－ボタン補正 & 1000 Yen 専用水色スタイル）
     st.markdown(
         """
 <style>
@@ -738,7 +770,7 @@ div[data-testid="stNumberInput"] button {
     cursor: pointer !important;
 }
 
-/* ★ 1000 Yen (st-key-n_1000y) 専用の水色＆濃い青文字デザイン */
+/* 1000 Yen (st-key-n_1000y) 専用の水色＆濃い青文字デザイン */
 div.st-key-n_1000y input {
     background-color: #e0f2fe !important; /* 水色 */
     color: #0369a1 !important;            /* 濃い青文字 */
@@ -755,7 +787,7 @@ div.st-key-n_1000y button {
         unsafe_allow_html=True,
     )
 
-    # ★ ペン入力で「L」など文字が入った場合の自動サニタイズ（クリア）関数
+    # ペン入力スクリブル等で誤入力された場合の自動サニタイズ（クリア）関数
     def clean_number_input(input_key):
         val = st.session_state.get(input_key)
         if val is None:
