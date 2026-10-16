@@ -93,7 +93,7 @@ if not frog_bin:
 
 frog_css = f'url("data:image/png;base64,{frog_bin}")' if frog_bin else 'none'
 
-# 全画面共通ベース設定（背景写真＋透けた白色カード＋横移動ぴょんぴょんカエル）
+# 全画面共通ベース設定（背景写真＋透けた白色カード＋完了ボタン付近のローディング）
 st.markdown(
     f"""
 <style>
@@ -140,58 +140,51 @@ st.markdown(
     line-height: 1.2 !important;
 }}
 
-/* 🐸 カエルが左から右へぴょんぴょん移動するローディング画面 🐸 */
+/* 🐸 完了ボタン付近（画面下部中央）に表示されるローディングボックス 🐸 */
 [data-testid="stSpinner"] {{
     position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    background-color: rgba(15, 23, 42, 0.70) !important;
+    bottom: 60px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    top: auto !important;
+    width: auto !important;
+    height: auto !important;
+    background-color: transparent !important;
     z-index: 999999 !important;
+}}
+
+[data-testid="stSpinner"] > div {{
+    background-color: #ffffff !important;
+    padding: 18px 35px !important;
+    border-radius: 24px !important;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.3) !important;
+    border: 4px solid #86efac !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-}}
-[data-testid="stSpinner"] > div {{
-    background-color: #ffffff !important;
-    padding: 35px 70px !important;
-    border-radius: 28px !important;
-    box-shadow: 0px 12px 35px rgba(0,0,0,0.35) !important;
-    border: 5px solid #86efac !important;
-    text-align: center !important;
-    overflow: hidden !important;
-    min-width: 320px !important;
+    gap: 15px !important;
 }}
 
-/* イラストカエルの配置と左➔右跳ね移動アニメーション */
-[data-testid="stSpinner"] > div::before {{
+/* 文字の後ろ（右側）にカエルイラストを配置し、ぴょんぴょん跳ねさせる */
+[data-testid="stSpinner"] > div::after {{
     content: "" !important;
-    display: block !important;
-    width: 100px !important;
-    height: 70px !important;
-    margin: 0 auto 10px auto !important;
+    display: inline-block !important;
+    width: 65px !important;
+    height: 48px !important;
     background-image: {frog_css} !important;
     background-size: contain !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
-    animation: frogHopMove 2.2s infinite ease-in-out !important;
+    animation: frogJumpSide 0.45s infinite alternate ease-in-out !important;
 }}
 
-@keyframes frogHopMove {{
-    0%    {{ transform: translateX(-120px) translateY(0); }}
-    12.5% {{ transform: translateX(-90px) translateY(-38px); }}
-    25%   {{ transform: translateX(-60px) translateY(0); }}
-    37.5% {{ transform: translateX(-30px) translateY(-38px); }}
-    50%   {{ transform: translateX(0px) translateY(0); }}
-    62.5% {{ transform: translateX(30px) translateY(-38px); }}
-    75%   {{ transform: translateX(60px) translateY(0); }}
-    87.5% {{ transform: translateX(90px) translateY(-38px); }}
-    100%  {{ transform: translateX(120px) translateY(0); }}
+@keyframes frogJumpSide {{
+    0% {{ transform: translateY(0) scale(1.05, 0.95); }}
+    100% {{ transform: translateY(-16px) scale(0.95, 1.05); }}
 }}
 
 [data-testid="stSpinner"] * {{
-    font-size: 28px !important;
+    font-size: 26px !important;
     font-weight: 900 !important;
     color: #0f172a !important;
 }}
