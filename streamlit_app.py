@@ -65,7 +65,7 @@ AMOUNT_CONFIG = {
 }
 
 # =========================================================
-# 背景画像の読み込みとBase64エンコード処理
+# 画像（背景＆カエル）の読み込みとBase64エンコード処理
 # =========================================================
 def get_base64_of_bin_file(bin_file):
     try:
@@ -75,7 +75,7 @@ def get_base64_of_bin_file(bin_file):
     except Exception:
         return ""
 
-# 外観.jpg / Shinnyo.jpg / Shinnyo.png の順で画像を自動検索
+# 外観背景画像の検索
 bg_bin = get_base64_of_bin_file("外観.jpg")
 if not bg_bin:
     bg_bin = get_base64_of_bin_file("Shinnyo.jpg")
@@ -84,7 +84,16 @@ if not bg_bin:
 
 bg_css = f'url("data:image/jpeg;base64,{bg_bin}")' if bg_bin else '#f0f7ff'
 
-# 全画面共通ベース設定（背景写真＋透けた白色カード＋カエルのローディングアニメーション）
+# カエルイラスト画像の検索 (frog.png / frog.jpg / kaeru.png)
+frog_bin = get_base64_of_bin_file("frog.png")
+if not frog_bin:
+    frog_bin = get_base64_of_bin_file("frog.jpg")
+if not frog_bin:
+    frog_bin = get_base64_of_bin_file("kaeru.png")
+
+frog_css = f'url("data:image/png;base64,{frog_bin}")' if frog_bin else 'none'
+
+# 全画面共通ベース設定（背景写真＋透けた白色カード＋横移動ぴょんぴょんカエル）
 st.markdown(
     f"""
 <style>
@@ -131,7 +140,7 @@ st.markdown(
     line-height: 1.2 !important;
 }}
 
-/* 🐸 送信中・処理中カエルのローディング画面 🐸 */
+/* 🐸 カエルが左から右へぴょんぴょん移動するローディング画面 🐸 */
 [data-testid="stSpinner"] {{
     position: fixed !important;
     top: 0 !important;
@@ -146,25 +155,39 @@ st.markdown(
 }}
 [data-testid="stSpinner"] > div {{
     background-color: #ffffff !important;
-    padding: 35px 60px !important;
+    padding: 35px 70px !important;
     border-radius: 28px !important;
     box-shadow: 0px 12px 35px rgba(0,0,0,0.35) !important;
-    border: 5px solid #4ade80 !important;
+    border: 5px solid #86efac !important;
     text-align: center !important;
+    overflow: hidden !important;
+    min-width: 320px !important;
 }}
 
-/* カエルが跳ねるアニメーション */
+/* イラストカエルの配置と左➔右跳ね移動アニメーション */
 [data-testid="stSpinner"] > div::before {{
-    content: "🐸" !important;
-    font-size: 85px !important;
+    content: "" !important;
     display: block !important;
+    width: 100px !important;
+    height: 70px !important;
     margin: 0 auto 10px auto !important;
-    animation: frogJump 0.45s infinite alternate ease-in-out !important;
+    background-image: {frog_css} !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    animation: frogHopMove 2.2s infinite ease-in-out !important;
 }}
 
-@keyframes frogJump {{
-    0% {{ transform: translateY(0) scale(1.05, 0.95); }}
-    100% {{ transform: translateY(-35px) scale(0.95, 1.05); }}
+@keyframes frogHopMove {{
+    0%    {{ transform: translateX(-120px) translateY(0); }}
+    12.5% {{ transform: translateX(-90px) translateY(-38px); }}
+    25%   {{ transform: translateX(-60px) translateY(0); }}
+    37.5% {{ transform: translateX(-30px) translateY(-38px); }}
+    50%   {{ transform: translateX(0px) translateY(0); }}
+    62.5% {{ transform: translateX(30px) translateY(-38px); }}
+    75%   {{ transform: translateX(60px) translateY(0); }}
+    87.5% {{ transform: translateX(90px) translateY(-38px); }}
+    100%  {{ transform: translateX(120px) translateY(0); }}
 }}
 
 [data-testid="stSpinner"] * {{
