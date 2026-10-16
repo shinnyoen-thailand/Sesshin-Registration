@@ -2,10 +2,10 @@ import base64
 import datetime
 from datetime import datetime, date
 import re
-import requests
+import requestshttps://script.goog
 import streamlit as st
 
-# ご自身のGASのウェブアプリのURLに書き換えてください
+# ★ご自身のGASのウェブアプリURLに書き換えてください★
 GAS_URL = "https://script.google.com/macros/s/AKfycbyXyNGukvbiGIGm3xACg08zW5eMzcNFcU8LROWmCVQUEd2QZ3J_eVDrofQO-7fyeYl3/exec"
 
 # =========================================================
@@ -75,14 +75,16 @@ def get_base64_of_bin_file(bin_file):
     except Exception:
         return ""
 
-# GitHubにアップロードした背景画像ファイル名 (外観.jpg)
+# 外観.jpg / Shinnyo.jpg / Shinnyo.png の順で画像を自動検索
 bg_bin = get_base64_of_bin_file("外観.jpg")
 if not bg_bin:
-    bg_bin = get_base64_of_bin_file("外観.jpg")
+    bg_bin = get_base64_of_bin_file("Shinnyo.jpg")
+if not bg_bin:
+    bg_bin = get_base64_of_bin_file("Shinnyo.png")
 
 bg_css = f'url("data:image/jpeg;base64,{bg_bin}")' if bg_bin else '#f0f7ff'
 
-# 全画面共通ベース設定（背景写真＋半透明カード＋基本デザイン）
+# 全画面共通ベース設定（背景写真＋透けた白色カード＋すりガラス効果）
 st.markdown(
     f"""
 <style>
@@ -95,16 +97,18 @@ st.markdown(
     background-attachment: fixed !important;
 }}
 
-/* メインコンテンツ枠（半透明白背景で文字を見やすく保持） */
+/* メインコンテンツ枠（透けた白色 65% ＋ すりガラスぼかし効果） */
 .block-container {{
     max-width: 98% !important;
     padding-top: 1.5rem !important;
     padding-bottom: 1.5rem !important;
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
-    background-color: rgba(240, 247, 255, 0.92) !important;
+    background-color: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
     border-radius: 20px !important;
-    box-shadow: 0px 8px 20px rgba(0,0,0,0.2) !important;
+    box-shadow: 0px 8px 24px rgba(0,0,0,0.18) !important;
     margin-top: 10px !important;
 }}
 
@@ -114,7 +118,7 @@ st.markdown(
     min-height: 120px !important;
     border-radius: 16px !important;
     border: 3px solid #1e293b !important;
-    background-color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.90) !important;
     box-shadow: 0px 6px 12px rgba(0,0,0,0.12) !important;
 }}
 .stButton > button p {{
@@ -187,7 +191,7 @@ div[data-testid="stColumn"]:last-child .stButton > button {
 
 div.st-key-btn_summary > button {
     min-height: 90px !important;
-    background-color: #fef9c3 !important;
+    background-color: rgba(254, 249, 195, 0.90) !important;
     border: 3px solid #eab308 !important;
 }
 div.st-key-btn_summary > button p {
@@ -197,7 +201,7 @@ div.st-key-btn_summary > button p {
 
 div.st-key-btn_cancel_page > button {
     min-height: 90px !important;
-    background-color: #f1f5f9 !important;
+    background-color: rgba(241, 245, 249, 0.90) !important;
     border: 3px solid #64748b !important;
 }
 div.st-key-btn_cancel_page > button p {
@@ -461,7 +465,7 @@ textarea[aria-label="任意金額"] {
     st.write("---")
     st.write("")
 
-    if st.button("完了 / เสร็จสิ้น", type="primary"):
+    if st.button("完了 /เสร็จสิ้น", type="primary"):
         if name.strip() == "":
             st.warning("กรุณากรอกชื่อ / お名前を入力してください。")
         elif is_amount_error:
