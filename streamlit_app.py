@@ -6,7 +6,7 @@ import requests
 import streamlit as st
 
 # ★ご自身のGASのウェブアプリURLに書き換えてください★
-GAS_URL = "https://script.google.com/macros/s/AKfycbw_nyTh3A-IuatIC2JzYX18RdCq6xiPQUDPQqOFfczQzaHinLSHr6YjC9bV-kZPknfj/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbxAIweuVAl_zMEoW2syvlONxnONiDYTh9C5pEc9SQlFcOm05qfYeqJ-RsxL2RVRSbQ0/exec"
 
 # =========================================================
 # 端末識別子 (ipad=A / ipad=B) の確実な取得と保持処理
@@ -21,8 +21,13 @@ if "ipad_id" not in st.session_state:
     except Exception:
         st.session_state.ipad_id = "A"
 
-# URLのアドレスバーにもパラメータを維持
 st.query_params["ipad"] = st.session_state.ipad_id
+
+# 編集用状態変数の初期化
+if "editing_ticket_id" not in st.session_state:
+    st.session_state.editing_ticket_id = None
+if "edit_data" not in st.session_state:
+    st.session_state.edit_data = {}
 
 # 受付種類ごとの金額設定データ (Baht 表記)
 AMOUNT_CONFIG = {
@@ -64,9 +69,6 @@ AMOUNT_CONFIG = {
     },
 }
 
-# =========================================================
-# 画像（背景＆カエル）の読み込みとBase64エンコード処理
-# =========================================================
 def get_base64_of_bin_file(bin_file):
     try:
         with open(bin_file, 'rb') as f:
@@ -75,7 +77,6 @@ def get_base64_of_bin_file(bin_file):
     except Exception:
         return ""
 
-# 外観背景画像の検索
 bg_bin = get_base64_of_bin_file("外観.jpg")
 if not bg_bin:
     bg_bin = get_base64_of_bin_file("Shinnyo.jpg")
@@ -84,7 +85,6 @@ if not bg_bin:
 
 bg_css = f'url("data:image/jpeg;base64,{bg_bin}")' if bg_bin else '#f0f7ff'
 
-# カエルイラスト画像の検索 (frog.png / frog.jpg / kaeru.png)
 frog_bin = get_base64_of_bin_file("frog.png")
 if not frog_bin:
     frog_bin = get_base64_of_bin_file("frog.jpg")
@@ -93,11 +93,9 @@ if not frog_bin:
 
 frog_css = f'url("data:image/png;base64,{frog_bin}")' if frog_bin else 'none'
 
-# 全画面共通ベース設定（背景写真＋透けた白色カード＋完了ボタン付近のローディング）
 st.markdown(
     f"""
 <style>
-/* 背景写真の設定 */
 .stApp, [data-testid="stAppViewContainer"] {{
     background-image: {bg_css} !important;
     background-size: cover !important;
@@ -106,7 +104,6 @@ st.markdown(
     background-attachment: fixed !important;
 }}
 
-/* メインコンテンツ枠（透けた白色 65% ＋ すりガラスぼかし効果） */
 .block-container {{
     max-width: 98% !important;
     padding-top: 1.5rem !important;
@@ -121,7 +118,6 @@ st.markdown(
     margin-top: 10px !important;
 }}
 
-/* ボタンの基本スタイル */
 .stButton > button {{
     width: 100% !important;
     min-height: 120px !important;
@@ -140,7 +136,6 @@ st.markdown(
     line-height: 1.2 !important;
 }}
 
-/* 🐸 完了ボタン付近（画面下部中央）に表示されるローディングボックス 🐸 */
 [data-testid="stSpinner"] {{
     position: fixed !important;
     bottom: 60px !important;
@@ -165,7 +160,6 @@ st.markdown(
     gap: 15px !important;
 }}
 
-/* 文字の後ろ（右側）にカエルイラストを配置し、ぴょんぴょん跳ねさせる */
 [data-testid="stSpinner"] > div::after {{
     content: "" !important;
     display: inline-block !important;
@@ -203,6 +197,10 @@ if "selected_category" not in st.session_state:
 # 画面1：接心受付 ＆ 集計ボタン・取り消しボタン
 # =========================================================
 if st.session_state.step == "select_category":
+    # 新規受付開始時は編集状態をクリア
+    st.session_state.editing_ticket_id = None
+    st.session_state.edit_data = {}
+
     st.markdown(
         """
 <style>
@@ -298,13 +296,13 @@ div.st-key-btn_cancel_page > button p {
             st.session_state.step = "summary"
             st.rerun()
     with c_cancel:
-        if st.button("🗑️ Cancel Registration\n受付の取り消し・修正", key="btn_cancel_page", use_container_width=True):
+        if st.button("🗑️ Cancel / Edit Registration\n受付の取り消し・修正", key="btn_cancel_page", use_container_width=True):
             st.session_state.step = "cancel_page"
             st.rerun()
 
 
 # =========================================================
-# 画面2：詳細情報の入力画面
+# 画面2：詳細情報の入力画面 (新規 ＆ 修正兼用)
 # =========================================================
 elif st.session_state.step == "input_details":
     st.markdown(
@@ -381,17 +379,30 @@ textarea[aria-label="任意金額"] {
     amt_info = AMOUNT_CONFIG.get(category, AMOUNT_CONFIG["向上"])
     thai_title = amt_info.get("thai", "")
 
-    st.markdown(f"<h1 style='font-size: 34px; margin-bottom: 10px;'>受付: 【 {category} ({thai_title}) 】 <span style='font-size:24px; color:#0284c7;'>(Terminal {st.session_state.ipad_id})</span></h1>", unsafe_allow_html=True)
+    # 編集モード判定ヘッダー
+    is_edit_mode = st.session_state.editing_ticket_id is not None
+    edit_title_tag = f"✏️ 修正 [{st.session_state.editing_ticket_id}]" if is_edit_mode else "新規受付"
+
+    st.markdown(f"<h1 style='font-size: 34px; margin-bottom: 10px;'>受付: 【 {category} ({thai_title}) 】 <span style='font-size:22px; color:#0284c7;'>({edit_title_tag} / Terminal {st.session_state.ipad_id})</span></h1>", unsafe_allow_html=True)
 
     if st.button("← ย้อนกลับ / 戻る"):
-        st.session_state.step = "select_category"
+        if is_edit_mode:
+            st.session_state.step = "cancel_page"
+        else:
+            st.session_state.step = "select_category"
         st.rerun()
 
     st.write("---")
 
+    # 初期値の設定（修正モードの場合は既存データをプリセット）
+    e_data = st.session_state.edit_data if is_edit_mode else {}
+
+    default_name = e_data.get("name", "")
+
     st.markdown("### Name （ภาษาอังกฤษ/English)")
     name = st.text_area(
         "お名前",
+        value=default_name,
         label_visibility="collapsed",
         placeholder="กรอกชื่อภาษาอังกฤษ / Type Name in English",
         height=120,
@@ -414,9 +425,16 @@ textarea[aria-label="任意金額"] {
 
     with col_left:
         st.markdown("### ภาษา / 言語")
+        lang_opts = ["ภาษาไทย / タイ語", "Japanese / 日本語", "English / 英語"]
+        default_lang_idx = 0
+        saved_lang = e_data.get("language", "")
+        if saved_lang == "Japanese": default_lang_idx = 1
+        elif saved_lang == "English": default_lang_idx = 2
+
         language = st.radio(
             "言語", 
-            ["ภาษาไทย / タイ語", "Japanese / 日本語", "English / 英語"], 
+            lang_opts, 
+            index=default_lang_idx,
             label_visibility="collapsed"
         )
 
@@ -424,26 +442,43 @@ textarea[aria-label="任意金額"] {
         if category == "初信":
             st.write("")
             st.markdown("### จำนวนครั้ง / 回数")
+            kai_opts = ["ครั้งที่ 1 / 1回目", "ครั้งที่ 2 / 2回目", "ครั้งที่ 3 / 3回目", "มากกว่า 1 ปี / 1年以上"]
+            default_kai_idx = 0
+            saved_kai = e_data.get("kaiSuu", "")
+            if saved_kai == "2": default_kai_idx = 1
+            elif saved_kai == "3": default_kai_idx = 2
+            elif saved_kai == "1year up": default_kai_idx = 3
+
             kai_suu = st.radio(
                 "回数", 
-                ["ครั้งที่ 1 / 1回目", "ครั้งที่ 2 / 2回目", "ครั้งที่ 3 / 3回目", "มากกว่า 1 ปี / 1年以上"], 
+                kai_opts, 
+                index=default_kai_idx,
                 label_visibility="collapsed"
             )
 
         st.write("")
         st.markdown("### ตัวเลือกอื่น ๆ / その他")
-        is_kanki = st.checkbox("ปีติขึ้นไป / 歓喜以上")
-        is_priority = st.checkbox("Priority / 優先")
-        is_infant = st.checkbox("พร้อมทารก / 乳児連れ")
+        is_kanki = st.checkbox("ปีติขึ้นไป / 歓喜以上", value=(e_data.get("isKanki") == "〇"))
+        is_priority = st.checkbox("Priority / 優先", value=(e_data.get("isPriority") == "〇"))
+        is_infant = st.checkbox("พร้อมทารก / 乳児連れ", value=(e_data.get("isInfant") == "〇"))
 
     with col_right:
         st.markdown("### จำนวนเงิน / 金額")
 
         other_option_label = "การถวาย\nお典供"
+        amt_opts = [amt_info["base"], amt_info["child"], other_option_label]
+        
+        default_amt_idx = 0
+        saved_amt = e_data.get("amount", "")
+        if saved_amt == amt_info["child"].replace("\n", " "):
+            default_amt_idx = 1
+        elif is_edit_mode and saved_amt != amt_info["base"].replace("\n", " "):
+            default_amt_idx = 2
 
         amount_type = st.radio(
             "金額種別",
-            [amt_info["base"], amt_info["child"], other_option_label],
+            amt_opts,
+            index=default_amt_idx,
             label_visibility="collapsed",
             key="amount_radio",
         )
@@ -459,8 +494,15 @@ textarea[aria-label="任意金額"] {
                 unsafe_allow_html=True
             )
 
+            # 既存金額数値の抽出
+            init_custom_val = ""
+            if is_edit_mode and saved_amt:
+                num_m = re.search(r'\d+', saved_amt)
+                if num_m: init_custom_val = num_m.group(0)
+
             custom_amount = st.text_area(
                 "任意金額",
+                value=init_custom_val,
                 label_visibility="collapsed",
                 placeholder="Ex: 2000",
                 height=90,
@@ -470,7 +512,8 @@ textarea[aria-label="任意金額"] {
             custom_val = custom_amount.strip()
 
             st.write("")
-            custom_currency = st.radio("通貨", ["Baht", "円 / Yen"], horizontal=True, label_visibility="collapsed", key="custom_currency")
+            init_curr_idx = 1 if ("円" in saved_amt or "Yen" in saved_amt) else 0
+            custom_currency = st.radio("通貨", ["Baht", "円 / Yen"], index=init_curr_idx, horizontal=True, label_visibility="collapsed", key="custom_currency")
 
             clean_currency = "円" if "円" in custom_currency else "Baht"
 
@@ -492,12 +535,17 @@ textarea[aria-label="任意金額"] {
 
         st.write("")
         st.markdown("### วิธีชำระเงิน / 支払方法")
-        payment = st.radio("支払方法", ["QR", "Cash"], label_visibility="collapsed")
+        saved_pay = e_data.get("payment", "QR")
+        default_pay_idx = 1 if saved_pay == "Cash" else 0
+
+        payment = st.radio("支払方法", ["QR", "Cash"], index=default_pay_idx, label_visibility="collapsed")
 
     st.write("---")
     st.write("")
 
-    if st.button("完了 / เสร็จสิ้น", type="primary"):
+    btn_label = "更新完了 / 修正完了" if is_edit_mode else "完了 / เสร็จสิ้น"
+
+    if st.button(btn_label, type="primary"):
         if name.strip() == "":
             st.warning("กรุณากรอกชื่อ / お名前を入力してください。")
         elif is_amount_error:
@@ -522,7 +570,6 @@ textarea[aria-label="任意金額"] {
                 elif "ภาษาไทย" in language:
                     clean_lang = "Thai"
 
-                # 回数（Beginner count）の判定（「1年以上」を最優先で正しく判定）
                 clean_kai = "-"
                 if "มากกว่า" in kai_suu or "1年" in kai_suu:
                     clean_kai = "1year up"
@@ -533,7 +580,12 @@ textarea[aria-label="任意金額"] {
                 elif "ครั้งที่ 3" in kai_suu or "3回目" in kai_suu:
                     clean_kai = "3"
 
+                # 修正更新(update_record) と 新規登録(post) の切り替え
+                action_type = "update_record" if is_edit_mode else "post"
+
                 post_data = {
+                    "action": action_type,
+                    "ticketId": st.session_state.editing_ticket_id, # 修正時は元のID
                     "date": now,
                     "terminal": st.session_state.ipad_id,
                     "category": clean_cat,
@@ -552,9 +604,14 @@ textarea[aria-label="任意金額"] {
                     res_json = response.json()
 
                     if response.status_code == 200 and res_json.get("status") == "success":
-                        ticket_id = res_json.get("ticketId", "A-1")
+                        ticket_id = res_json.get("ticketId") or st.session_state.editing_ticket_id or "A-1"
                         st.session_state.ticket_id = ticket_id
                         st.session_state.completed_name = name.strip()
+                        
+                        # 編集状態のリセット
+                        st.session_state.editing_ticket_id = None
+                        st.session_state.edit_data = {}
+
                         st.session_state.step = "completed"
                         st.rerun()
                     else:
@@ -564,10 +621,10 @@ textarea[aria-label="任意金額"] {
 
 
 # =========================================================
-# 画面3：受付の取り消し・キャンセル画面
+# 画面3：受付の取り消し・修正画面 (Cancel ＆ Edit)
 # =========================================================
 elif st.session_state.step == "cancel_page":
-    st.markdown("<h1 style='text-align: center; font-size: 38px;'>Cancel Registration / 受付の取り消し</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 38px;'>Cancel / Edit Registration<br>受付の取り消し・修正</h1>", unsafe_allow_html=True)
 
     if st.button("← ย้อนกลับ / 戻る"):
         st.session_state.step = "select_category"
@@ -590,6 +647,16 @@ elif st.session_state.step == "cancel_page":
     if not records:
         st.info("There are no registration records for today.")
     else:
+        # カテゴリ文字列から日本語カテゴリへの変換マップ
+        reverse_cat_map = {
+            "KOJO": "向上", "向上": "向上",
+            "KOJOSOUDAN": "向上相談", "向上相談": "向上相談",
+            "Biginner": "初信", "Beginner": "初信", "初信": "初信",
+            "SODAN": "相談", "相談": "相談",
+            "TOKUBETU": "特別相談", "特別相談": "特別相談",
+            "KANTEI": "鑑定", "鑑定": "鑑定"
+        }
+
         for i, rec in enumerate(records):
             t_id = rec.get("ticketId") or f"NO_ID_{i}"
             name_str = rec.get("name", "Unknown")
@@ -597,7 +664,7 @@ elif st.session_state.step == "cancel_page":
             amt_str = rec.get("amount", "-")
             pay_str = rec.get("payment", "-")
 
-            c_info, c_btn = st.columns([3.5, 1.5])
+            c_info, c_edit_btn, c_del_btn = st.columns([3.0, 1.0, 1.0])
 
             with c_info:
                 st.markdown(
@@ -612,7 +679,17 @@ elif st.session_state.step == "cancel_page":
                     unsafe_allow_html=True,
                 )
 
-            with c_btn:
+            with c_edit_btn:
+                st.write("")
+                if st.button(f"✏️ Edit\n({t_id})", key=f"edit_{t_id}_{i}", use_container_width=True):
+                    # 選択したデータを編集用stateに保持して入力画面へ移動
+                    st.session_state.editing_ticket_id = t_id
+                    st.session_state.edit_data = rec
+                    st.session_state.selected_category = reverse_cat_map.get(cat_str, "向上")
+                    st.session_state.step = "input_details"
+                    st.rerun()
+
+            with c_del_btn:
                 st.write("")
                 if st.button(f"❌ Cancel\n({t_id})", key=f"del_{t_id}_{i}", use_container_width=True):
                     with st.spinner("กำลังยกเลิก... / 取り消し処理中..."):
@@ -641,7 +718,6 @@ elif st.session_state.step == "summary":
 
     today_str = datetime.now().strftime("%Y-%m-%d")
 
-    # スプレッドシートの行拡張（Yen追加）に対応したデータ定義
     rows_def = [
         ("โคโจเซสชิน\n向上", 50, "Baht", "kojo_50"),
         ("", 100, "Baht", "kojo_100"),
@@ -701,7 +777,6 @@ elif st.session_state.step == "summary":
             qr_person_style = "background-color: #555555;"
             qr_amount_style = "background-color: #555555;"
 
-        # セル結合(rowspan)の判定処理
         cat_td = ""
         if cat_label in ["โคโจเซสชิน\n向上", "Beginner\n初信"]:
             cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
@@ -766,10 +841,8 @@ elif st.session_state.step == "summary":
     st.write("")
     st.write("---")
 
-    # CASH ONLY エリア
     st.markdown("### CASH ONLY（Count the cash in the safe and enter the amount.）")
 
-    # 手入力エリアのCSS（＋/－ボタン補正 & 1000 Yen 専用水色スタイル）
     st.markdown(
         """
 <style>
@@ -812,11 +885,10 @@ div[data-testid="stNumberInput"] button {
     cursor: pointer !important;
 }
 
-/* 1000 Yen (st-key-n_1000y) 専用の水色＆濃い青文字デザイン */
 div.st-key-n_1000y input {
-    background-color: #e0f2fe !important; /* 水色 */
-    color: #0369a1 !important;            /* 濃い青文字 */
-    border: 2px solid #0284c7 !important; /* 青枠線 */
+    background-color: #e0f2fe !important;
+    color: #0369a1 !important;
+    border: 2px solid #0284c7 !important;
 }
 div.st-key-n_1000y button {
     background-color: #bae6fd !important;
@@ -829,7 +901,6 @@ div.st-key-n_1000y button {
         unsafe_allow_html=True,
     )
 
-    # ペン入力スクリブル等で誤入力された場合の自動サニタイズ（クリア）関数
     def clean_number_input(input_key):
         val = st.session_state.get(input_key)
         if val is None:
