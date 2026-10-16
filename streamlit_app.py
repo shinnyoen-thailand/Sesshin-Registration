@@ -84,7 +84,7 @@ if not bg_bin:
 
 bg_css = f'url("data:image/jpeg;base64,{bg_bin}")' if bg_bin else '#f0f7ff'
 
-# 全画面共通ベース設定（背景写真＋透けた白色カード＋すりガラス効果）
+# 全画面共通ベース設定（背景写真＋透けた白色カード＋カエルのローディングアニメーション）
 st.markdown(
     f"""
 <style>
@@ -131,14 +131,14 @@ st.markdown(
     line-height: 1.2 !important;
 }}
 
-/* 送信中・処理中ローディング */
+/* 🐸 送信中・処理中カエルのローディング画面 🐸 */
 [data-testid="stSpinner"] {{
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
-    background-color: rgba(15, 23, 42, 0.65) !important;
+    background-color: rgba(15, 23, 42, 0.70) !important;
     z-index: 999999 !important;
     display: flex !important;
     align-items: center !important;
@@ -146,13 +146,29 @@ st.markdown(
 }}
 [data-testid="stSpinner"] > div {{
     background-color: #ffffff !important;
-    padding: 35px 55px !important;
-    border-radius: 20px !important;
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.3) !important;
-    border: 4px solid #3b82f6 !important;
+    padding: 35px 60px !important;
+    border-radius: 28px !important;
+    box-shadow: 0px 12px 35px rgba(0,0,0,0.35) !important;
+    border: 5px solid #4ade80 !important;
+    text-align: center !important;
 }}
+
+/* カエルが跳ねるアニメーション */
+[data-testid="stSpinner"] > div::before {{
+    content: "🐸" !important;
+    font-size: 85px !important;
+    display: block !important;
+    margin: 0 auto 10px auto !important;
+    animation: frogJump 0.45s infinite alternate ease-in-out !important;
+}}
+
+@keyframes frogJump {{
+    0% {{ transform: translateY(0) scale(1.05, 0.95); }}
+    100% {{ transform: translateY(-35px) scale(0.95, 1.05); }}
+}}
+
 [data-testid="stSpinner"] * {{
-    font-size: 30px !important;
+    font-size: 28px !important;
     font-weight: 900 !important;
     color: #0f172a !important;
 }}
@@ -465,7 +481,7 @@ textarea[aria-label="任意金額"] {
     st.write("---")
     st.write("")
 
-    if st.button("完了 /เสร็จสิ้น", type="primary"):
+    if st.button("完了 / เสร็จสิ้น", type="primary"):
         if name.strip() == "":
             st.warning("กรุณากรอกชื่อ / お名前を入力してください。")
         elif is_amount_error:
