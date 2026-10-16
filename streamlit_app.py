@@ -543,7 +543,7 @@ textarea[aria-label="任意金額"] {
     st.write("---")
     st.write("")
 
-    btn_label = "更新完了 / 修正完了" if is_edit_mode else "完了 / เสร็จสิ้น"
+    btn_label = "Updated" if is_edit_mode else "เสร็จสิ้น / 完了"
 
     if st.button(btn_label, type="primary"):
         if name.strip() == "":
