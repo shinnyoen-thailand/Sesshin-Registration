@@ -6,7 +6,7 @@ import requests
 import streamlit as st
 
 # ★ご自身のGASのウェブアプリURLに書き換えてください★
-GAS_URL = "https://script.google.com/macros/s/AKfycbyXyNGukvbiGIGm3xACg08zW5eMzcNFcU8LROWmCVQUEd2QZ3J_eVDrofQO-7fyeYl3/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbw_nyTh3A-IuatIC2JzYX18RdCq6xiPQUDPQqOFfczQzaHinLSHr6YjC9bV-kZPknfj/exec"
 
 # =========================================================
 # 端末識別子 (ipad=A / ipad=B) の確実な取得と保持処理
@@ -641,6 +641,7 @@ elif st.session_state.step == "summary":
 
     today_str = datetime.now().strftime("%Y-%m-%d")
 
+    # スプレッドシートの行拡張（Yen追加）に対応したデータ定義
     rows_def = [
         ("โคโจเซสชิน\n向上", 50, "Baht", "kojo_50"),
         ("", 100, "Baht", "kojo_100"),
@@ -653,9 +654,13 @@ elif st.session_state.step == "summary":
         ("", 250, "Baht", "shoshin_250"),
         ("", 1000, "Yen", "shoshin_1000y"),
         ("โคโจโซดันเซสชิน 向上相談", 200, "Baht", "kojosodan_200"),
+        ("", 2000, "Yen", "kojosodan_2000y"),
         ("เซสชินปรึกษา 相談", 300, "Baht", "sodan_300"),
+        ("", 3000, "Yen", "sodan_3000y"),
         ("เซสชินปรึกษาพิเศษ 特別相談", 600, "Baht", "tokubetsu_600"),
+        ("", 6000, "Yen", "tokubetsu_6000y"),
         ("เซสชินเพื่อการตัดสินใจ 鑑定", 800, "Baht", "kantei_800"),
+        ("", 8000, "Yen", "kantei_8000y"),
     ]
 
     summary_data = {}
@@ -696,13 +701,14 @@ elif st.session_state.step == "summary":
             qr_person_style = "background-color: #555555;"
             qr_amount_style = "background-color: #555555;"
 
+        # セル結合(rowspan)の判定処理
         cat_td = ""
-        if cat_label == "โคโจเซสชิน\n向上":
+        if cat_label in ["โคโจเซสชิน\n向上", "Beginner\n初信"]:
             cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
-        elif cat_label == "Beginner\n初信":
-            cat_td = f'<td rowspan="5" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line;">{cat_label}</td>'
-        elif cat_label != "":
-            cat_td = f'<td style="border: 1px solid #000; font-weight: bold; text-align: left; padding-left: 10px;">{cat_label}</td>'
+        elif cat_label in ["โคโจโซดันเซสชิน 向上相談", "เซสชินปรึกษา 相談", "เซสชินปรึกษาพิเศษ 特別相談", "เซสชินเพื่อการตัดสินใจ 鑑定"]:
+            cat_td = f'<td rowspan="2" style="border: 1px solid #000; font-weight: bold; vertical-align: middle; white-space: pre-line; text-align: center;">{cat_label}</td>'
+        elif cat_label == "":
+            cat_td = ""
 
         c_amt_str = f"{c_amount:,}" if c_amount > 0 else ""
         q_amt_str = f"{q_amount:,}" if q_amount > 0 and curr != "Yen" else ""
