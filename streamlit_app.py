@@ -456,10 +456,14 @@ textarea[aria-label="任意金額"] {
                     clean_lang = "Thai"
 
                 clean_kai = "-"
-                if "1" in kai_suu: clean_kai = "1"
-                elif "2" in kai_suu: clean_kai = "2"
-                elif "3" in kai_suu: clean_kai = "3"
-                elif "มากกว่า" in kai_suu or "1年" in kai_suu: clean_kai = "1year up"
+                if "มากกว่า" in kai_suu or "1年" in kai_suu:
+                    clean_kai = "1year up"
+                elif "ครั้งที่ 1" in kai_suu or "1回目" in kai_suu:
+                    clean_kai = "1"
+                elif "ครั้งที่ 2" in kai_suu or "2回目" in kai_suu:
+                    clean_kai = "2"
+                elif "ครั้งที่ 3" in kai_suu or "3回目" in kai_suu:
+                    clean_kai = "3"
 
                 post_data = {
                     "date": now,
